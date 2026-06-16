@@ -66,6 +66,11 @@
             $role = $user->hasRole('super-admin') ? 'super-admin' : 'field-officer';
             $items = [
                 ['route' => 'admin.dashboard', 'label' => 'Dashboard', 'icon' => 'layout-dashboard'],
+            ];
+            if ($user->hasRole('field-officer')) {
+                $items[] = ['route' => 'kyc.onboarding', 'label' => 'KYC Profile', 'icon' => 'file-check-2'];
+            }
+            $items = array_merge($items, [
                 ['route' => 'admin.atex.users.index', 'label' => 'Users', 'icon' => 'users'],
                 ['route' => 'admin.kyc.index', 'label' => 'KYC Verification', 'icon' => 'file-check-2'],
                 ['route' => 'admin.products.index', 'label' => 'Products', 'icon' => 'box'],
@@ -76,12 +81,13 @@
                 ['route' => 'admin.fulfillment.index', 'label' => 'Fulfillment', 'icon' => 'package'],
                 ['route' => 'admin.settlements.index', 'label' => 'Settlements', 'icon' => 'wallet'],
                 ['route' => 'admin.audit.index', 'label' => 'Audit Logs', 'icon' => 'clipboard-list'],
-            ];
+            ]);
         } elseif ($user->hasRole('exporter')) {
             $role = 'exporter';
             $items = [
                 ['route' => 'admin.dashboard', 'label' => 'Dashboard', 'icon' => 'layout-dashboard'],
                 ['route' => 'admin.profile.show', 'label' => 'My Profile', 'icon' => 'user'],
+                ['route' => 'kyc.onboarding', 'label' => 'KYC Profile', 'icon' => 'file-check-2'],
                 ['route' => 'admin.products.index', 'label' => 'My Products', 'icon' => 'box'],
                 ['route' => 'admin.documents.index', 'label' => 'My Documents', 'icon' => 'file-text'],
                 ['route' => 'admin.quotes.index', 'label' => 'My RFQs', 'icon' => 'message-square'],
@@ -92,6 +98,7 @@
             $items = [
                 ['route' => 'admin.dashboard', 'label' => 'Dashboard', 'icon' => 'layout-dashboard'],
                 ['route' => 'admin.profile.show', 'label' => 'My Profile', 'icon' => 'user'],
+                ['route' => 'kyc.onboarding', 'label' => 'KYC Profile', 'icon' => 'file-check-2'],
                 ['route' => 'admin.orders.index', 'label' => 'Assigned Shipments', 'icon' => 'truck'],
             ];
         }

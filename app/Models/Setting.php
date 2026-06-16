@@ -51,14 +51,16 @@ class Setting extends Model
         
         if ($emailSettings->isEmpty()) return;
 
+        $mailer = $emailSettings['mail_mailer'] ?? config('mail.default', 'smtp');
+
         config([
-            'mail.default' => 'smtp',
-            'mail.mailers.smtp.transport' => 'smtp',
-            'mail.mailers.smtp.host' => $emailSettings['mail_host'] ?? config('mail.mailers.smtp.host'),
-            'mail.mailers.smtp.port' => $emailSettings['mail_port'] ?? config('mail.mailers.smtp.port'),
-            'mail.mailers.smtp.encryption' => $emailSettings['mail_encryption'] ?? config('mail.mailers.smtp.encryption'),
-            'mail.mailers.smtp.username' => $emailSettings['mail_username'] ?? config('mail.mailers.smtp.username'),
-            'mail.mailers.smtp.password' => $emailSettings['mail_password'] ?? config('mail.mailers.smtp.password'),
+            'mail.default' => $mailer,
+            "mail.mailers.{$mailer}.transport" => $mailer,
+            "mail.mailers.{$mailer}.host" => $emailSettings['mail_host'] ?? config("mail.mailers.{$mailer}.host"),
+            "mail.mailers.{$mailer}.port" => $emailSettings['mail_port'] ?? config("mail.mailers.{$mailer}.port"),
+            "mail.mailers.{$mailer}.encryption" => $emailSettings['mail_encryption'] ?? config("mail.mailers.{$mailer}.encryption"),
+            "mail.mailers.{$mailer}.username" => $emailSettings['mail_username'] ?? config("mail.mailers.{$mailer}.username"),
+            "mail.mailers.{$mailer}.password" => $emailSettings['mail_password'] ?? config("mail.mailers.{$mailer}.password"),
             'mail.from.address' => $emailSettings['mail_from_address'] ?? config('mail.from.address'),
             'mail.from.name' => $emailSettings['mail_from_name'] ?? config('mail.from.name'),
         ]);

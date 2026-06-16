@@ -13,6 +13,8 @@ class ExporterProfile extends Model
         'business_name',
         'registration_number',
         'tax_number',
+        'bvn',
+        'nin',
         'business_type',
         'lga',
         'address',
@@ -22,11 +24,18 @@ class ExporterProfile extends Model
         'verification_status',
         'readiness_score',
         'approved_at',
+        'bank_name',
+        'account_number',
+        'account_name',
+        'trade_capacity',
+        'rejection_reason',
+        'regulatory_reviews',
     ];
 
     protected $casts = [
         'approved_at' => 'datetime',
         'readiness_score' => 'integer',
+        'regulatory_reviews' => 'array',
     ];
 
     public function user(): BelongsTo

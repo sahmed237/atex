@@ -28,13 +28,21 @@
             <strong>{{ $profile['organization'] }}</strong><br>
             <small class="muted">{{ $profile['name'] }} ({{ $profile['email'] }})</small>
           </td>
-          <td style="padding: 12px 5px;">{{ ucfirst($profile['profile_type']) }}</td>
           <td style="padding: 12px 5px;">
-            {{ $profile['profile_category'] }}<br>
-            <small class="muted">{{ $profile['location'] }}</small>
+            {{ $profile['profile_type_label'] ?? ucfirst($profile['profile_type']) }}<br>
+            <small class="muted">RC: {{ $profile['rc_number'] }}</small>
           </td>
           <td style="padding: 12px 5px;">
-            <span class="status {{ $profile['verification_status'] }}">{{ $profile['verification_status'] }}</span>
+            <div style="margin-bottom: 4px;">BVN: <strong>{{ $profile['bvn'] }}</strong></div>
+            <div>NIN: <strong>{{ $profile['nin'] }}</strong></div>
+          </td>
+          <td style="padding: 12px 5px;">
+            <span class="status {{ $profile['verification_status'] }}">{{ $profile['verification_status'] }}</span><br>
+            <div style="margin-top: 5px; font-size: 0.8rem;">
+              @foreach($profile['documents'] as $doc)
+                <a href="{{ asset('storage/' . $doc->path) }}" target="_blank" style="display: block; color: var(--primary);">📄 {{ $doc->title }}</a>
+              @endforeach
+            </div>
           </td>
           <td style="padding: 12px 5px;">
             <span class="status {{ $profile['account_status'] }}">{{ $profile['account_status'] }}</span>
@@ -44,6 +52,8 @@
               @csrf
               <input type="hidden" name="profile_type" value="{{ $profile['profile_type'] }}">
               <input type="hidden" name="profile_id" value="{{ $profile['id'] }}">
+              
+              <a href="{{ route('admin.kyc.show', ['type' => $profile['profile_type'], 'id' => $profile['id']]) }}" class="btn secondary" style="min-height: 32px; padding: 0 10px; font-size: 0.85rem; font-weight: normal; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center;">View Details</a>
               
               @if($profile['verification_status'] !== 'approved')
                 <button type="submit" name="status" value="approved" class="btn primary" style="min-height: 32px; padding: 0 10px; font-size: 0.85rem; font-weight: normal; border: 0; cursor: pointer;">Verify</button>

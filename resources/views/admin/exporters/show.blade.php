@@ -11,6 +11,17 @@
             <i data-lucide="arrow-left" class="w-5 h-5 mr-2"></i>
             Back to List
         </a>
+        
+        @if(!$exporter->email_verified_at)
+            <form action="{{ route('admin.exporters.verify-email', $exporter->id) }}" method="POST" class="inline">
+                @csrf
+                <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-xl font-medium flex items-center hover:bg-emerald-700 transition-colors">
+                    <i data-lucide="check-circle" class="w-5 h-5 mr-2"></i>
+                    Verify Email
+                </button>
+            </form>
+        @endif
+
         <a href="{{ route('admin.exporters.edit', $exporter->id) }}" class="px-4 py-2 bg-primary-600 text-white rounded-xl font-medium flex items-center hover:bg-primary-700 transition-colors">
             <i data-lucide="edit-3" class="w-5 h-5 mr-2"></i>
             Edit Profile

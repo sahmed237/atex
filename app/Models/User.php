@@ -34,6 +34,14 @@ class User extends Authenticatable implements MustVerifyEmail
         'is_active',
         'email_verified_at',
         'locked_until',
+        'bvn',
+        'nin',
+        'bank_name',
+        'account_number',
+        'account_name',
+        'kyc_verification_status',
+        'kyc_submitted_at',
+        'kyc_approved_at',
     ];
 
     /**
@@ -62,6 +70,8 @@ class User extends Authenticatable implements MustVerifyEmail
             'require_password_change' => 'boolean',
             'is_active' => 'boolean',
             'locked_until' => 'datetime',
+            'kyc_submitted_at' => 'datetime',
+            'kyc_approved_at' => 'datetime',
         ];
     }
     /**
@@ -131,5 +141,27 @@ class User extends Authenticatable implements MustVerifyEmail
     public function logisticsProfile()
     {
         return $this->hasOne(LogisticsProfile::class);
+    }
+
+    public function fieldOfficerProfile()
+    {
+        return $this->hasOne(FieldOfficerProfile::class);
+    }
+
+    public function kycProfile()
+    {
+        if ($this->hasRole('exporter')) {
+            return $this->exporterProfile();
+        }
+        if ($this->hasRole('buyer')) {
+            return $this->buyerProfile();
+        }
+        if ($this->hasRole('logistics')) {
+            return $this->logisticsProfile();
+        }
+        if ($this->hasRole('field-officer')) {
+            return $this->fieldOfficerProfile();
+        }
+        return null;
     }
 }

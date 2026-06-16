@@ -58,6 +58,17 @@
                 <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i>
                 Back to Login
             </a>
+
+            @if(app()->environment('local'))
+                <form action="{{ route('verification.bypass') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="email" value="{{ $email }}">
+                    <button type="submit" class="w-full px-8 py-4 bg-emerald-600 text-white rounded-2xl font-bold text-sm shadow-xl shadow-emerald-200 hover:bg-emerald-700 hover:-translate-y-1 transition-all flex items-center justify-center mt-4">
+                        <i data-lucide="check-circle" class="w-4 h-4 mr-2"></i>
+                        Auto-Approve Verification (Local Dev)
+                    </button>
+                </form>
+            @endif
         </div>
 
         <p class="mt-8 text-[11px] text-slate-400 font-medium">

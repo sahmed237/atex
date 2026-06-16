@@ -4,48 +4,34 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class BuyerProfile extends Model
+class FieldOfficerProfile extends Model
 {
     protected $fillable = [
         'user_id',
-        'company_name',
-        'registration_number',
-        'tax_number',
+        'full_name',
+        'phone',
+        'address',
         'bvn',
         'nin',
-        'address',
-        'buyer_type',
-        'country',
-        'verification_status',
-        'readiness_score',
-        'approved_at',
         'bank_name',
         'account_number',
         'account_name',
-        'trade_capacity',
+        'identification_number',
+        'verification_status',
+        'approved_at',
         'rejection_reason',
         'regulatory_reviews',
     ];
 
     protected $casts = [
+        'approved_at' => 'datetime',
         'regulatory_reviews' => 'array',
     ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function quoteRequests(): HasMany
-    {
-        return $this->hasMany(QuoteRequest::class);
-    }
-
-    public function orders(): HasMany
-    {
-        return $this->hasMany(Order::class);
     }
 
     public function documents()

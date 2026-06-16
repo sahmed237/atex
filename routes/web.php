@@ -45,6 +45,7 @@ Route::post('/reset-password', [ForgotPasswordController::class, 'reset'])->name
 Route::match(['get', 'post'], '/verify-email/{id}/{hash}', [UserController::class, 'verifyEmailLink'])->name('verification.verify');
 Route::get('/verify-email/notice', [UserController::class, 'showVerificationNotice'])->name('verification.notice');
 Route::post('/verify-email/resend', [UserController::class, 'resendVerification'])->name('verification.resend');
+Route::post('/verify-email/bypass', [UserController::class, 'verifyEmailBypass'])->name('verification.bypass');
 
 // Two-Factor Authentication Challenge
 Route::get('/2fa-challenge', [LoginController::class, 'showChallenge'])->name('2fa.challenge');
@@ -118,7 +119,11 @@ Route::middleware(['auth', 'verified', 'security_policy', 'kyc_completed'])->gro
     Route::post('/atex/users/status', [\App\Http\Controllers\Admin\UserController::class, 'status'])->name('admin.atex.users.status');
 
     Route::get('/kyc', [\App\Http\Controllers\Admin\KycController::class, 'index'])->name('admin.kyc.index');
+    Route::get('/kyc/{type}/{id}', [\App\Http\Controllers\Admin\KycController::class, 'show'])->name('admin.kyc.show');
     Route::post('/kyc/review', [\App\Http\Controllers\Admin\KycController::class, 'review'])->name('admin.kyc.review');
+    Route::post('/kyc/document/{id}/review', [\App\Http\Controllers\Admin\KycController::class, 'reviewDocument'])->name('admin.kyc.document.review');
+    Route::post('/kyc/documents/review-all', [\App\Http\Controllers\Admin\KycController::class, 'reviewAllDocuments'])->name('admin.kyc.document.review-all');
+    Route::post('/kyc/review-regulatory', [\App\Http\Controllers\Admin\KycController::class, 'reviewRegulatory'])->name('admin.kyc.review-regulatory');
 
     // Placeholders for missing prototype views
         Route::get('exporters/trashed', [\App\Http\Controllers\Admin\ExporterController::class, 'trashed'])->name('admin.exporters.trashed');

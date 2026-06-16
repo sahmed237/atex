@@ -271,6 +271,23 @@ class UserController extends Controller
         return response()->json(['message' => 'Email verified successfully!']);
     }
 
+    /**
+     * Bypass email verification for local development
+     */
+    public function verifyEmailBypass(Request $request)
+    {
+        if (app()->environment('local')) {
+            $request->validate(['email' => 'required|email']);
+            $user = User::where('email', $request->email)->first();
+            if ($user && !$user->hasVerifiedEmail()) {
+                $user->markEmailAsVerified();
+                \App\Models\AuthenticationLog::log($user, 'email_verified', ['via' => 'local_bypass']);
+                return redirect()->route('dashboard')->with('success', 'Email auto-verified for local development.');
+            }
+        }
+        return redirect()->route('login');
+    }
+
     public function edit(User $user)
     {
         $roles = Role::whereNotIn('name', ['super-admin', 'exporter', 'buyer', 'logistics'])->get();

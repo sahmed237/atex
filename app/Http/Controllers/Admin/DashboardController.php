@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\ExporterProfile;
 use App\Models\BuyerProfile;
 use App\Models\LogisticsProfile;
+use App\Models\FieldOfficerProfile;
 use App\Models\Product;
 use App\Models\Document;
 use App\Models\QuoteRequest;
@@ -28,7 +29,9 @@ class DashboardController extends Controller
             'exporters' => ExporterProfile::count(),
             'buyers' => BuyerProfile::count(),
             'pending_kyc' => ExporterProfile::whereIn('verification_status', ['pending', 'submitted'])->count()
-                + BuyerProfile::whereIn('verification_status', ['pending', 'submitted'])->count(),
+                + BuyerProfile::whereIn('verification_status', ['pending', 'submitted'])->count()
+                + LogisticsProfile::whereIn('verification_status', ['pending', 'submitted'])->count()
+                + FieldOfficerProfile::whereIn('verification_status', ['pending', 'submitted'])->count(),
             'products' => Product::count(),
             'pending_documents' => Document::where('status', 'pending')->count(),
             'open_quotes' => QuoteRequest::where('status', 'open')->count(),
