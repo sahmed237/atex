@@ -33,8 +33,8 @@
             <small class="muted">RC: {{ $profile['rc_number'] }}</small>
           </td>
           <td style="padding: 12px 5px;">
-            <div style="margin-bottom: 4px;">BVN: <strong>{{ $profile['bvn'] }}</strong></div>
-            <div>NIN: <strong>{{ $profile['nin'] }}</strong></div>
+            <div style="margin-bottom: 4px;">{{ $profile['profile_category'] ?? $profile['profile_type_label'] }}</div>
+            <small class="muted">{{ $profile['location'] ?? 'N/A' }}</small>
           </td>
           <td style="padding: 12px 5px;">
             <span class="status {{ $profile['verification_status'] }}">{{ $profile['verification_status'] }}</span><br>

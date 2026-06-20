@@ -18,6 +18,8 @@ class BuyerProfile extends Model
         'state',
         'zip_code',
         'country',
+        'verification_status',
+        'approved_at',
     ];
 
     public function user(): BelongsTo
@@ -34,6 +36,10 @@ class BuyerProfile extends Model
     {
         return $this->hasMany(Order::class);
     }
+
+    protected $casts = [
+        'approved_at' => 'datetime',
+    ];
 
     public function documents()
     {

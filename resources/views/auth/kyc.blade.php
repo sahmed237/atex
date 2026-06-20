@@ -170,23 +170,18 @@
       $isExisting = (bool) $profile;
     @endphp
 
-    @if(!$user->hasRole('buyer'))
-      @if($isPending)
+    @if($isPending)
       <div class="pending-state">
         <i data-lucide="clock" class="pending-icon"></i>
         <h1 style="font-size: 1.25rem;">Under Review</h1>
         <p>Your application is being reviewed. We'll notify you once approved.</p>
       </div>
-    @endif
-
-    @if($isApproved)
+    @elseif($isApproved)
       <div class="alert alert-success text-center">
         <i data-lucide="check-circle" style="width: 20px; height: 20px; display: block; margin: 0 auto 0.25rem;"></i>
         KYC Approved
       </div>
-    @endif
-
-    @if($isRejected)
+    @elseif($isRejected)
       <div class="alert alert-error">
         <strong>KYC Rejected</strong>
         @if($profile->rejection_reason)
@@ -230,12 +225,11 @@
       @endif
     @endif
 
-    @endif
-
     @if(session('success'))
       <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
+    @unless($isPending)
     <form method="POST" action="{{ route('kyc.onboarding.store') }}" enctype="multipart/form-data">
       @csrf
 
@@ -526,6 +520,7 @@
 
       <button type="submit" class="btn-submit">{{ $isExisting ? 'Resubmit' : 'Submit' }}</button>
     </form>
+    @endunless
 
     @if(!$isExisting)
       <form method="POST" action="{{ route('logout') }}">

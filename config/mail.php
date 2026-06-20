@@ -49,6 +49,18 @@ return [
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
 
+        'smtp_kyc' => [
+            'transport' => 'smtp',
+            'scheme' => env('MAIL_KYC_SCHEME'),
+            'host' => env('MAIL_KYC_HOST', env('MAIL_HOST', '127.0.0.1')),
+            'port' => env('MAIL_KYC_PORT', env('MAIL_PORT', 465)),
+            'username' => env('MAIL_KYC_USERNAME'),
+            'password' => env('MAIL_KYC_PASSWORD'),
+            'encryption' => env('MAIL_KYC_ENCRYPTION', env('MAIL_ENCRYPTION', 'ssl')),
+            'timeout' => null,
+            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+        ],
+
         'ses' => [
             'transport' => 'ses',
         ],

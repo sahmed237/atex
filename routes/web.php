@@ -24,7 +24,7 @@ Route::get('/dashboard', function () {
     } elseif ($user->hasRole('seller')) {
         return redirect()->route('seller.dashboard');
     } elseif ($user->hasRole('buyer')) {
-        return redirect()->route('buyer.dashboard');
+        return redirect()->route('buyer.products.index');
     } elseif ($user->hasRole('logistics')) {
         return redirect()->route('logistics.dashboard');
     }
@@ -63,12 +63,18 @@ Route::middleware('auth')->group(function () {
     Route::post('/legal-acceptance', [\App\Http\Controllers\LegalAcceptanceController::class, 'store'])->name('legal-acceptance.store');
 });
 
+Route::get('/api/world/states/{countryCode}', function (string $countryCode) {
+    return \Imujas9\World\Facades\State::where('country_code', strtoupper($countryCode))->get(['name', 'code']);
+})->name('api.world.states');
+
 Route::middleware(['auth', 'verified', 'security_policy', 'legal_acceptance'])->group(function () {
     Route::get('/kyc/onboarding', [\App\Http\Controllers\Auth\KycOnboardingController::class, 'show'])->name('kyc.onboarding');
     Route::post('/kyc/onboarding', [\App\Http\Controllers\Auth\KycOnboardingController::class, 'store'])->name('kyc.onboarding.store');
 
     Route::get('/become-a-seller', [\App\Http\Controllers\SellerOnboardingController::class, 'show'])->name('seller.onboarding');
     Route::post('/become-a-seller', [\App\Http\Controllers\SellerOnboardingController::class, 'store'])->name('seller.onboarding.store');
+    Route::get('/become-a-seller/upgrade', [\App\Http\Controllers\SellerOnboardingController::class, 'showUpgrade'])->name('seller.onboarding.upgrade');
+    Route::post('/become-a-seller/upgrade', [\App\Http\Controllers\SellerOnboardingController::class, 'storeUpgrade'])->name('seller.onboarding.upgrade.store');
 });
 
 Route::middleware(['auth', 'verified', 'security_policy', 'kyc_completed', 'legal_acceptance'])->group(function () {
@@ -78,6 +84,8 @@ Route::middleware(['auth', 'verified', 'security_policy', 'kyc_completed', 'lega
 
     Route::prefix('buyer')->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'buyerDashboard'])->name('buyer.dashboard');
+        Route::get('/products', [\App\Http\Controllers\Buyer\ProductController::class, 'index'])->name('buyer.products.index');
+        Route::get('/products/{id}', [\App\Http\Controllers\Buyer\ProductController::class, 'show'])->name('buyer.products.show');
         
         // Profile Settings
         Route::get('/profile', [\App\Http\Controllers\Buyer\ProfileController::class, 'show'])->name('buyer.profile.show');
@@ -174,6 +182,7 @@ Route::middleware(['auth', 'verified', 'security_policy', 'kyc_completed', 'lega
             Route::get('{id}/auth-logs', 'authLogs')->name('auth-logs');
             Route::post('{id}/send-email', 'sendCustomEmail')->name('send-custom-email');
             Route::post('{id}/unlock', 'unlock')->name('unlock');
+            Route::post('{id}/become-seller', 'becomeSeller')->name('become-seller');
         });
     Route::resource('buyers', \App\Http\Controllers\Admin\BuyerController::class)->names('admin.buyers')->except(['create', 'store']);
         Route::get('logistics/trashed', [\App\Http\Controllers\Admin\LogisticsController::class, 'trashed'])->name('admin.logistics.trashed');

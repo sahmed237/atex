@@ -64,6 +64,17 @@ class Setting extends Model
             'mail.from.address' => $emailSettings['mail_from_address'] ?? config('mail.from.address'),
             'mail.from.name' => $emailSettings['mail_from_name'] ?? config('mail.from.name'),
         ]);
+
+        // Configure KYC mailer
+        if (isset($emailSettings['mail_kyc_username'])) {
+            config([
+                "mail.mailers.smtp_kyc.host" => $emailSettings['mail_host'] ?? config("mail.mailers.smtp_kyc.host"),
+                "mail.mailers.smtp_kyc.port" => $emailSettings['mail_port'] ?? config("mail.mailers.smtp_kyc.port"),
+                "mail.mailers.smtp_kyc.encryption" => $emailSettings['mail_encryption'] ?? config("mail.mailers.smtp_kyc.encryption"),
+                "mail.mailers.smtp_kyc.username" => $emailSettings['mail_kyc_username'],
+                "mail.mailers.smtp_kyc.password" => $emailSettings['mail_kyc_password'],
+            ]);
+        }
     }
 
     /**

@@ -11,6 +11,8 @@ class SellerProfile extends Model
     protected $fillable = [
         'user_id',
         'business_name',
+        'business_description',
+        'business_category',
         'registration_number',
         'tax_number',
         'bvn',
@@ -22,14 +24,21 @@ class SellerProfile extends Model
         'seller_brand_name',
         'fulfillment_model',
         'verification_status',
+        'seller_tier',
         'readiness_score',
         'approved_at',
         'bank_name',
         'account_number',
         'account_name',
         'trade_capacity',
+        'years_of_experience',
+        'export_markets',
         'rejection_reason',
         'regulatory_reviews',
+        'country',
+        'state',
+        'city',
+        'phone',
     ];
 
     protected $casts = [

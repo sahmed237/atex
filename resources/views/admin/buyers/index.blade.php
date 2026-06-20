@@ -329,6 +329,14 @@
                                 @endif
                                 @endcan
                                 
+                                <form action="{{ route('admin.buyers.become-seller', $buyer->id) }}" method="POST" class="contents" onsubmit="return confirm('Promote {{ $buyer->name }} to Seller? This will change their role from Buyer to Seller.')">
+                                    @csrf
+                                    <button class="w-full flex items-center px-4 py-2.5 text-sm text-emerald-600 hover:bg-emerald-50 transition-colors">
+                                        <i data-lucide="trending-up" class="w-4 h-4 mr-3 text-emerald-400"></i>
+                                        Become a Seller
+                                    </button>
+                                </form>
+
                                 @can('users edit')
                                 <a href="{{ route('admin.buyers.edit', $buyer->id) }}" class="flex items-center px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 transition-colors">
                                     <i data-lucide="shield-check" class="w-4 h-4 mr-3 text-slate-400"></i>

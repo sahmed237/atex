@@ -1,6 +1,18 @@
 @extends('layouts.admin')
 
 @section('content')
+@if(isset($profile) && $profile->seller_tier === 'local')
+<div class="bg-gradient-to-r from-[#1a2a3a] to-[#0f1a26] rounded-2xl p-6 mb-6 flex items-center justify-between">
+    <div>
+        <h2 class="text-lg font-bold text-white">Upgrade to Export Seller</h2>
+        <p class="text-sm text-white/60 mt-1">Reach international buyers and grow your export business.</p>
+    </div>
+    <a href="{{ route('seller.onboarding.upgrade') }}" class="text-sm font-semibold px-6 py-2.5 rounded-lg border shrink-0 text-white bg-[#ffd814] border-[#fcd200] hover:bg-[#f7ca00]" style="color: #fff !important;">
+        Upgrade Now
+    </a>
+</div>
+@endif
+
 <div class="mb-8">
     <h1 class="text-2xl font-bold text-slate-800">Welcome Back, {{ $user->name }}</h1>
     <p class="text-slate-500 text-sm">Here's your seller overview for today.</p>

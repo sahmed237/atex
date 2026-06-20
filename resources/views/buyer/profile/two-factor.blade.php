@@ -1,18 +1,15 @@
-@extends('layouts.admin')
-
-@section('title', 'Two-Factor Authentication')
+@extends('layouts.buyer')
 
 @section('content')
-<div class="p-6">
-    <div class="max-w-4xl mx-auto">
-        <div class="mb-6 flex items-center justify-between">
-            <div>
-                <h1 class="text-2xl font-bold text-slate-800">Two-Factor Authentication (2FA)</h1>
-                <p class="text-slate-500 text-sm mt-1">Add an extra layer of security to your account using an authenticator app.</p>
-            </div>
-            <a href="{{ route('buyer.profile.show') }}" class="flex items-center text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">
-                <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i>
-                Back to Profile
+<div class="mb-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-bold text-[#0f1111]">Two-Factor Authentication (2FA)</h1>
+            <p class="text-sm text-[#565959] mt-1">Add an extra layer of security to your account using an authenticator app.</p>
+        </div>
+        <a href="{{ route('buyer.profile.show') }}" class="text-sm text-[#007185] hover:text-[#c7511f] hover:underline flex items-center gap-1">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            Back to Profile
             </a>
         </div>
 

@@ -32,10 +32,18 @@ class KycOnboardingController extends Controller
         $user = Auth::user();
 
         if ($user->hasRole('buyer')) {
-            BuyerProfile::updateOrCreate(
+            $profile = BuyerProfile::updateOrCreate(
                 ['user_id' => $user->id],
-                $request->only(['phone_number', 'gender', 'shipping_address', 'billing_address', 'city', 'state', 'zip_code', 'country'])
+                array_merge(
+                    $request->only(['phone_number', 'gender', 'shipping_address', 'billing_address', 'city', 'state', 'zip_code', 'country']),
+                    ['verification_status' => 'approved', 'approved_at' => now()]
+                )
             );
+
+            $user->kyc_verification_status = 'approved';
+            $user->kyc_approved_at = now();
+            $user->save();
+
             return redirect()->route('dashboard')->with('success', 'Profile completed successfully.');
         }
 
@@ -58,6 +66,7 @@ class KycOnboardingController extends Controller
         // Include text fields when submitted (new profile or existing correcting rejected fields)
         $textFields = [
             'registration_number', 'tax_number', 'bvn', 'nin', 'address',
+            'country', 'state',
             'bank_name', 'account_number', 'account_name',
         ];
         foreach ($textFields as $field) {

@@ -1,75 +1,161 @@
-@extends('layouts.atex')
-
-@section('title', 'Become a Seller')
+@extends('layouts.buyer')
 
 @section('content')
-<div class="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-    <div class="bg-white shadow sm:rounded-lg">
-        <div class="px-4 py-5 sm:p-6">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">
-                Become a Seller on Atex
-            </h3>
-            <div class="mt-2 max-w-xl text-sm text-gray-500">
-                <p>Register your business to start selling non-oil exports globally.</p>
-            </div>
-            <form class="mt-5 sm:flex sm:items-center" method="POST" action="{{ route('seller.onboarding.store') }}">
-                @csrf
-                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6 w-full">
-                    <div class="sm:col-span-6">
-                        <label for="business_name" class="block text-sm font-medium text-gray-700">Business Name</label>
-                        <div class="mt-1">
-                            <input type="text" name="business_name" id="business_name" value="{{ old('business_name') }}" class="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md" required>
-                        </div>
-                    </div>
-                    
-                    <div class="sm:col-span-3">
-                        <label for="business_type" class="block text-sm font-medium text-gray-700">Business Type</label>
-                        <div class="mt-1">
-                            <select id="business_type" name="business_type" class="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md">
-                                <option value="SME">SME</option>
-                                <option value="Cooperative">Cooperative</option>
-                                <option value="Enterprise">Enterprise</option>
-                            </select>
-                        </div>
-                    </div>
+<div class="max-w-3xl mx-auto" x-data="{
+    country: '{{ old('country', 'Nigeria') }}',
+    codes: @php
+        $codes = \Imujas9\World\Facades\Country::all()->mapWithKeys(fn($c) => [$c->name => $c->code]);
+    @endphp {{ $codes->toJson() }},
+    states: [],
+    async loadStates() {
+        const code = this.codes[this.country];
+        if (!code) { this.states = []; return; }
+        const r = await fetch('/api/world/states/' + code);
+        this.states = await r.json();
+    }
+}" x-init="loadStates()">
+    <div class="mb-6">
+        <h1 class="text-xl font-bold text-[#0f1111]">Become a Local Seller</h1>
+        <p class="text-sm text-[#565959]">Register your business to sell on Adamawa Export Market. Start locally, upgrade to export anytime.</p>
+    </div>
 
-                    <div class="sm:col-span-3">
-                        <label for="lga" class="block text-sm font-medium text-gray-700">LGA / Region</label>
-                        <div class="mt-1">
-                            <input type="text" name="lga" id="lga" value="{{ old('lga') }}" class="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md" required>
-                        </div>
-                    </div>
-
-                    <div class="sm:col-span-6">
-                        <label for="address" class="block text-sm font-medium text-gray-700">Business Address</label>
-                        <div class="mt-1">
-                            <textarea id="address" name="address" rows="3" class="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border border-gray-300 rounded-md" required>{{ old('address') }}</textarea>
-                        </div>
-                    </div>
-
-                    <div class="sm:col-span-3">
-                        <label for="registration_number" class="block text-sm font-medium text-gray-700">Registration Number (Optional)</label>
-                        <div class="mt-1">
-                            <input type="text" name="registration_number" id="registration_number" value="{{ old('registration_number') }}" class="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md">
-                        </div>
-                    </div>
-
-                    <div class="sm:col-span-3">
-                        <label for="tax_number" class="block text-sm font-medium text-gray-700">Tax Number (Optional)</label>
-                        <div class="mt-1">
-                            <input type="text" name="tax_number" id="tax_number" value="{{ old('tax_number') }}" class="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md">
-                        </div>
-                    </div>
-
-                </div>
-                
-                <div class="mt-6 flex w-full">
-                    <button type="submit" class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:w-auto sm:text-sm">
-                        Register as Seller
-                    </button>
-                </div>
-            </form>
+    <div class="bg-[#f0f8f0] border border-[#007600] rounded-lg px-4 py-3 mb-4 flex items-start gap-3">
+        <i data-lucide="info" class="w-5 h-5 text-[#007600] shrink-0 mt-0.5"></i>
+        <div>
+            <p class="text-sm font-medium text-[#0f1111]">Stage 1 of 2 — Local Seller</p>
+            <p class="text-xs text-[#565959]">After this, you can upgrade to an export seller with additional verification to reach international buyers.</p>
         </div>
     </div>
+
+    @if(session('error'))
+        <div class="bg-[#fff5f0] border border-[#ff8f00] text-[#c45500] px-4 py-3 rounded-lg text-sm mb-4">{{ session('error') }}</div>
+    @endif
+
+    @if($errors->any())
+        <div class="bg-[#fff5f0] border border-[#ff8f00] text-[#c45500] px-4 py-3 rounded-lg text-sm mb-4">
+            <ul class="list-disc pl-4">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <form action="{{ route('seller.onboarding.store') }}" method="POST">
+        @csrf
+
+        <div class="bg-white rounded-lg border border-[#e7e7e7] overflow-hidden mb-4">
+            <div class="px-6 py-4 border-b border-[#e7e7e7] flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-[#f0f2f2] flex items-center justify-center">
+                    <i data-lucide="store" class="w-4 h-4 text-[#007185]"></i>
+                </div>
+                <div>
+                    <h2 class="text-sm font-bold text-[#0f1111]">Business Information</h2>
+                    <p class="text-xs text-[#565959]">Basic details about your business.</p>
+                </div>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-[#565959] mb-1.5">Business Name <span class="text-[#c45500]">*</span></label>
+                    <input type="text" name="business_name" value="{{ old('business_name') }}" required
+                           class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-[#0f1111] focus:border-[#007185] focus:ring-1 focus:ring-[#007185] outline-none transition-colors" placeholder="Your business name">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-[#565959] mb-1.5">Business Description</label>
+                    <textarea name="business_description" rows="3" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-[#0f1111] focus:border-[#007185] focus:ring-1 focus:ring-[#007185] outline-none transition-colors" placeholder="Tell us about your business...">{{ old('business_description') }}</textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-[#565959] mb-1.5">Business Category <span class="text-[#c45500]">*</span></label>
+                    <select name="business_category" required class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-[#0f1111] focus:border-[#007185] focus:ring-1 focus:ring-[#007185] outline-none transition-colors">
+                        <option value="">Select category</option>
+                        <option value="Agriculture" {{ old('business_category') == 'Agriculture' ? 'selected' : '' }}>Agriculture</option>
+                        <option value="Food Processing" {{ old('business_category') == 'Food Processing' ? 'selected' : '' }}>Food Processing</option>
+                        <option value="Textiles" {{ old('business_category') == 'Textiles' ? 'selected' : '' }}>Textiles</option>
+                        <option value="Handicrafts" {{ old('business_category') == 'Handicrafts' ? 'selected' : '' }}>Handicrafts</option>
+                        <option value="Minerals" {{ old('business_category') == 'Minerals' ? 'selected' : '' }}>Minerals</option>
+                        <option value="Packaging" {{ old('business_category') == 'Packaging' ? 'selected' : '' }}>Packaging</option>
+                        <option value="Other" {{ old('business_category') == 'Other' ? 'selected' : '' }}>Other</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg border border-[#e7e7e7] overflow-hidden mb-4">
+            <div class="px-6 py-4 border-b border-[#e7e7e7] flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-[#f0f2f2] flex items-center justify-center">
+                    <i data-lucide="map-pin" class="w-4 h-4 text-[#007185]"></i>
+                </div>
+                <div>
+                    <h2 class="text-sm font-bold text-[#0f1111]">Business Location</h2>
+                    <p class="text-xs text-[#565959]">Where is your business located?</p>
+                </div>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-[#565959] mb-1.5">Business Address <span class="text-[#c45500]">*</span></label>
+                    <textarea name="business_address" rows="2" required class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-[#0f1111] focus:border-[#007185] focus:ring-1 focus:ring-[#007185] outline-none transition-colors" placeholder="Street address">{{ old('business_address') }}</textarea>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-[#565959] mb-1.5">Country <span class="text-[#c45500]">*</span></label>
+                        <select name="country" x-model="country" required class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-[#0f1111] focus:border-[#007185] focus:ring-1 focus:ring-[#007185] outline-none transition-colors">
+                            @foreach(\Imujas9\World\Facades\Country::all() as $c)
+                                <option value="{{ $c->name }}" {{ old('country', 'Nigeria') == $c->name ? 'selected' : '' }}>{{ $c->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-[#565959] mb-1.5">State <span class="text-[#c45500]">*</span></label>
+                        <select name="state" required class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-[#0f1111] focus:border-[#007185] focus:ring-1 focus:ring-[#007185] outline-none transition-colors">
+                            <option value="">Select state</option>
+                            <template x-for="s in states" :key="s.code">
+                                <option :value="s.name" x-text="s.name" :selected="s.name === '{{ old('state') }}'"></option>
+                            </template>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-[#565959] mb-1.5">LGA</label>
+                        <input type="text" name="lga" value="{{ old('lga') }}"
+                               class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-[#0f1111] focus:border-[#007185] focus:ring-1 focus:ring-[#007185] outline-none transition-colors" placeholder="Local Government Area">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-[#565959] mb-1.5">City</label>
+                        <input type="text" name="city" value="{{ old('city') }}"
+                               class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-[#0f1111] focus:border-[#007185] focus:ring-1 focus:ring-[#007185] outline-none transition-colors" placeholder="City">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg border border-[#e7e7e7] overflow-hidden mb-4">
+            <div class="px-6 py-4 border-b border-[#e7e7e7] flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-[#f0f2f2] flex items-center justify-center">
+                    <i data-lucide="phone" class="w-4 h-4 text-[#007185]"></i>
+                </div>
+                <div>
+                    <h2 class="text-sm font-bold text-[#0f1111]">Contact Information</h2>
+                    <p class="text-xs text-[#565959]">How buyers can reach you.</p>
+                </div>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-[#565959] mb-1.5">Phone Number <span class="text-[#c45500]">*</span></label>
+                    <input type="text" name="phone" value="{{ old('phone') }}" required
+                           class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-[#0f1111] focus:border-[#007185] focus:ring-1 focus:ring-[#007185] outline-none transition-colors" placeholder="+234 XXX XXX XXXX">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-[#565959] mb-1.5">NIN <span class="text-[#c45500]">*</span></label>
+                    <input type="text" name="nin" value="{{ old('nin') }}" required
+                           class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-[#0f1111] focus:border-[#007185] focus:ring-1 focus:ring-[#007185] outline-none transition-colors" placeholder="National Identification Number">
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="w-full amazon-btn text-base font-semibold py-3 rounded-lg border mb-8">
+            Register as Local Seller
+        </button>
+    </form>
 </div>
-@endsection
+@endSection

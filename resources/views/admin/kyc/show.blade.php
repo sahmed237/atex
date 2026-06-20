@@ -67,6 +67,29 @@
                         {{ ucfirst($type) }}
                     </p>
                 </div>
+                @if(isset($profile->seller_tier))
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Seller Tier</p>
+                    <p class="text-sm text-slate-700 font-medium flex items-start">
+                        <i data-lucide="trophy" class="w-4 h-4 mr-2 text-slate-400 mt-0.5 shrink-0"></i>
+                        {{ ucfirst($profile->seller_tier) }}
+                    </p>
+                </div>
+                @endif
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Country</p>
+                    <p class="text-sm text-slate-700 font-medium flex items-start">
+                        <i data-lucide="globe" class="w-4 h-4 mr-2 text-slate-400 mt-0.5 shrink-0"></i>
+                        {{ $profile->country ?? 'N/A' }}
+                    </p>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">State</p>
+                    <p class="text-sm text-slate-700 font-medium flex items-start">
+                        <i data-lucide="map" class="w-4 h-4 mr-2 text-slate-400 mt-0.5 shrink-0"></i>
+                        {{ $profile->state ?? 'N/A' }}
+                    </p>
+                </div>
                 <div>
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Address</p>
                     <p class="text-sm text-slate-700 font-medium flex items-start">

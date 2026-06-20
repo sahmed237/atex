@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Buyer;
+use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -306,6 +307,20 @@ class BuyerController extends Controller
         $buyer->syncRoles($request->roles);
 
         return redirect()->route('admin.buyers.index')->with('success', 'Buyer profile updated successfully.');
+    }
+
+    public function becomeSeller($id)
+    {
+        $user = User::findOrFail($id);
+
+        if (!$user->hasRole('buyer')) {
+            return redirect()->back()->with('error', 'This user is not a buyer.');
+        }
+
+        $user->removeRole('buyer');
+        $user->assignRole('seller');
+
+        return redirect()->back()->with('success', "{$user->name} has been promoted to Seller.");
     }
 
     public function destroy(Buyer $buyer)

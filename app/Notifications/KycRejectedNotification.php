@@ -32,6 +32,8 @@ class KycRejectedNotification extends Notification
         $roleLabel = ucfirst($this->profileType);
 
         $message = (new MailMessage)
+            ->mailer('smtp_kyc')
+            ->from('kyc@atex.adamawastate.gov.ng', 'ATEX KYC - Adamawa State')
             ->subject('Your KYC Application Needs Attention')
             ->greeting("Hello {$this->user->name}!")
             ->line("Your {$roleLabel} KYC application has been reviewed and was not approved at this time.");

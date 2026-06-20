@@ -30,6 +30,8 @@ class KycApprovedNotification extends Notification
         $roleLabel = ucfirst($this->profileType);
 
         return (new MailMessage)
+            ->mailer('smtp_kyc')
+            ->from('kyc@atex.adamawastate.gov.ng', 'ATEX KYC - Adamawa State')
             ->subject('Your KYC Application Has Been Approved')
             ->greeting("Hello {$this->user->name}!")
             ->line("Congratulations! Your {$roleLabel} KYC application has been approved.")

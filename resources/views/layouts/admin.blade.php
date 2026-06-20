@@ -225,7 +225,7 @@
                         <i data-lucide="banknote" class="w-5 h-5 mr-3"></i>
                         Payments & Payouts
                     </a>
-                    <a href="#" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl text-white/60 hover:bg-white/10 hover:text-white">
+                    <a href="{{ route('admin.profile.show') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl text-white/60 hover:bg-white/10 hover:text-white">
                         <i data-lucide="user" class="w-5 h-5 mr-3"></i>
                         Company Profile
                     </a>
@@ -234,7 +234,7 @@
                     @hasrole('buyer')
                     <div class="pt-4 pb-2 text-xs font-semibold tracking-wider uppercase text-white/30">Buying & Sourcing</div>
                     
-                    <a href="#" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl text-white/60 hover:bg-white/10 hover:text-white">
+                    <a href="{{ route('buyer.products.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl text-white/60 hover:bg-white/10 hover:text-white">
                         <i data-lucide="search" class="w-5 h-5 mr-3"></i>
                         Browse Products
                     </a>
@@ -287,10 +287,8 @@
                 </nav>
 
                 @php
-                    $bottomProfileRoute = 'admin.profile';
-                    if(auth()->user()->hasRole('seller')) $bottomProfileRoute = 'seller.profile';
-                    elseif(auth()->user()->hasRole('buyer')) $bottomProfileRoute = 'buyer.profile.show';
-                    elseif(auth()->user()->hasRole('logistics')) $bottomProfileRoute = 'logistics.profile';
+                    $bottomProfileRoute = 'admin.profile.show';
+                    if(auth()->user()->hasRole('buyer')) $bottomProfileRoute = 'buyer.profile.show';
                 @endphp
                 <a href="{{ route($bottomProfileRoute) }}" class="block p-4 m-4 rounded-2xl transition-all hover:bg-white/10 group" style="background-color: rgba(255,255,255,0.05)">
                     <div class="flex items-center">

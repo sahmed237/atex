@@ -13,6 +13,7 @@
     @endisset
     <script src="{{ asset('assets/landing.js') }}" defer></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" async onload="window.lucide && window.lucide.createIcons()"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     @yield('styles')
   </head>
   <body>
