@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fe0d79cfd6c42818121de48c57cf827f",
+    "content-hash": "8c7afeab6fb7496672391fb1ffe5472b",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1157,6 +1157,76 @@
                 }
             ],
             "time": "2025-08-22T14:27:06+00:00"
+        },
+        {
+            "name": "imujas9/laravel-world",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/imujas9/laravel-world.git",
+                "reference": "989495cc2607cc9f278c4e00c79aa4e4176bfeb9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/imujas9/laravel-world/zipball/989495cc2607cc9f278c4e00c79aa4e4176bfeb9",
+                "reference": "989495cc2607cc9f278c4e00c79aa4e4176bfeb9",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/console": "^10.0|^11.0|^12.0|^13.0",
+                "illuminate/database": "^10.0|^11.0|^12.0|^13.0",
+                "illuminate/support": "^10.0|^11.0|^12.0|^13.0",
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^8.0|^9.0|^10.0",
+                "phpunit/phpunit": "^10.0|^11.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "City": "Imujas9\\World\\Facades\\City",
+                        "State": "Imujas9\\World\\Facades\\State",
+                        "Country": "Imujas9\\World\\Facades\\Country"
+                    },
+                    "providers": [
+                        "Imujas9\\World\\WorldServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Imujas9\\World\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ujas Patel",
+                    "email": "imujaspatel@gmail.com",
+                    "homepage": "https://github.com/imujas9"
+                }
+            ],
+            "description": "World countries, states and cities with multi-language support for Laravel. Works without a database out of the box.",
+            "keywords": [
+                "cities",
+                "countries",
+                "i18n",
+                "laravel",
+                "multilingual",
+                "php",
+                "states",
+                "world"
+            ],
+            "support": {
+                "issues": "https://github.com/imujas9/laravel-world/issues",
+                "source": "https://github.com/imujas9/laravel-world/tree/v1.1.0"
+            },
+            "time": "2026-05-30T19:00:44+00:00"
         },
         {
             "name": "laravel/framework",
