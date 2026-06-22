@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.seller')
 
 @section('title', 'My Documents | Adamawa Export Market')
 @section('header_title', 'My Documents')

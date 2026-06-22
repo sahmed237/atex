@@ -72,7 +72,7 @@ class ProfileController extends Controller
                 'ip_address' => $request->ip(),
             ]);
 
-            return redirect()->route('admin.profile.show')->with('success', 'Profile updated successfully.');
+            return redirect()->back()->with('success', 'Profile updated successfully.');
         }
 
         if ($user->hasRole('logistics')) {
@@ -109,7 +109,7 @@ class ProfileController extends Controller
                 'ip_address' => $request->ip(),
             ]);
 
-            return redirect()->route('admin.profile.show')->with('success', 'Profile updated successfully.');
+            return redirect()->back()->with('success', 'Profile updated successfully.');
         }
 
         return redirect()->route('admin.dashboard');

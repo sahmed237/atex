@@ -80,7 +80,7 @@ class DocumentController extends Controller
             'ip_address' => $request->ip(),
         ]);
 
-        return redirect()->route('admin.documents.index')->with('success', 'Document uploaded successfully and is pending verification.');
+        return redirect()->back()->with('success', 'Document uploaded successfully and is pending verification.');
     }
 
     public function review(Request $request, $id)

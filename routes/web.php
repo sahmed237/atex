@@ -76,7 +76,19 @@ Route::middleware(['auth', 'verified', 'security_policy', 'legal_acceptance'])->
 
 Route::middleware(['auth', 'verified', 'security_policy', 'kyc_completed', 'legal_acceptance'])->group(function () {
     Route::prefix('seller')->group(function () {
-        Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'sellerDashboard'])->name('seller.dashboard');
+        Route::get('/dashboard', [\App\Http\Controllers\Seller\DashboardController::class, 'index'])->name('seller.dashboard');
+        
+        Route::get('/catalog', [\App\Http\Controllers\Seller\ProductController::class, 'index'])->name('seller.catalog.index');
+        Route::post('/catalog', [\App\Http\Controllers\Seller\ProductController::class, 'store'])->name('seller.catalog.store');
+
+        Route::get('/inventory', [\App\Http\Controllers\Seller\InventoryController::class, 'index'])->name('seller.inventory.index');
+        Route::get('/orders', [\App\Http\Controllers\Seller\OrderController::class, 'index'])->name('seller.orders.index');
+
+        Route::get('/documents', [\App\Http\Controllers\Seller\DocumentController::class, 'index'])->name('seller.documents.index');
+        Route::post('/documents', [\App\Http\Controllers\Seller\DocumentController::class, 'store'])->name('seller.documents.store');
+
+        Route::get('/profile', [\App\Http\Controllers\Seller\ProfileController::class, 'show'])->name('seller.profile.show');
+        Route::post('/profile', [\App\Http\Controllers\Seller\ProfileController::class, 'update'])->name('seller.profile.update');
     });
 
     Route::prefix('buyer')->group(function () {

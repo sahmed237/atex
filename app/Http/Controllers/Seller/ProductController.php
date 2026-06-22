@@ -94,7 +94,7 @@ class ProductController extends Controller
             'ip_address' => $request->ip(),
         ]);
 
-        return redirect()->route('admin.products.index')->with('success', 'Product listing submitted successfully and is pending review.');
+        return redirect()->back()->with('success', 'Product listing submitted successfully and is pending review.');
     }
 
     public function review(Request $request, $id)

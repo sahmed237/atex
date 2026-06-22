@@ -78,8 +78,8 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-[#565959] mb-1.5">Email Address</label>
-                                <input type="email" name="email" value="{{ old('email', $user->email) }}" required
-                                       class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-[#0f1111] focus:border-[#007185] focus:ring-1 focus:ring-[#007185] outline-none transition-colors">
+                                <input type="email" name="email" value="{{ old('email', $user->email) }}" required readonly
+                                       class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-[#0f1111] bg-gray-100 cursor-not-allowed outline-none transition-colors">
                                 @error('email') <p class="mt-1 text-xs text-red-500 font-medium">{{ $message }}</p> @enderror
                             </div>
                             <div>

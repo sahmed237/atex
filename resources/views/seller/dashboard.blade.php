@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.seller')
 
 @section('content')
 @if(isset($profile) && $profile->seller_tier === 'local')

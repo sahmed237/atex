@@ -169,8 +169,14 @@ class KycController extends Controller
         ]);
 
         // Fire events and send notifications
+        $profileUser = $profile->user;
         if ($profileUser) {
             if ($status === 'approved') {
+                if ($profileType === 'seller') {
+                    $profileUser->assignRole('seller');
+                } elseif ($profileType === 'logistics') {
+                    $profileUser->assignRole('logistics');
+                }
                 event(new KycApproved($profileUser, $profileType, $profile, $user->name));
                 $profileUser->notify(new KycApprovedNotification($profileUser, $profileType));
             } elseif ($status === 'rejected') {

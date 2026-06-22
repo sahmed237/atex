@@ -115,6 +115,9 @@
                 <a href="{{ route('buyer.products.index') }}" class="whitespace-nowrap font-medium px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded">All Products</a>
                 <a href="{{ route('buyer.dashboard') }}" class="whitespace-nowrap font-medium px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded">My Dashboard</a>
                 <a href="{{ route('buyer.profile.show') }}" class="whitespace-nowrap font-medium px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded">My Profile</a>
+                @hasrole('seller')
+                <a href="{{ route('seller.dashboard') }}" class="whitespace-nowrap font-medium px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded amazon-gold">My Store</a>
+                @endhasrole
                 <div class="flex-1"></div>
                 <form action="{{ route('logout') }}" method="POST" class="inline">
                     @csrf
