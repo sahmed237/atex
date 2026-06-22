@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Request Quote | Adamawa Export Market')
+@section('title', 'Request Quote | Adamawa Ecommerce platform')
 @section('header_title', 'Request Quote')
 
 @section('content')

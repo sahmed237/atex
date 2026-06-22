@@ -41,7 +41,7 @@
 }">
     <div class="mb-6">
         <h1 class="text-xl font-bold text-[#0f1111]">Become a Local Seller</h1>
-        <p class="text-sm text-[#565959]">Register your business to sell on Adamawa Export Market. Start locally, upgrade to export anytime.</p>
+        <p class="text-sm text-[#565959]">Register your business to sell on Adamawa Ecommerce platform. Start locally, upgrade to export anytime.</p>
     </div>
 
     <div class="bg-[#f0f8f0] border border-[#007600] rounded-lg px-4 py-3 mb-4 flex items-start gap-3">
@@ -84,6 +84,11 @@
                     <label class="block text-xs font-bold text-[#565959] mb-1.5">Business Name <span class="text-[#c45500]">*</span></label>
                     <input type="text" name="business_name" value="{{ old('business_name') }}" required
                            class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-[#0f1111] focus:border-[#007185] focus:ring-1 focus:ring-[#007185] outline-none transition-colors" placeholder="Your business name">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-[#565959] mb-1.5">Brand Name</label>
+                    <input type="text" name="seller_brand_name" value="{{ old('seller_brand_name') }}"
+                           class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-[#0f1111] focus:border-[#007185] focus:ring-1 focus:ring-[#007185] outline-none transition-colors" placeholder="Your brand name (if different from business name)">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-[#565959] mb-1.5">Business Description</label>
@@ -161,18 +166,24 @@
                 </div>
             </div>
             <div class="p-6 space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-[#565959] mb-1.5">Phone Number <span class="text-[#c45500]">*</span></label>
-                    <div wire:ignore>
-                        <input type="text" name="phone" id="phone_input" value="{{ old('phone') }}" required
-                               class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-[#0f1111] focus:border-[#007185] focus:ring-1 focus:ring-[#007185] outline-none transition-colors" placeholder="Phone number">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-[#565959] mb-1.5">Phone Number <span class="text-[#c45500]">*</span></label>
+                        <div wire:ignore>
+                            <input type="text" name="phone" id="phone_input" value="{{ old('phone') }}" required
+                                   class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-[#0f1111] focus:border-[#007185] focus:ring-1 focus:ring-[#007185] outline-none transition-colors" placeholder="+234 XXX XXX XXXX">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-[#565959] mb-1.5">NIN <span class="text-[#c45500]">*</span></label>
+                        <input type="text" name="nin" value="{{ old('nin') }}" required maxlength="11"
+                               class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-[#0f1111] focus:border-[#007185] focus:ring-1 focus:ring-[#007185] outline-none transition-colors" placeholder="11-digit National ID Number">
                     </div>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-[#565959] mb-1.5">NIN <span class="text-[#c45500]">*</span></label>
-                    <input type="text" name="nin" value="{{ old('nin') }}" required
-                           class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-[#0f1111] focus:border-[#007185] focus:ring-1 focus:ring-[#007185] outline-none transition-colors" placeholder="National Identification Number">
-                </div>
+                <p class="text-xs text-[#565959] flex items-start gap-1.5">
+                    <i data-lucide="shield-check" class="w-4 h-4 text-[#007185] shrink-0 mt-0.5"></i>
+                    Full export compliance (BVN, bank &amp; documents) is only required later if you upgrade to an exporter.
+                </p>
             </div>
         </div>
 

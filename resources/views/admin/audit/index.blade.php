@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'System Audit Trail | Adamawa Export Market')
+@section('title', 'System Audit Trail | Adamawa Ecommerce platform')
 @section('header_title', 'System Audit Trail')
 
 @section('content')

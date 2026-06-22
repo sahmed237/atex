@@ -31,7 +31,9 @@ class KycOnboardingController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->hasRole('buyer')) {
+        if ($user->hasRole('seller') || $user->hasRole('logistics') || $user->hasRole('admin')) {
+            // Fall through to the detailed KYC flow below for these roles
+        } elseif ($user->hasRole('buyer')) {
             $profile = BuyerProfile::updateOrCreate(
                 ['user_id' => $user->id],
                 array_merge(
@@ -79,8 +81,14 @@ class KycOnboardingController extends Controller
             if (!$existingProfile || $request->filled('business_name')) {
                 $data['business_name'] = $request->business_name;
             }
-            if (!$existingProfile || $request->filled('trade_capacity')) {
-                $data['trade_capacity'] = $request->trade_capacity;
+            $isExporter = $existingProfile && $existingProfile->seller_tier === 'export';
+            if ($isExporter) {
+                if ($request->filled('trade_capacity')) {
+                    $data['trade_capacity'] = $request->trade_capacity;
+                }
+                if ($request->filled('export_markets')) {
+                    $data['export_markets'] = $request->export_markets;
+                }
             }
             $profile = SellerProfile::updateOrCreate(['user_id' => $user->id], $data);
             $profileType = 'seller';
@@ -112,8 +120,8 @@ class KycOnboardingController extends Controller
             $this->uploadDocument($request, 'valid_id', 'Valid Identification', $profileType, $profile->id);
             $this->uploadDocument($request, 'proof_of_address', 'Proof of Address', $profileType, $profile->id);
 
-            if ($user->hasRole('seller')) {
-                $this->uploadDocument($request, 'nepc_certificate', 'NEPC Certificate', $profileType, $profile->id);
+            if ($user->hasRole('seller') && $profile->seller_tier === 'export') {
+                $this->uploadDocument($request, 'nepc_certificate', 'NEPC Export Certificate', $profileType, $profile->id);
             }
             if ($user->hasRole('logistics')) {
                 $this->uploadDocument($request, 'git_insurance', 'Goods in Transit Insurance', $profileType, $profile->id);

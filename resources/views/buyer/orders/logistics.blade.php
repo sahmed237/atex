@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Assigned Shipments | Adamawa Export Market')
+@section('title', 'Assigned Shipments | Adamawa Ecommerce platform')
 @section('header_title', 'Assigned Shipments')
 
 @section('content')

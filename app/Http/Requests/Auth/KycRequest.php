@@ -16,7 +16,13 @@ class KycRequest extends FormRequest
     {
         $user = Auth::user();
 
-        if ($user->hasRole('buyer')) {
+        if ($user->hasRole('seller')) {
+            // we let it fall through to the seller rules below
+        } elseif ($user->hasRole('logistics')) {
+            // let it fall through
+        } elseif ($user->hasRole('admin')) {
+            // let it fall through
+        } elseif ($user->hasRole('buyer')) {
             return [
                 'phone_number' => 'required|string|max:20',
                 'shipping_address' => 'required|string',
@@ -31,6 +37,7 @@ class KycRequest extends FormRequest
         $hasExistingProfile = $this->hasExistingProfile($user);
 
         $fileRule = $hasExistingProfile ? 'nullable|file' : 'required|file';
+        $optionalFile = 'nullable|file';
 
         $textRule = $hasExistingProfile ? 'nullable|string' : 'required|string';
 
@@ -44,24 +51,38 @@ class KycRequest extends FormRequest
             'bank_name' => $textRule . '|max:255',
             'account_number' => $textRule . '|max:20',
             'account_name' => $textRule . '|max:255',
-            'cac_document' => $fileRule . '|mimes:pdf,jpg,jpeg,png|max:5120',
             'valid_id' => $fileRule . '|mimes:pdf,jpg,jpeg,png|max:5120',
             'proof_of_address' => $fileRule . '|mimes:pdf,jpg,jpeg,png|max:5120',
         ];
 
         if ($user->hasRole('seller')) {
-            $rules['trade_capacity'] = 'nullable|string|max:255';
-            $rules['nepc_certificate'] = $fileRule . '|mimes:pdf,jpg,jpeg,png|max:5120';
+            // CAC registration is an export-compliance requirement; optional for local sellers.
+            $isExporter = $this->sellerTier($user) === 'export';
+            $rules['cac_document'] = $isExporter
+                ? $fileRule . '|mimes:pdf,jpg,jpeg,png|max:5120'
+                : $optionalFile . '|mimes:pdf,jpg,jpeg,png|max:5120';
+            if ($isExporter) {
+                $rules['nepc_certificate'] = $fileRule . '|mimes:pdf,jpg,jpeg,png|max:5120';
+                $rules['trade_capacity'] = 'nullable|string|max:255';
+                $rules['export_markets'] = 'nullable|string|max:255';
+            }
         } elseif ($user->hasRole('logistics')) {
+            $rules['cac_document'] = $fileRule . '|mimes:pdf,jpg,jpeg,png|max:5120';
             $rules['fleet_size'] = 'nullable|string|max:255';
             $rules['git_insurance'] = $fileRule . '|mimes:pdf,jpg,jpeg,png|max:5120';
         } elseif ($user->hasRole('admin')) {
+            $rules['cac_document'] = $fileRule . '|mimes:pdf,jpg,jpeg,png|max:5120';
             $rules['identification_number'] = 'nullable|string|max:255';
             $rules['full_name'] = $textRule . '|max:255';
             $rules['phone'] = $textRule . '|max:20';
         }
 
         return $rules;
+    }
+
+    private function sellerTier($user): ?string
+    {
+        return \App\Models\SellerProfile::where('user_id', $user->id)->value('seller_tier');
     }
 
     private function hasExistingProfile($user): bool

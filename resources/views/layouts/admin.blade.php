@@ -122,10 +122,23 @@
                         <i data-lucide="users" class="w-5 h-5 mr-3"></i>
                         AEM Users
                     </a>
-                    <a href="{{ route('admin.kyc.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.kyc.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
-                        <i data-lucide="file-check-2" class="w-5 h-5 mr-3"></i>
-                        KYC Verification
-                    </a>
+                    <div x-data="{ open: {{ request()->routeIs('admin.kyc.*') ? 'true' : 'false' }} }">
+                        <button type="button" @click="open = !open" class="w-full flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.kyc.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
+                            <i data-lucide="file-check-2" class="w-5 h-5 mr-3"></i>
+                            <span class="flex-1 text-left">KYC Verification</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 transition-transform" :class="{ 'rotate-180': open }"></i>
+                        </button>
+                        <div x-show="open" x-transition class="mt-1 ml-4 pl-3 space-y-1 border-l border-white/10">
+                            <a href="{{ route('admin.kyc.index', ['type' => 'seller']) }}" class="flex items-center px-4 py-2 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.kyc.*') && request('type') === 'seller' ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
+                                <i data-lucide="store" class="w-4 h-4 mr-3"></i>
+                                Seller
+                            </a>
+                            <a href="{{ route('admin.kyc.index', ['type' => 'export']) }}" class="flex items-center px-4 py-2 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.kyc.*') && request('type') === 'export' ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
+                                <i data-lucide="globe" class="w-4 h-4 mr-3"></i>
+                                Exporter
+                            </a>
+                        </div>
+                    </div>
                     <a href="{{ route('admin.sellers.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.sellers.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
                         <i data-lucide="briefcase" class="w-5 h-5 mr-3"></i>
                         Sellers
@@ -254,7 +267,7 @@
                         <i data-lucide="shopping-cart" class="w-5 h-5 mr-3"></i>
                         My Orders
                     </a>
-                    <a href="#" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl text-white/60 hover:bg-white/10 hover:text-white">
+                    <a href="{{ route('seller.compliance.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('seller.compliance.index') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
                         <i data-lucide="file-text" class="w-5 h-5 mr-3"></i>
                         Compliance Docs
                     </a>

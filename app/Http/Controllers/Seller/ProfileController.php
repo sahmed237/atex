@@ -17,12 +17,12 @@ class ProfileController extends Controller
         
         if ($user->hasRole('seller')) {
             $profile = SellerProfile::where('user_id', $user->id)->first();
-            return view('seller.profile.seller', compact('profile', 'user'));
+            return view('atex.profile.seller', compact('profile', 'user'));
         }
 
         if ($user->hasRole('logistics')) {
             $profile = LogisticsProfile::where('user_id', $user->id)->first();
-            return view('seller.profile.logistics', compact('profile', 'user'));
+            return view('atex.profile.logistics', compact('profile', 'user'));
         }
 
         return redirect()->route('admin.dashboard');

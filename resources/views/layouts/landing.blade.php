@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ config('app.name', 'Adamawa Export Market') }}</title>
+    <title>{{ config('app.name', 'Adamawa Ecommerce platform') }}</title>
     <link rel="preconnect" href="https://images.unsplash.com" />
     <link rel="stylesheet" href="{{ asset('assets/landing.css') }}" />
     @isset($marketplaceProducts)
@@ -18,10 +18,10 @@
   </head>
   <body>
     <header class="topbar">
-      <a class="brand" href="{{ route('home') }}" aria-label="Adamawa Export Market home">
-        <span class="brand-mark"><img src="{{ asset('assets/logo.png') }}" alt="Adamawa Export Market logo" /></span>
+      <a class="brand" href="{{ route('home') }}" aria-label="Adamawa Ecommerce platform home">
+        <span class="brand-mark"><img src="{{ asset('assets/logo.png') }}" alt="Adamawa Ecommerce platform logo" /></span>
         <span>
-          <strong>Adamawa Export Market</strong>
+          <strong>Adamawa Ecommerce platform</strong>
           <small>Verified non-oil trade portal</small>
         </span>
       </a>

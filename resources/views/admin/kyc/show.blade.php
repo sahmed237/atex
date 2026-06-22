@@ -1,13 +1,29 @@
 @extends('layouts.admin')
 
-@section('title', 'KYC Details | Adamawa Export Market')
+@section('title', 'KYC Details | Adamawa Ecommerce platform')
 @section('header_title', 'KYC Details')
 
 @section('content')
+@php
+    $kycLabel = match ($type) {
+        'buyer' => 'Buyer',
+        'seller' => ($profile->seller_tier ?? 'local') === 'export' ? 'Exporter' : 'Local Seller',
+        'logistics' => 'Logistics',
+        'admin' => 'Admin',
+        default => ucfirst($type),
+    };
+    $kycIcon = match ($type) {
+        'buyer' => 'shopping-bag',
+        'seller' => ($profile->seller_tier ?? 'local') === 'export' ? 'globe' : 'store',
+        'logistics' => 'truck',
+        default => 'building-2',
+    };
+    $isLocalSeller = $type === 'seller' && ($profile->seller_tier ?? 'local') !== 'export';
+@endphp
 <div class="mb-8 flex justify-between items-center">
     <div>
-        <h1 class="text-2xl font-bold text-slate-800">KYC Verification</h1>
-        <p class="text-slate-500 text-sm">Detailed KYC profile for {{ $profile->business_name ?? $profile->company_name ?? ($profile->user->name ?? 'User') }}</p>
+        <h1 class="text-2xl font-bold text-slate-800">{{ $kycLabel }} KYC Verification</h1>
+        <p class="text-slate-500 text-sm">Detailed {{ $kycLabel }} KYC profile for {{ $profile->business_name ?? $profile->company_name ?? ($profile->user->name ?? 'User') }}</p>
     </div>
     <div class="flex gap-3">
         <a href="{{ route('admin.kyc.index') }}" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl font-medium flex items-center hover:bg-slate-50 transition-colors">
@@ -31,10 +47,14 @@
             @endif
 
             <div class="w-24 h-24 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100 mx-auto mb-6 flex items-center justify-center">
-                <i data-lucide="building-2" class="w-10 h-10"></i>
+                <i data-lucide="{{ $kycIcon }}" class="w-10 h-10"></i>
+            </div>
+            <div class="inline-flex items-center px-3 py-1 mb-3 rounded-full text-[11px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-100">
+                <i data-lucide="{{ $kycIcon }}" class="w-3.5 h-3.5 mr-1.5"></i>
+                {{ $kycLabel }}
             </div>
             
-            <h2 class="text-xl font-bold text-slate-800 mb-1">{{ $profile->business_name ?? $profile->company_name ?? $profile->full_name ?? 'N/A' }}</h2>
+            <h2 class="text-xl font-bold text-slate-800 mb-1">{{ $profile->business_name ?? $profile->company_name ?? $profile->full_name ?? $profile->user->name ?? 'N/A' }}</h2>
             <p class="text-slate-500 text-sm mb-4">{{ $profile->user->email ?? 'N/A' }}</p>
             
             <div class="inline-flex px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-6
@@ -64,18 +84,9 @@
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Profile Type</p>
                     <p class="text-sm text-slate-700 font-medium flex items-center">
                         <i data-lucide="tag" class="w-4 h-4 mr-2 text-slate-400"></i>
-                        {{ ucfirst($type) }}
+                        {{ $kycLabel }}
                     </p>
                 </div>
-                @if(isset($profile->seller_tier))
-                <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Seller Tier</p>
-                    <p class="text-sm text-slate-700 font-medium flex items-start">
-                        <i data-lucide="trophy" class="w-4 h-4 mr-2 text-slate-400 mt-0.5 shrink-0"></i>
-                        {{ ucfirst($profile->seller_tier) }}
-                    </p>
-                </div>
-                @endif
                 <div>
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Country</p>
                     <p class="text-sm text-slate-700 font-medium flex items-start">
@@ -140,7 +151,83 @@
 
     <!-- Right Column: Verification Data & Docs -->
     <div class="lg:col-span-2 space-y-6">
-        
+
+        @if($type === 'buyer')
+        <!-- Buyer Contact & Shipping Details -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
+            <div class="flex items-center mb-6">
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center mr-4">
+                    <i data-lucide="contact" class="w-5 h-5 text-indigo-600"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800">Contact &amp; Shipping Details</h3>
+            </div>
+            @php
+                $buyerFields = [
+                    'phone_number' => ['label' => 'Phone Number', 'value' => $profile->phone_number ?? 'Not provided'],
+                    'gender' => ['label' => 'Gender', 'value' => $profile->gender ?? 'Not provided'],
+                    'shipping_address' => ['label' => 'Shipping Address', 'value' => $profile->shipping_address ?? 'Not provided'],
+                    'billing_address' => ['label' => 'Billing Address', 'value' => $profile->billing_address ?? 'Not provided'],
+                    'city' => ['label' => 'City', 'value' => $profile->city ?? 'Not provided'],
+                    'state' => ['label' => 'State', 'value' => $profile->state ?? 'Not provided'],
+                    'zip_code' => ['label' => 'Zip Code', 'value' => $profile->zip_code ?? 'Not provided'],
+                    'country' => ['label' => 'Country', 'value' => $profile->country ?? 'Not provided'],
+                ];
+            @endphp
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @foreach($buyerFields as $field => $info)
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                        <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">{{ $info['label'] }}</p>
+                        <p class="text-sm font-bold text-slate-800">{{ $info['value'] }}</p>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        @if($type === 'seller')
+        <!-- Business & Export Details -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
+            <div class="flex items-center mb-6">
+                <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center mr-4">
+                    <i data-lucide="briefcase" class="w-5 h-5 text-amber-600"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800">{{ $kycLabel === 'Exporter' ? 'Business & Export Details' : 'Business Details' }}</h3>
+            </div>
+            @php
+                $businessFields = [
+                    'profile_type' => ['label' => 'Profile Type', 'value' => isset($profile->seller_tier) ? ($profile->seller_tier === 'local' ? 'Local Seller' : 'Export Seller') : ucfirst($type)],
+                    'country' => ['label' => 'Country', 'value' => $profile->country ?? 'Not provided'],
+                    'state' => ['label' => 'State', 'value' => $profile->state ?? 'Not provided'],
+                    'address' => ['label' => 'Address', 'value' => $profile->address ?? 'Not provided'],
+                    'business_name' => ['label' => 'Business Name', 'value' => $profile->business_name ?? 'Not provided'],
+                    'business_category' => ['label' => 'Business Category', 'value' => $profile->business_category ?? 'Not provided'],
+                    'seller_brand_name' => ['label' => 'Brand Name', 'value' => $profile->seller_brand_name ?? 'Not provided'],
+                    'phone' => ['label' => 'Phone Number', 'value' => $profile->phone ?? 'Not provided'],
+                ];
+                if ($kycLabel === 'Exporter') {
+                    $businessFields['trade_capacity'] = ['label' => 'Monthly Trade Capacity', 'value' => $profile->trade_capacity ?? 'Not provided'];
+                    $businessFields['export_markets'] = ['label' => 'Export Markets', 'value' => $profile->export_markets ?? 'Not provided'];
+                    $businessFields['years_of_experience'] = ['label' => 'Years of Experience', 'value' => ($profile->years_of_experience !== null && $profile->years_of_experience !== '') ? $profile->years_of_experience : 'Not provided'];
+                }
+            @endphp
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @foreach($businessFields as $field => $info)
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                        <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">{{ $info['label'] }}</p>
+                        <p class="text-sm font-bold text-slate-800">{{ $info['value'] }}</p>
+                    </div>
+                @endforeach
+            </div>
+            @if($profile->business_description)
+                <div class="mt-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                    <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Business Description</p>
+                    <p class="text-sm text-slate-700">{{ $profile->business_description }}</p>
+                </div>
+            @endif
+        </div>
+        @endif
+
+        @unless($type === 'buyer')
         <!-- Nigerian KYC Info -->
         <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
             <div class="flex items-center justify-between mb-6">
@@ -148,7 +235,7 @@
                     <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center mr-4">
                         <i data-lucide="fingerprint" class="w-5 h-5 text-indigo-600"></i>
                     </div>
-                    <h3 class="text-lg font-bold text-slate-800">Regulatory Information</h3>
+                    <h3 class="text-lg font-bold text-slate-800">{{ $isLocalSeller ? 'Identity Verification' : 'Regulatory Information' }}</h3>
                 </div>
                 @if($profile->verification_status !== 'approved')
                     <div class="flex items-center gap-2">
@@ -165,12 +252,17 @@
 
                 @php
                     $reviews = $profile->regulatory_reviews ?? [];
-                    $regulatoryFields = [
-                        'registration_number' => ['label' => 'CAC Registration', 'icon' => 'file-text', 'value' => $profile->registration_number ?? 'Not provided'],
-                        'tax_number' => ['label' => 'Tax Identification (TIN)', 'icon' => 'landmark', 'value' => $profile->tax_number ?? 'Not provided'],
-                        'bvn' => ['label' => 'Bank Verification (BVN)', 'icon' => 'credit-card', 'value' => $profile->bvn ?? 'Not provided'],
-                        'nin' => ['label' => 'National Identity (NIN)', 'icon' => 'user-check', 'value' => $profile->nin ?? 'Not provided'],
-                    ];
+                    // Local sellers only provide NIN; full CAC/TIN/BVN compliance applies to exporters.
+                    $regulatoryFields = $isLocalSeller
+                        ? [
+                            'nin' => ['label' => 'National Identity (NIN)', 'icon' => 'user-check', 'value' => $profile->nin ?? 'Not provided'],
+                        ]
+                        : [
+                            'registration_number' => ['label' => 'CAC Registration', 'icon' => 'file-text', 'value' => $profile->registration_number ?? 'Not provided'],
+                            'tax_number' => ['label' => 'Tax Identification (TIN)', 'icon' => 'landmark', 'value' => $profile->tax_number ?? 'Not provided'],
+                            'bvn' => ['label' => 'Bank Verification (BVN)', 'icon' => 'credit-card', 'value' => $profile->bvn ?? 'Not provided'],
+                            'nin' => ['label' => 'National Identity (NIN)', 'icon' => 'user-check', 'value' => $profile->nin ?? 'Not provided'],
+                        ];
                 @endphp
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -207,6 +299,7 @@
                 </div>
 
                 <!-- Bank Details -->
+                @unless($isLocalSeller)
                 <div class="mt-6 pt-5 border-t border-slate-100">
                     <h4 class="text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider flex items-center">
                         <i data-lucide="wallet" class="w-4 h-4 mr-2 text-emerald-500"></i> Bank Details
@@ -250,8 +343,10 @@
                         @endforeach
                     </div>
                 </div>
+                @endunless
             </form>
         </div>
+        @endunless
 
         <!-- Uploaded Documents -->
         <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">

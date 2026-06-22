@@ -4,7 +4,7 @@
 
 @section('content')
 <style>
-    /* Custom specific styles to match Adamawa Export Market perfectly */
+    /* Custom specific styles to match Adamawa Ecommerce platform perfectly */
     .login-hero-bg {
         background: linear-gradient(90deg, rgba(11, 35, 25, 0.92), rgba(11, 35, 25, 0.55)), url("https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1600&q=80") center/cover;
     }
@@ -66,7 +66,7 @@
                 @endif
             </div>
             <div>
-                <strong class="block text-[#17201c] font-bold text-lg leading-tight">{{ $system_settings['platform_name'] ?? 'Adamawa Export Market' }}</strong>
+                <strong class="block text-[#17201c] font-bold text-lg leading-tight">{{ $system_settings['platform_name'] ?? 'Adamawa Ecommerce platform' }}</strong>
                 <small class="block text-[#65736b] text-sm">Enterprise login</small>
             </div>
         </div>

@@ -1,10 +1,10 @@
-@extends('layouts.buyer')
+@extends('layouts.admin')
 
 @section('content')
 <div class="max-w-3xl mx-auto" x-data="{}">
     <div class="mb-6">
         <h1 class="text-xl font-bold text-[#0f1111]">Upgrade to Export Seller</h1>
-        <p class="text-sm text-[#565959]">Complete additional verification to sell internationally on Adamawa Export Market.</p>
+        <p class="text-sm text-[#565959]">Complete additional verification to sell internationally on Adamawa Ecommerce platform.</p>
     </div>
 
     <div class="bg-[#f0f8f0] border border-[#007600] rounded-lg px-4 py-3 mb-4 flex items-start gap-3">
@@ -136,31 +136,6 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-lg border border-[#e7e7e7] overflow-hidden mb-4">
-            <div class="px-6 py-4 border-b border-[#e7e7e7] flex items-center gap-3">
-                <div class="w-9 h-9 rounded-lg bg-[#f0f2f2] flex items-center justify-center">
-                    <i data-lucide="trending-up" class="w-4 h-4 text-[#007185]"></i>
-                </div>
-                <div>
-                    <h2 class="text-sm font-bold text-[#0f1111]">Export Capacity</h2>
-                    <p class="text-xs text-[#565959]">Tell us about your export readiness.</p>
-                </div>
-            </div>
-            <div class="p-6 space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-[#565959] mb-1.5">Monthly Capacity</label>
-                        <input type="text" name="trade_capacity" value="{{ old('trade_capacity') }}"
-                               class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-[#0f1111] focus:border-[#007185] focus:ring-1 focus:ring-[#007185] outline-none transition-colors" placeholder="e.g. 500kg monthly">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-[#565959] mb-1.5">Export Markets</label>
-                        <input type="text" name="export_markets" value="{{ old('export_markets') }}"
-                               class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-[#0f1111] focus:border-[#007185] focus:ring-1 focus:ring-[#007185] outline-none transition-colors" placeholder="e.g. UK, US, EU">
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <div class="bg-white rounded-lg border border-[#e7e7e7] overflow-hidden mb-6">
             <div class="px-6 py-4 border-b border-[#e7e7e7] flex items-center gap-3">
@@ -176,28 +151,32 @@
                 <p class="text-xs text-[#565959]">Accepted formats: PDF, JPG, PNG (max 5MB each)</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-[#565959] mb-1.5">CAC Certificate</label>
-                        <input type="file" name="document_cac" accept=".pdf,.jpg,.jpeg,.png" class="w-full text-sm text-[#565959] file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border file:border-gray-300 file:text-sm file:font-medium file:bg-[#f7f8f8] file:text-[#0f1111] hover:file:bg-gray-100">
+                        <label class="block text-xs font-bold text-[#565959] mb-1.5">CAC Certificate <span class="text-[#c45500]">*</span></label>
+                        <input type="file" name="cac_document" accept=".pdf,.jpg,.jpeg,.png" required class="w-full text-sm text-[#565959] file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border file:border-gray-300 file:text-sm file:font-medium file:bg-[#f7f8f8] file:text-[#0f1111] hover:file:bg-gray-100">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-[#565959] mb-1.5">Business Logo</label>
-                        <input type="file" name="document_logo" accept=".jpg,.jpeg,.png" class="w-full text-sm text-[#565959] file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border file:border-gray-300 file:text-sm file:font-medium file:bg-[#f7f8f8] file:text-[#0f1111] hover:file:bg-gray-100">
+                        <label class="block text-xs font-bold text-[#565959] mb-1.5">NEPC Export Certificate <span class="text-[#c45500]">*</span></label>
+                        <input type="file" name="nepc_certificate" accept=".pdf,.jpg,.jpeg,.png" required class="w-full text-sm text-[#565959] file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border file:border-gray-300 file:text-sm file:font-medium file:bg-[#f7f8f8] file:text-[#0f1111] hover:file:bg-gray-100">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-[#565959] mb-1.5">Valid ID (National ID/Passport) <span class="text-[#c45500]">*</span></label>
-                        <input type="file" name="document_id" accept=".pdf,.jpg,.jpeg,.png" required class="w-full text-sm text-[#565959] file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border file:border-gray-300 file:text-sm file:font-medium file:bg-[#f7f8f8] file:text-[#0f1111] hover:file:bg-gray-100">
+                        <input type="file" name="valid_id" accept=".pdf,.jpg,.jpeg,.png" required class="w-full text-sm text-[#565959] file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border file:border-gray-300 file:text-sm file:font-medium file:bg-[#f7f8f8] file:text-[#0f1111] hover:file:bg-gray-100">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-[#565959] mb-1.5">Proof of Business Address <span class="text-[#c45500]">*</span></label>
-                        <input type="file" name="document_address" accept=".pdf,.jpg,.jpeg,.png" required class="w-full text-sm text-[#565959] file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border file:border-gray-300 file:text-sm file:font-medium file:bg-[#f7f8f8] file:text-[#0f1111] hover:file:bg-gray-100">
+                        <input type="file" name="proof_of_address" accept=".pdf,.jpg,.jpeg,.png" required class="w-full text-sm text-[#565959] file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border file:border-gray-300 file:text-sm file:font-medium file:bg-[#f7f8f8] file:text-[#0f1111] hover:file:bg-gray-100">
                     </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-[#565959] mb-1.5">Business Logo</label>
+                    <input type="file" name="business_logo" accept=".jpg,.jpeg,.png" class="w-full text-sm text-[#565959] file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border file:border-gray-300 file:text-sm file:font-medium file:bg-[#f7f8f8] file:text-[#0f1111] hover:file:bg-gray-100">
                 </div>
             </div>
         </div>
 
-        <button type="submit" class="w-full amazon-btn text-base font-semibold py-3 rounded-lg border mb-8">
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-base font-semibold py-3 rounded-xl shadow-sm transition-colors mb-8">
             Submit Export Upgrade
         </button>
     </form>

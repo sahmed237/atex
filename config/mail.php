@@ -50,7 +50,7 @@ return [
         ],
 
         'smtp_kyc' => [
-            'transport' => 'smtp',
+            'transport' => env('MAIL_KYC_MAILER', 'smtp'),
             'scheme' => env('MAIL_KYC_SCHEME'),
             'host' => env('MAIL_KYC_HOST', env('MAIL_HOST', '127.0.0.1')),
             'port' => env('MAIL_KYC_PORT', env('MAIL_PORT', 465)),

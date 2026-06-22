@@ -36,7 +36,12 @@ class EnsureKycCompleted
             if ($user->hasRole($role)) {
                 $profile = $modelClass::where('user_id', $user->id)->first();
                 if (!$profile || in_array($profile->verification_status, ['pending', 'rejected'])) {
-                    return redirect()->route('kyc.onboarding');
+                    // Allow local sellers who are pending export upgrade to still access the dashboard
+                    if ($role === 'seller' && $profile && $profile->seller_tier === 'export' && $profile->verification_status === 'pending') {
+                        // Do not redirect
+                    } else {
+                        return redirect()->route('kyc.onboarding');
+                    }
                 }
                 break;
             }

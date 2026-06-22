@@ -40,41 +40,58 @@ class KycController extends Controller
         };
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
         if (!$user->hasRole('super-admin') && !$user->hasRole('admin')) {
             abort(403);
         }
 
+        // Dropdown filter: all | export | buyer | logistics | admin
+        $filter = $request->query('type', 'all');
+        $filters = [
+            'all' => 'All KYC',
+            'seller' => 'Seller KYC',
+            'export' => 'Exporter KYC',
+            'buyer' => 'Buyer KYC',
+            'logistics' => 'Logistics KYC',
+            'admin' => 'Admin KYC',
+        ];
+        if (!array_key_exists($filter, $filters)) {
+            $filter = 'all';
+        }
+
         $profiles = collect();
 
         $profileTypes = [
             'seller' => SellerProfile::class,
+            'buyer' => BuyerProfile::class,
             'logistics' => LogisticsProfile::class,
             'admin' => AdminProfile::class,
         ];
 
         foreach ($profileTypes as $type => $class) {
             $records = $class::with('user')->get()->map(function ($profile) use ($type) {
+                $sellerTier = $type === 'seller' ? ($profile->seller_tier ?? 'local') : null;
+
                 $org = match ($type) {
                     'seller' => $profile->business_name,
-                    'buyer' => $profile->company_name ?: 'Buyer Account',
+                    'buyer' => $profile->company_name ?: ($profile->user->name ?? 'Buyer Account'),
                     'logistics' => $profile->company_name,
                     'admin' => $profile->full_name ?: 'Admin',
                     default => 'Unknown',
                 };
 
                 $category = match ($type) {
-                    'seller' => $profile->business_type,
-                    'buyer' => $profile->buyer_type,
+                    'seller' => $profile->business_category ?: $profile->business_type,
+                    'buyer' => 'Buyer',
                     'logistics' => 'logistics',
                     'admin' => 'admin',
                     default => null,
                 };
 
                 $location = match ($type) {
-                    'seller' => $profile->lga,
+                    'seller' => $profile->state ?: $profile->lga,
                     'buyer' => $profile->country,
                     'logistics' => $profile->coverage_regions,
                     'admin' => $profile->address,
@@ -82,7 +99,7 @@ class KycController extends Controller
                 };
 
                 $labels = [
-                    'seller' => 'Seller',
+                    'seller' => $sellerTier === 'export' ? 'Export Seller' : 'Local Seller',
                     'buyer' => 'Buyer',
                     'logistics' => 'Logistics',
                     'admin' => 'Admin',
@@ -91,6 +108,7 @@ class KycController extends Controller
                 return [
                     'id' => $profile->id,
                     'profile_type' => $type,
+                    'seller_tier' => $sellerTier,
                     'profile_type_label' => $labels[$type] ?? ucfirst($type),
                     'organization' => $org,
                     'name' => $profile->user->name ?? '',
@@ -110,11 +128,23 @@ class KycController extends Controller
             $profiles = $profiles->concat($records);
         }
 
+        // Apply dropdown filter
+        $profiles = $profiles->filter(function ($item) use ($filter) {
+            return match ($filter) {
+                'seller' => $item['profile_type'] === 'seller' && $item['seller_tier'] !== 'export',
+                'export' => $item['profile_type'] === 'seller' && $item['seller_tier'] === 'export',
+                'buyer' => $item['profile_type'] === 'buyer',
+                'logistics' => $item['profile_type'] === 'logistics',
+                'admin' => $item['profile_type'] === 'admin',
+                default => true,
+            };
+        });
+
         $profiles = $profiles->sortByDesc(function ($item) {
             return in_array($item['verification_status'], ['pending', 'submitted']) ? 1 : 0;
         })->values()->toArray();
 
-        return view('admin.kyc.index', compact('profiles'));
+        return view('admin.kyc.index', compact('profiles', 'filters', 'filter'));
     }
 
     public function review(Request $request)
@@ -125,7 +155,7 @@ class KycController extends Controller
         }
 
         $request->validate([
-            'profile_type' => 'required|in:seller,logistics,admin',
+            'profile_type' => 'required|in:seller,buyer,logistics,admin',
             'profile_id' => 'required|integer',
             'status' => 'required|in:approved,rejected,pending',
             'reason' => 'nullable|string|max:1000',
@@ -243,7 +273,7 @@ class KycController extends Controller
         }
 
         $request->validate([
-            'profile_type' => 'required|in:seller,logistics,admin',
+            'profile_type' => 'required|in:seller,buyer,logistics,admin',
             'profile_id' => 'required|integer',
             'status' => 'required|in:approved,rejected',
             'comment' => 'nullable|string|max:1000',
@@ -296,7 +326,7 @@ class KycController extends Controller
         }
 
         $request->validate([
-            'profile_type' => 'required|in:seller,logistics,admin',
+            'profile_type' => 'required|in:seller,buyer,logistics,admin',
             'profile_id' => 'required|integer',
             'fields' => 'nullable|array',
             'fields.*.status' => 'nullable|in:approved,rejected',

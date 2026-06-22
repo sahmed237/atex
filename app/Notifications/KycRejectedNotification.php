@@ -33,17 +33,17 @@ class KycRejectedNotification extends Notification
 
         $message = (new MailMessage)
             ->mailer('smtp_kyc')
-            ->from('kyc@atex.adamawastate.gov.ng', 'ATEX KYC - Adamawa State')
-            ->subject('Your KYC Application Needs Attention')
+            ->from('kyc@atex.adamawastate.gov.ng', 'Adamawa Ecommerce platform KYC')
+            ->subject('Your Account Verification Needs Attention')
             ->greeting("Hello {$this->user->name}!")
-            ->line("Your {$roleLabel} KYC application has been reviewed and was not approved at this time.");
+            ->line("Your {$roleLabel} profile verification has been reviewed, but we need you to address a few things before we can approve it.");
 
         if ($this->reason) {
             $message->line("Reason: {$this->reason}");
         }
 
-        $message->line('Please review your information and submit a new KYC application.')
-            ->action('Complete KYC', url('/kyc/onboarding'))
+        $message->line('Please review your profile information, update your documents, and resubmit.')
+            ->action('Review Verification Status', url('/kyc/onboarding'))
             ->line('If you have any questions, please contact our support team.');
 
         return $message;
@@ -52,8 +52,8 @@ class KycRejectedNotification extends Notification
     public function toArray($notifiable): array
     {
         return [
-            'title' => 'KYC Rejected',
-            'message' => 'Your KYC application was not approved. Please resubmit with correct information.',
+            'title' => 'Verification Needs Attention',
+            'message' => 'Your profile verification requires attention. Please review and resubmit.',
             'profile_type' => $this->profileType,
             'reason' => $this->reason,
         ];

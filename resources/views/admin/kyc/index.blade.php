@@ -1,15 +1,22 @@
 @extends('layouts.admin')
 
-@section('title', 'KYC Verification | Adamawa Export Market')
+@section('title', 'KYC Verification | Adamawa Ecommerce platform')
 @section('header_title', 'KYC verification')
 
 @section('content')
 <section class="panel">
   <div class="panel-head">
     <h2>KYC Registration Verification</h2>
-    <span class="status pending">Awaiting Audit</span>
+    <form method="GET" action="{{ route('admin.kyc.index') }}" style="display: inline-flex; align-items: center; gap: 8px;">
+      <label for="type" class="muted" style="font-size: 0.85rem;">Filter</label>
+      <select name="type" id="type" onchange="this.form.submit()" style="padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; font-size: 0.85rem; background: var(--bg, #fff);">
+        @foreach($filters as $value => $label)
+          <option value="{{ $value }}" {{ $filter === $value ? 'selected' : '' }}>{{ $label }}</option>
+        @endforeach
+      </select>
+    </form>
   </div>
-  
+
   <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
     <thead>
       <tr style="text-align: left; border-bottom: 1px solid var(--line);">

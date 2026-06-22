@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $title ?? 'ATEX Marketplace' }} - Adamawa Export Market</title>
+    <title>{{ $title ?? 'Adamawa Ecommerce platform' }} - Adamawa Ecommerce platform</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -116,7 +116,9 @@
                 <a href="{{ route('buyer.dashboard') }}" class="whitespace-nowrap font-medium px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded">My Dashboard</a>
                 <a href="{{ route('buyer.profile.show') }}" class="whitespace-nowrap font-medium px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded">My Profile</a>
                 @hasrole('seller')
-                <a href="{{ route('seller.dashboard') }}" class="whitespace-nowrap font-medium px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded amazon-gold">My Store</a>
+                <a href="{{ route('seller.dashboard') }}" class="whitespace-nowrap font-medium px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded text-[#febd69]">My Store</a>
+                @else
+                <a href="{{ route('seller.onboarding') }}" class="whitespace-nowrap font-bold text-[#febd69] px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded">Sell on Adamawa Ecommerce platform</a>
                 @endhasrole
                 <div class="flex-1"></div>
                 <form action="{{ route('logout') }}" method="POST" class="inline">
@@ -177,7 +179,7 @@
                 </div>
             </div>
             <div class="py-4 text-center text-white/40 text-[11px]">
-                &copy; {{ date('Y') }} Adamawa Export Market (ATEX). All rights reserved.
+                &copy; {{ date('Y') }} Adamawa Ecommerce platform. All rights reserved.
             </div>
         </footer>
     </div>

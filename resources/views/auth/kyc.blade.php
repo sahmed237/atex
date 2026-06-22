@@ -168,6 +168,8 @@
       $isApproved = $profile && $profile->verification_status === 'approved';
       $isRejected = $profile && $profile->verification_status === 'rejected';
       $isExisting = (bool) $profile;
+      $sellerTier = $profile->seller_tier ?? null;
+      $isExporter = $user->hasRole('seller') && $sellerTier === 'export';
     @endphp
 
     @if($isPending)
@@ -233,7 +235,7 @@
     <form method="POST" action="{{ route('kyc.onboarding.store') }}" enctype="multipart/form-data">
       @csrf
 
-      @if($user->hasRole('buyer'))
+      @if($user->hasRole('buyer') && !$user->hasRole('seller') && !$user->hasRole('logistics') && !$user->hasRole('admin'))
           <h1>Complete Your Profile</h1>
           <p class="mb-2">Please provide your shipping and billing details.</p>
 
@@ -366,11 +368,16 @@
           @error('account_name') <p class="input-error">{{ $message }}</p> @enderror
         </div>
 
-        @if($user->hasRole('seller') || $user->hasRole('buyer'))
+        @if($isExporter)
           <div class="form-group">
             <label class="form-label">Monthly Trade Volume Capacity</label>
-            <input type="text" name="trade_capacity" value="{{ old('trade_capacity') }}" class="form-input">
+            <input type="text" name="trade_capacity" value="{{ old('trade_capacity', $profile->trade_capacity ?? '') }}" class="form-input" placeholder="e.g. 500kg monthly">
             @error('trade_capacity') <p class="input-error">{{ $message }}</p> @enderror
+          </div>
+          <div class="form-group">
+            <label class="form-label">Target Export Markets</label>
+            <input type="text" name="export_markets" value="{{ old('export_markets', $profile->export_markets ?? '') }}" class="form-input" placeholder="e.g. UK, US, EU">
+            @error('export_markets') <p class="input-error">{{ $message }}</p> @enderror
           </div>
         @endif
 
@@ -468,10 +475,10 @@
           @endif
         @endforeach
 
-        @if($user->hasRole('seller'))
+        @if($isExporter)
           @if(($doc = $documents->get('nepc_certificate')) && $doc->status === 'rejected')
             <div class="form-group">
-              <label class="form-label">NEPC Certificate</label>
+              <label class="form-label">NEPC Export Certificate</label>
               <div class="doc-status"><span class="badge rejected">Rejected</span></div>
               @if($doc->review_comment) <p class="doc-comment">{{ $doc->review_comment }}</p> @endif
               <input type="file" name="nepc_certificate" class="form-input" accept=".pdf,.jpg,.jpeg,.png" required>
@@ -492,17 +499,25 @@
           @endif
         @endif
       @else
-        @foreach(['cac_document' => 'CAC Certificate', 'valid_id' => 'Valid ID', 'proof_of_address' => 'Proof of Address'] as $key => $label)
-          <div class="form-group">
-            <label class="form-label">{{ $label }}</label>
-            <input type="file" name="{{ $key }}" class="form-input" accept=".pdf,.jpg,.jpeg,.png" required>
-            @error($key) <p class="input-error">{{ $message }}</p> @enderror
-          </div>
-        @endforeach
+        <div class="form-group">
+          <label class="form-label">Valid ID</label>
+          <input type="file" name="valid_id" class="form-input" accept=".pdf,.jpg,.jpeg,.png" required>
+          @error('valid_id') <p class="input-error">{{ $message }}</p> @enderror
+        </div>
+        <div class="form-group">
+          <label class="form-label">Proof of Address</label>
+          <input type="file" name="proof_of_address" class="form-input" accept=".pdf,.jpg,.jpeg,.png" required>
+          @error('proof_of_address') <p class="input-error">{{ $message }}</p> @enderror
+        </div>
+        <div class="form-group">
+          <label class="form-label">CAC Certificate {{ $isExporter ? '' : '(optional)' }}</label>
+          <input type="file" name="cac_document" class="form-input" accept=".pdf,.jpg,.jpeg,.png" {{ $isExporter ? 'required' : '' }}>
+          @error('cac_document') <p class="input-error">{{ $message }}</p> @enderror
+        </div>
 
-        @if($user->hasRole('seller'))
+        @if($isExporter)
           <div class="form-group">
-            <label class="form-label">NEPC Certificate</label>
+            <label class="form-label">NEPC Export Certificate</label>
             <input type="file" name="nepc_certificate" class="form-input" accept=".pdf,.jpg,.jpeg,.png" required>
             @error('nepc_certificate') <p class="input-error">{{ $message }}</p> @enderror
           </div>

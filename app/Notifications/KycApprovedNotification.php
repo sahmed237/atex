@@ -31,11 +31,11 @@ class KycApprovedNotification extends Notification
 
         return (new MailMessage)
             ->mailer('smtp_kyc')
-            ->from('kyc@atex.adamawastate.gov.ng', 'ATEX KYC - Adamawa State')
-            ->subject('Your KYC Application Has Been Approved')
+            ->from('kyc@atex.adamawastate.gov.ng', 'Adamawa Ecommerce platform KYC')
+            ->subject('Your Account Verification is Complete')
             ->greeting("Hello {$this->user->name}!")
-            ->line("Congratulations! Your {$roleLabel} KYC application has been approved.")
-            ->line('You can now access all features of your account on the Adamawa Export Market platform.')
+            ->line("Congratulations! Your {$roleLabel} profile verification has been successfully completed.")
+            ->line('You can now access all features of your account on the Adamawa Ecommerce platform platform.')
             ->action('Go to Dashboard', url('/dashboard'))
             ->line('Thank you for joining us!');
     }
@@ -43,8 +43,8 @@ class KycApprovedNotification extends Notification
     public function toArray($notifiable): array
     {
         return [
-            'title' => 'KYC Approved',
-            'message' => 'Your KYC application has been approved. You can now access all platform features.',
+            'title' => 'Verification Approved',
+            'message' => 'Your profile verification is complete. You can now access all platform features.',
             'profile_type' => $this->profileType,
         ];
     }

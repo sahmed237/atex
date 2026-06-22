@@ -1,6 +1,6 @@
 @extends('layouts.seller')
 
-@section('title', 'My Documents | Adamawa Export Market')
+@section('title', 'My Documents | Adamawa Ecommerce platform')
 @section('header_title', 'My Documents')
 
 @section('content')

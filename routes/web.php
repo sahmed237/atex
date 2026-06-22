@@ -77,6 +77,7 @@ Route::middleware(['auth', 'verified', 'security_policy', 'legal_acceptance'])->
 Route::middleware(['auth', 'verified', 'security_policy', 'kyc_completed', 'legal_acceptance'])->group(function () {
     Route::prefix('seller')->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Seller\DashboardController::class, 'index'])->name('seller.dashboard');
+        Route::get('/compliance', [\App\Http\Controllers\Seller\ComplianceController::class, 'index'])->name('seller.compliance.index');
         
         Route::get('/catalog', [\App\Http\Controllers\Seller\ProductController::class, 'index'])->name('seller.catalog.index');
         Route::post('/catalog', [\App\Http\Controllers\Seller\ProductController::class, 'store'])->name('seller.catalog.store');

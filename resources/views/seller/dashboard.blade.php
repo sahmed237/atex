@@ -11,6 +11,16 @@
         Upgrade Now
     </a>
 </div>
+@elseif(isset($profile) && $profile->seller_tier === 'export' && $profile->verification_status === 'pending')
+<div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-6 flex items-start gap-4">
+    <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+        <i data-lucide="clock" class="w-5 h-5 text-amber-600"></i>
+    </div>
+    <div>
+        <h2 class="text-lg font-bold text-amber-800">Export Upgrade Under Review</h2>
+        <p class="text-sm text-amber-700 mt-1">Your export seller upgrade has been submitted for verification. We will notify you once approved.</p>
+    </div>
+</div>
 @endif
 
 <div class="mb-8">

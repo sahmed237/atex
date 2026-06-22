@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Document Compliance | Adamawa Export Market')
+@section('title', 'Document Compliance | Adamawa Ecommerce platform')
 @section('header_title', 'Document Compliance')
 
 @section('content')
