@@ -377,17 +377,7 @@ document.addEventListener('alpine:init', () => {
                     </div>
                 </div>
                 <div class="p-6 space-y-6">
-                    <!-- ID Selection -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-[#565959] mb-1.5">NIN (Optional) <span class="text-[#c45500]">*</span></label>
-                            
-<input type="text" name="nin" value="{{ old('nin', isset($profile) ? $profile->nin ?? '' : '') }}" required maxlength="11"
-                                   class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-[#0f1111] focus:border-[#007185] focus:ring-1 focus:ring-[#007185] outline-none transition-colors" placeholder="11-digit NIN">
-                        @if(isset($rejectedFields) && $rejectedFields->has('nin'))
-                            <p class="text-xs text-red-600 mt-2 font-semibold flex items-start"><i data-lucide="alert-circle" class="w-3.5 h-3.5 mr-1 shrink-0 mt-0.5"></i> <span>{{ $rejectedFields['nin']->comment }}</span></p>
-                        @endif
-                        </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-[#565959] mb-1.5">Document Type <span class="text-[#c45500]">*</span></label>
                             
@@ -411,74 +401,6 @@ document.addEventListener('alpine:init', () => {
                         @if(isset($rejectedFields) && $rejectedFields->has('id_number'))
                             <p class="text-xs text-red-600 mt-2 font-semibold flex items-start"><i data-lucide="alert-circle" class="w-3.5 h-3.5 mr-1 shrink-0 mt-0.5"></i> <span>{{ $rejectedFields['id_number']->comment }}</span></p>
                         @endif
-                        </div>
-                    </div>
-                    
-                    <hr class="border-[#e7e7e7]">
-
-                    <!-- File Uploads -->
-                    <div>
-                        <h3 class="text-sm font-bold text-[#0f1111] mb-3">Document Uploads (Optional for Local)</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label class="block text-xs font-bold text-[#565959] mb-1.5">Front Side of ID</label>
-                                
-<input type="file" name="id_front" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#f0f2f2] file:text-[#0f1111] hover:file:bg-[#e3e6e6] transition-colors">
-                        @if(isset($rejectedFields) && $rejectedFields->has('id_front'))
-                            <p class="text-xs text-red-600 mt-2 font-semibold flex items-start"><i data-lucide="alert-circle" class="w-3.5 h-3.5 mr-1 shrink-0 mt-0.5"></i> <span>{{ $rejectedFields['id_front']->comment }}</span></p>
-                        @endif
-                        @if(isset($profile) && $profile->kyc && $profile->kyc->id_front_path)
-                            <a href="{{ asset('storage/' . $profile->kyc->id_front_path) }}" target="_blank" class="text-xs text-[#007185] hover:underline flex items-center gap-1 mt-1.5"><i data-lucide="external-link" class="w-3.5 h-3.5"></i> View submitted document</a>
-                        @endif
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-[#565959] mb-1.5">Back Side of ID</label>
-                                
-<input type="file" name="id_back" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#f0f2f2] file:text-[#0f1111] hover:file:bg-[#e3e6e6] transition-colors">
-                        @if(isset($rejectedFields) && $rejectedFields->has('id_back'))
-                            <p class="text-xs text-red-600 mt-2 font-semibold flex items-start"><i data-lucide="alert-circle" class="w-3.5 h-3.5 mr-1 shrink-0 mt-0.5"></i> <span>{{ $rejectedFields['id_back']->comment }}</span></p>
-                        @endif
-                        @if(isset($profile) && $profile->kyc && $profile->kyc->id_back_path)
-                            <a href="{{ asset('storage/' . $profile->kyc->id_back_path) }}" target="_blank" class="text-xs text-[#007185] hover:underline flex items-center gap-1 mt-1.5"><i data-lucide="external-link" class="w-3.5 h-3.5"></i> View submitted document</a>
-                        @endif
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-[#565959] mb-1.5">Selfie</label>
-                                
-<input type="file" name="selfie" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#f0f2f2] file:text-[#0f1111] hover:file:bg-[#e3e6e6] transition-colors">
-                        @if(isset($rejectedFields) && $rejectedFields->has('selfie'))
-                            <p class="text-xs text-red-600 mt-2 font-semibold flex items-start"><i data-lucide="alert-circle" class="w-3.5 h-3.5 mr-1 shrink-0 mt-0.5"></i> <span>{{ $rejectedFields['selfie']->comment }}</span></p>
-                        @endif
-                        @if(isset($profile) && $profile->kyc && $profile->kyc->selfie_path)
-                            <a href="{{ asset('storage/' . $profile->kyc->selfie_path) }}" target="_blank" class="text-xs text-[#007185] hover:underline flex items-center gap-1 mt-1.5"><i data-lucide="external-link" class="w-3.5 h-3.5"></i> View submitted document</a>
-                        @endif
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-[#565959] mb-1.5">Proof of Address</label>
-                                
-<input type="file" name="proof_of_address" accept="image/*,application/pdf" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#f0f2f2] file:text-[#0f1111] hover:file:bg-[#e3e6e6] transition-colors">
-                        @if(isset($rejectedFields) && $rejectedFields->has('proof_of_address'))
-                            <p class="text-xs text-red-600 mt-2 font-semibold flex items-start"><i data-lucide="alert-circle" class="w-3.5 h-3.5 mr-1 shrink-0 mt-0.5"></i> <span>{{ $rejectedFields['proof_of_address']->comment }}</span></p>
-                        @endif
-                        @if(isset($profile) && $profile->kyc && $profile->kyc->proof_of_address_path)
-                            <a href="{{ asset('storage/' . $profile->kyc->proof_of_address_path) }}" target="_blank" class="text-xs text-[#007185] hover:underline flex items-center gap-1 mt-1.5"><i data-lucide="external-link" class="w-3.5 h-3.5"></i> View submitted document</a>
-                        @endif
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                            <div>
-                                <label class="block text-xs font-bold text-[#565959] mb-1.5">CAC Certificate</label>
-                                
-<input type="file" name="cac_certificate" accept="image/*,application/pdf" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#f0f2f2] file:text-[#0f1111] hover:file:bg-[#e3e6e6] transition-colors">
-                        @if(isset($rejectedFields) && $rejectedFields->has('cac_certificate'))
-                            <p class="text-xs text-red-600 mt-2 font-semibold flex items-start"><i data-lucide="alert-circle" class="w-3.5 h-3.5 mr-1 shrink-0 mt-0.5"></i> <span>{{ $rejectedFields['cac_certificate']->comment }}</span></p>
-                        @endif
-                        @if(isset($profile) && $profile->kyc && $profile->kyc->cac_certificate_path)
-                            <a href="{{ asset('storage/' . $profile->kyc->cac_certificate_path) }}" target="_blank" class="text-xs text-[#007185] hover:underline flex items-center gap-1 mt-1.5"><i data-lucide="external-link" class="w-3.5 h-3.5"></i> View submitted document</a>
-                        @endif
-                            </div>
                         </div>
                     </div>
                 </div>

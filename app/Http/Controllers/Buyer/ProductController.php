@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Buyer;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\ProductReview;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -26,9 +27,21 @@ class ProductController extends Controller
         }
 
         if ($request->filled('category')) {
-            $query->whereHas('category', function($q) use ($request) {
-                $q->where('slug', $request->category);
+            $categories = $request->category;
+            if (!is_array($categories)) {
+                $categories = [$categories];
+            }
+            $query->whereHas('category', function($q) use ($categories) {
+                $q->whereIn('slug', $categories);
             });
+        }
+
+        if ($request->filled('min_price')) {
+            $query->where('unit_price', '>=', $request->min_price);
+        }
+
+        if ($request->filled('max_price')) {
+            $query->where('unit_price', '<=', $request->max_price);
         }
 
         if ($request->filled('sort')) {
@@ -48,6 +61,12 @@ class ProductController extends Controller
         return view('buyer.products.index', compact('products', 'categories', 'user'));
     }
 
+    public function categories()
+    {
+        $allCategories = Category::where('status', true)->orderBy('name')->get();
+        return view('buyer.products.categories', compact('allCategories'));
+    }
+
     public function show($id)
     {
         $product = Product::with(['category', 'sellerProfile'])
@@ -62,6 +81,12 @@ class ProductController extends Controller
             ->take(4)
             ->get();
 
-        return view('buyer.products.show', compact('product', 'related'));
+        $reviews = ProductReview::with('user')
+            ->where('product_name', $product->name)
+            ->latest()
+            ->get();
+        $avgRating = $reviews->avg('rating') ?? 0;
+
+        return view('buyer.products.show', compact('product', 'related', 'reviews', 'avgRating'));
     }
 }

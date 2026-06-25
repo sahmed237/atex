@@ -81,6 +81,7 @@ class DashboardController extends Controller
             'saved_items' => 0,
             'total_spent' => 0.00,
         ];
-        return view('admin.dashboard.buyer', compact('metrics', 'user'));
+        $sellerProfile = \App\Models\SellerProfile::where('user_id', $user->id)->first();
+        return view('admin.dashboard.buyer', compact('metrics', 'user', 'sellerProfile'));
     }
 }

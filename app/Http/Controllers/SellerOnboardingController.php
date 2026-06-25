@@ -60,7 +60,6 @@ class SellerOnboardingController extends Controller
             'lga' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:255',
             'phone' => 'required|string|max:20',
-            'nin' => 'required|string|size:11',
             'seller_brand_name' => 'nullable|string|max:255',
             'full_name' => 'required|string|max:255',
             'date_of_birth' => 'required|date',
@@ -68,11 +67,6 @@ class SellerOnboardingController extends Controller
             'residential_address' => 'required|string',
             'id_type' => 'required|string|in:nin,passport,drivers,voter',
             'id_number' => 'required|string|max:255',
-            'id_front' => 'nullable|image|max:5120',
-            'id_back' => 'nullable|image|max:5120',
-            'selfie' => 'nullable|image|max:5120',
-            'proof_of_address' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
-            'cac_certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
 
         $user = Auth::user();
@@ -90,7 +84,6 @@ class SellerOnboardingController extends Controller
                 'city' => $request->city,
                 'address' => $request->business_address,
                 'phone' => $request->phone,
-                'nin' => $request->nin,
                 'seller_tier' => 'local',
                 'verification_status' => 'pending',
                 'seller_program_status' => 'pending',
@@ -107,22 +100,6 @@ class SellerOnboardingController extends Controller
             'id_type' => $request->id_type,
             'id_number' => $request->id_number,
         ];
-
-        if ($request->hasFile('id_front')) {
-            $kycData['id_front_path'] = $request->file('id_front')->store('kyc', 'public');
-        }
-        if ($request->hasFile('id_back')) {
-            $kycData['id_back_path'] = $request->file('id_back')->store('kyc', 'public');
-        }
-        if ($request->hasFile('selfie')) {
-            $kycData['selfie_path'] = $request->file('selfie')->store('kyc', 'public');
-        }
-        if ($request->hasFile('proof_of_address')) {
-            $kycData['proof_of_address_path'] = $request->file('proof_of_address')->store('kyc', 'public');
-        }
-        if ($request->hasFile('cac_certificate')) {
-            $kycData['cac_certificate_path'] = $request->file('cac_certificate')->store('kyc', 'public');
-        }
 
         $sellerProfile->kyc()->updateOrCreate(
             ['seller_profile_id' => $sellerProfile->id],

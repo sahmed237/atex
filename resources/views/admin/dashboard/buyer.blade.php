@@ -41,15 +41,25 @@
 </div>
 
 @if(!$user->hasRole('seller'))
-<div class="bg-white rounded-lg border border-[#e7e7e7] p-5 mb-6 flex items-center justify-between">
-    <div>
-        <h3 class="font-bold text-[#0f1111]">Start selling on ATEX</h3>
-        <p class="text-sm text-[#565959] mt-0.5">Reach buyers across Nigeria and beyond.</p>
+    @if($sellerProfile && $sellerProfile->verification_status === 'pending')
+    <div class="bg-[#fff8e1] border border-[#ffb300] rounded-lg px-5 py-4 mb-6 flex items-start gap-3">
+        <i data-lucide="clock" class="w-5 h-5 text-[#ff8f00] shrink-0 mt-0.5"></i>
+        <div>
+            <h3 class="font-bold text-[#0f1111]">Seller Application Under Review</h3>
+            <p class="text-sm text-[#565959] mt-0.5">Your application to become a seller is being reviewed. You'll be notified once approved.</p>
+        </div>
     </div>
-    <a href="{{ route('seller.onboarding') }}" class="amazon-btn text-sm font-semibold px-6 py-2 rounded-full border shrink-0">
-        Become a Seller
-    </a>
-</div>
+    @elseif(!$sellerProfile || $sellerProfile->verification_status !== 'approved')
+    <div class="bg-white rounded-lg border border-[#e7e7e7] p-5 mb-6 flex items-center justify-between">
+        <div>
+            <h3 class="font-bold text-[#0f1111]">Start selling on ATEX</h3>
+            <p class="text-sm text-[#565959] mt-0.5">Reach buyers across Nigeria and beyond.</p>
+        </div>
+        <a href="{{ route('seller.onboarding') }}" class="amazon-btn text-sm font-semibold px-6 py-2 rounded-full border shrink-0">
+            Become a Seller
+        </a>
+    </div>
+    @endif
 @endif
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
@@ -81,7 +91,7 @@
                         </td>
                         <td class="px-4 py-3 text-right font-bold">&#8358;45,000</td>
                         <td class="px-4 py-3 text-right">
-                            <a href="#" class="link-blue text-xs font-semibold">Track</a>
+                            <a href="{{ route('buyer.orders.track', 'ORD-12345') }}" class="link-blue text-xs font-semibold">Track</a>
                         </td>
                     </tr>
                     <tr class="hover:bg-[#f7f8f8] transition-colors">
@@ -95,7 +105,7 @@
                         </td>
                         <td class="px-4 py-3 text-right font-bold">&#8358;120,500</td>
                         <td class="px-4 py-3 text-right">
-                            <a href="#" class="link-blue text-xs font-semibold">Review</a>
+                            <a href="{{ route('buyer.orders.review', 'ORD-12344') }}" class="link-blue text-xs font-semibold">Review</a>
                         </td>
                     </tr>
                     <tr class="hover:bg-[#f7f8f8] transition-colors">
@@ -109,7 +119,7 @@
                         </td>
                         <td class="px-4 py-3 text-right font-bold">&#8358;15,000</td>
                         <td class="px-4 py-3 text-right">
-                            <a href="#" class="link-blue text-xs font-semibold">Reorder</a>
+                            <a href="{{ route('buyer.orders.reorder', 'ORD-12343') }}" class="link-blue text-xs font-semibold">Reorder</a>
                         </td>
                     </tr>
                 </tbody>
@@ -157,32 +167,5 @@
             </a>
         </div>
     </div>
-</div>
-
-<div class="flex items-center justify-between mb-3">
-    <h2 class="section-title flex items-center gap-2">
-        <i data-lucide="trending-up" class="w-5 h-5 text-[#007185]"></i>
-        Recommended for You
-    </h2>
-    <a href="{{ route('buyer.products.index') }}" class="link-blue text-sm font-semibold">See all &rarr;</a>
-</div>
-
-<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-    @for($i = 0; $i < 5; $i++)
-    <div class="product-card rounded-lg overflow-hidden">
-        <div class="aspect-square bg-white flex items-center justify-center p-4">
-            <div class="w-full h-full bg-[#f7f7f7] rounded flex items-center justify-center">
-                <i data-lucide="package" class="w-10 h-10 text-gray-300"></i>
-            </div>
-        </div>
-        <div class="p-3">
-            <p class="text-[11px] text-[#565959] mb-0.5 truncate">Featured Supplier</p>
-            <p class="link-blue text-sm leading-snug line-clamp-2 mb-1">Premium Export Product from Nigeria</p>
-            <div class="flex text-[#de7921] text-xs mb-1">&#9733;&#9733;&#9733;&#9733;&#9734;</div>
-            <span class="text-base font-bold text-[#0f1111]">&#8358;0.00</span>
-            <button class="w-full amazon-btn text-[13px] font-semibold py-1.5 rounded-full border mt-2">Inquire</button>
-        </div>
-    </div>
-    @endfor
 </div>
 @endsection

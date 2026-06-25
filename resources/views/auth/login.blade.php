@@ -1,130 +1,95 @@
-@extends('layouts.auth')
+@extends('layouts.landing')
 
-@section('title', 'Sign In')
+@section('styles')
+<style>
+.auth-page { display: flex; min-height: calc(100vh - 100px); align-items: center; justify-content: center; padding: 40px 24px; }
+.auth-card { background: #fff; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,.1); width: 100%; max-width: 440px; padding: 40px; }
+.auth-card h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; color: #0f172a; }
+.auth-card .sub { color: #64748b; font-size: .9rem; margin-bottom: 28px; }
+.auth-card .form-group { margin-bottom: 18px; }
+.auth-card label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: 6px; color: #0f172a; }
+.auth-card input { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: .9rem; outline: none; transition: border-color .25s ease; background: #fff; }
+.auth-card input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
+.auth-card .form-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.auth-card .form-row label { font-size: .85rem; font-weight: 400; margin: 0; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.auth-card .form-row label input { width: auto; }
+.auth-card .forgot { font-size: .85rem; color: #2563eb; }
+.auth-card .forgot:hover { text-decoration: underline; }
+.auth-btn { width: 100%; padding: 12px; background: #febd69; border: none; border-radius: 8px; font-size: 1rem; font-weight: 700; color: #131921; cursor: pointer; transition: background .25s ease; }
+.auth-btn:hover { background: #f3a847; }
+.auth-btn:disabled { opacity: .5; cursor: not-allowed; }
+.auth-divider { display: flex; align-items: center; gap: 16px; margin: 24px 0; color: #64748b; font-size: .85rem; }
+.auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: #e2e8f0; }
+.social-btns { display: flex; gap: 10px; }
+.social-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: .85rem; font-weight: 500; cursor: pointer; background: #fff; transition: background .25s ease; }
+.social-btn:hover { background: #f8fafc; }
+.social-btn svg { width: 20px; height: 20px; }
+.auth-switch { text-align: center; margin-top: 24px; font-size: .9rem; color: #64748b; }
+.auth-switch a { color: #2563eb; font-weight: 600; }
+.auth-switch a:hover { text-decoration: underline; }
+.error-box { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 10px 14px; border-radius: 8px; font-size: .85rem; margin-bottom: 18px; display: none; }
+.error-box.show { display: block; }
+.success-box { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 10px 14px; border-radius: 8px; font-size: .85rem; margin-bottom: 18px; display: none; }
+.success-box.show { display: block; }
+.toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background: #131921; color: #fff; padding: 12px 24px; border-radius: 8px; font-size: .9rem; opacity: 0; transition: all .3s; z-index: 999; pointer-events: none; }
+.toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+@endsection
 
 @section('content')
-<style>
-    /* Custom specific styles to match Adamawa Ecommerce platform perfectly */
-    .login-hero-bg {
-        background: linear-gradient(90deg, rgba(11, 35, 25, 0.92), rgba(11, 35, 25, 0.55)), url("https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1600&q=80") center/cover;
-    }
-    
-    .btn-primary {
-        background: linear-gradient(135deg, #0f5132 0%, #1f7a4d 100%);
-        box-shadow: 0 12px 26px rgba(15, 81, 50, 0.2);
-        color: white;
-        transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
-    }
-    .btn-primary:hover {
-        transform: translateY(-1px);
-    }
-    .btn-secondary {
-        color: #0f5132;
-        background: rgba(255, 255, 255, 0.96);
-        border: 1px solid #d7e3da;
-        transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
-    }
-    .btn-secondary:hover {
-        transform: translateY(-1px);
-        background: #f8fbf8;
-    }
-    
-    .form-input-custom {
-        border: 1px solid #d7e3da;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
-        transition: all 0.2s;
-    }
-    .form-input-custom:focus {
-        border-color: rgba(31, 122, 77, 0.48);
-        box-shadow: 0 0 0 4px rgba(31, 122, 77, 0.1);
-        outline: none;
-    }
-</style>
-
-<div class="min-h-screen flex flex-col lg:grid lg:grid-cols-[1fr_430px]">
-    
-    <!-- Hero Section -->
-    <section class="login-hero-bg flex flex-col justify-end p-8 lg:p-16 xl:p-20 text-white min-h-[320px] lg:min-h-screen">
-        <span class="text-[#c99724] text-xs font-[850] uppercase tracking-wider mb-4 block">Enterprise Application</span>
-        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-4 max-w-3xl" style="line-height: 0.95;">
-            Verified export trade operations for Adamawa State.
-        </h1>
-        <p class="text-white/80 text-lg max-w-2xl">
-            Manage sellers, products, RFQs, compliance documents, orders, payments, logistics, and audit trails from one role-aware system.
-        </p>
-    </section>
-
-    <!-- Login Panel -->
-    <section class="bg-white/98 flex flex-col justify-center p-8 lg:p-10 shadow-[-20px_0_40px_rgba(0,0,0,0.05)] relative z-10">
-        
-        <div class="flex items-center gap-3 mb-8">
-            <div class="flex items-center justify-center w-10 h-10 bg-white border border-[#d7e3da] rounded-lg overflow-hidden shrink-0">
-                @if(!empty($system_settings['platform_logo']))
-                    <img src="{{ $system_settings['platform_logo'] }}" alt="Logo" class="max-w-[28px] max-h-[28px] object-contain">
-                @else
-                    <span class="text-[#0f5132] font-black text-xl">{{ substr($system_settings['platform_name'] ?? 'APP', 0, 1) }}</span>
-                @endif
-            </div>
-            <div>
-                <strong class="block text-[#17201c] font-bold text-lg leading-tight">{{ $system_settings['platform_name'] ?? 'Adamawa Ecommerce platform' }}</strong>
-                <small class="block text-[#65736b] text-sm">Enterprise login</small>
-            </div>
-        </div>
+<div class="auth-page">
+    <div class="auth-card">
+        <h1>Sign In</h1>
+        <p class="sub">Welcome back to Adamawa Export Platform</p>
 
         @if($errors->any())
-            <div class="p-3 mb-4 bg-[#fde8e6] text-[#b83a35] rounded-lg text-sm font-medium border border-[#b83a35]/20">
-                <ul class="space-y-1">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
+        <div class="error-box show">
+            @foreach($errors->all() as $error) {{ $error }} @endforeach
+        </div>
         @endif
 
         @if(session('success'))
-            <div class="p-3 mb-4 bg-[#e6f4ec] text-[#17633c] rounded-lg text-sm font-medium border border-[#17633c]/20">
-                {{ session('success') }}
-            </div>
+        <div class="success-box show">{{ session('success') }}</div>
         @endif
 
-        <form method="POST" action="{{ route('login.post') }}" class="space-y-4">
+        <form method="POST" action="{{ route('login.post') }}">
             @csrf
-            
-            <div class="flex flex-col gap-2">
-                <label class="text-[#17201c] font-[750] text-sm">Email</label>
-                <input type="email" name="email" value="{{ old('email') }}" required autofocus
-                    class="form-input-custom w-full min-h-[42px] px-3 py-2 rounded-lg text-[#17201c] bg-white"
-                    placeholder="admin@example.com">
+            <div class="form-group">
+                <label for="email">Email address</label>
+                <input type="email" name="email" id="email" value="{{ old('email') }}" placeholder="you@company.com" required autofocus>
             </div>
-
-            <div class="flex flex-col gap-2">
-                <label class="text-[#17201c] font-[750] text-sm">Password</label>
-                <input type="password" name="password" required
-                    class="form-input-custom w-full min-h-[42px] px-3 py-2 rounded-lg text-[#17201c] bg-white"
-                    placeholder="••••••••">
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" placeholder="Enter your password" required>
             </div>
-
-            <div class="flex items-center">
-                <input type="checkbox" id="remember" name="remember" class="w-4 h-4 text-[#1f7a4d] border-[#d7e3da] rounded focus:ring-[#1f7a4d]">
-                <label for="remember" class="ml-2 block text-sm font-medium text-[#65736b] !mb-0 !font-normal">Remember me</label>
+            <div class="form-row">
+                <label><input type="checkbox" name="remember" checked> Remember me</label>
+                <a href="{{ route('password.request') }}" class="forgot">Forgot password?</a>
             </div>
-
-            <button type="submit" class="btn-primary w-full min-h-[40px] px-4 rounded-lg font-[800] text-sm flex items-center justify-center mt-2">
-                Sign In
-            </button>
+            <button type="submit" class="auth-btn" id="loginBtn">Sign In</button>
         </form>
 
-        <div class="flex flex-wrap gap-2.5 mt-4">
-            <a href="/" class="btn-secondary flex-1 min-h-[40px] px-4 rounded-lg font-[800] text-sm flex items-center justify-center">Back to Landing</a>
-            <a href="/register" class="btn-secondary flex-1 min-h-[40px] px-4 rounded-lg font-[800] text-sm flex items-center justify-center">Create Account</a>
+        <div class="auth-divider">or continue with</div>
+        <div class="social-btns">
+            <button class="social-btn" onclick="showToast('Google sign-in coming soon')">
+                <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                Google
+            </button>
+            <button class="social-btn" onclick="showToast('LinkedIn sign-in coming soon')">
+                <svg viewBox="0 0 24 24" fill="#0A66C2"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                LinkedIn
+            </button>
         </div>
 
-        <div class="flex flex-col gap-2 mt-6 p-4 bg-[#f8fbf8] rounded-lg border border-[#d7e3da]/50">
-            <strong class="text-[#17201c] text-sm">Seeded demo accounts</strong>
-            <small class="text-[#65736b] text-xs">admin@example.com, officer@example.com, seller@example.com, buyer@example.com, logistics@example.com</small>
-            <small class="text-[#65736b] text-xs">Password for all accounts: password</small>
-        </div>
-
-    </section>
+        <div class="auth-switch">Don't have an account? <a href="{{ route('register') }}">Create one</a></div>
+    </div>
 </div>
+
+<div class="toast" id="toast"></div>
+@endsection
+
+@section('scripts')
+<script>
+function showToast(msg) { var t = document.getElementById('toast'); if (t) { t.textContent = msg; t.classList.add('visible'); setTimeout(function() { t.classList.remove('visible'); }, 2500); } }
+</script>
 @endsection

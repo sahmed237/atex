@@ -1,134 +1,189 @@
 @extends('layouts.buyer')
 
 @section('content')
-<div class="bg-white rounded-lg border border-[#e7e7e7] p-6 mb-6">
-    <a href="{{ route('buyer.products.index') }}" class="link-blue text-sm flex items-center gap-1 mb-4">
-        <i data-lucide="arrow-left" class="w-4 h-4"></i>
-        Back to results
-    </a>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <!-- Product Image -->
-        <div class="aspect-square bg-[#f7f7f7] rounded-lg flex items-center justify-center p-8">
-            @if($product->image_path)
-                <img src="{{ asset($product->image_path) }}" alt="{{ $product->name }}" class="w-full h-full object-contain">
-            @else
-                <i data-lucide="package" class="w-24 h-24 text-gray-300"></i>
-            @endif
-        </div>
-
-        <!-- Product Details -->
-        <div>
-            <p class="text-sm text-[#565959] mb-1">{{ $product->brand_name ?: ($product->sellerProfile->business_name ?? 'ATEX Marketplace') }}</p>
-            <h1 class="text-xl font-bold text-[#0f1111] leading-snug mb-2">{{ $product->name }}</h1>
-
-            <div class="flex items-center gap-3 mb-3">
-                <div class="flex text-[#de7921] text-sm">&#9733;&#9733;&#9733;&#9733;&#9734;</div>
-                <a href="#" class="link-blue text-sm">{{ rand(5, 50) }} ratings</a>
-            </div>
-
-            <hr class="border-gray-200 mb-4">
-
-            @if($product->unit_price && $product->unit_price !== 'Request quote')
-            <div class="mb-4">
-                <span class="text-2xl font-bold text-[#0f1111]">&#8358;{{ number_format((float) $product->unit_price) }}</span>
-            </div>
-            @else
-            <div class="mb-4">
-                <span class="text-lg font-bold text-[#007185]">Price: Request Quote</span>
-            </div>
-            @endif
-
-            <div class="space-y-2 text-sm mb-4">
-                <div class="flex gap-2">
-                    <span class="text-[#565959] w-28 shrink-0">MOQ:</span>
-                    <span class="font-medium">{{ $product->moq }}</span>
-                </div>
-                @if($product->hs_code)
-                <div class="flex gap-2">
-                    <span class="text-[#565959] w-28 shrink-0">HS Code:</span>
-                    <span class="font-medium">{{ $product->hs_code }}</span>
-                </div>
-                @endif
-                @if($product->origin_lga)
-                <div class="flex gap-2">
-                    <span class="text-[#565959] w-28 shrink-0">Origin:</span>
-                    <span class="font-medium">{{ $product->origin_lga }}</span>
-                </div>
-                @endif
-                @if($product->packaging)
-                <div class="flex gap-2">
-                    <span class="text-[#565959] w-28 shrink-0">Packaging:</span>
-                    <span class="font-medium">{{ $product->packaging }}</span>
-                </div>
-                @endif
-            </div>
-
-            <hr class="border-gray-200 mb-4">
-
-            <div class="flex items-center gap-3 mb-4">
-                <div class="w-10 h-10 rounded-full bg-[#f0f2f2] flex items-center justify-center">
-                    <i data-lucide="store" class="w-5 h-5 text-[#565959]"></i>
-                </div>
-                <div>
-                    <p class="text-xs text-[#565959]">Sold by</p>
-                    <p class="text-sm font-bold text-[#0f1111]">{{ $product->sellerProfile->business_name ?? 'ATEX Seller' }}</p>
-                </div>
-            </div>
-
-            @if($product->description)
-            <hr class="border-gray-200 mb-4">
-            <div>
-                <h3 class="text-sm font-bold text-[#0f1111] mb-1">About this product</h3>
-                <p class="text-sm text-[#0f1111] leading-relaxed">{{ $product->description }}</p>
-            </div>
-            @endif
-
-            <div class="mt-6 flex gap-3">
-                <form action="{{ route('admin.quotes.create') }}" method="GET">
-                    <input type="hidden" name="product_id" value="{{ $product->id }}">
-                    <button type="submit" class="amazon-btn text-sm font-semibold px-8 py-3 rounded-full border">
-                        <i data-lucide="message-square" class="w-4 h-4 inline mr-1"></i>
-                        Inquire
-                    </button>
-                </form>
-                <button class="amazon-btn-secondary text-sm font-semibold px-8 py-3 rounded-full border">
-                    <i data-lucide="shopping-cart" class="w-4 h-4 inline mr-1"></i>
-                    Add to Cart
-                </button>
-            </div>
-        </div>
-    </div>
+<div style="padding-bottom:20px;font-size:.85rem;color:var(--text-muted)">
+  <a href="{{ url('/') }}" style="color:inherit;text-decoration:none">Home</a>
+  / <a href="{{ route('buyer.products.index') }}" style="color:inherit;text-decoration:none">Products</a>
+  / <span style="color:var(--text)">{{ $product->name }}</span>
 </div>
 
-@if($related->count() > 0)
-<div class="mb-8">
-    <h2 class="section-title mb-4">Related Products</h2>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        @foreach($related as $item)
-        <div class="product-card rounded-lg overflow-hidden">
-            <a href="{{ route('buyer.products.show', $item->id) }}" class="aspect-square bg-white flex items-center justify-center p-4 block">
-                @if($item->image_path)
-                    <img src="{{ asset($item->image_path) }}" alt="{{ $item->name }}" class="w-full h-full object-contain">
-                @else
-                    <div class="w-full h-full bg-[#f7f7f7] flex items-center justify-center">
-                        <i data-lucide="package" class="w-10 h-10 text-gray-300"></i>
-                    </div>
-                @endif
-            </a>
-            <div class="p-3">
-                <p class="text-[11px] text-[#565959] mb-0.5 truncate">{{ $item->brand_name ?: ($item->sellerProfile->business_name ?? 'ATEX') }}</p>
-                <a href="{{ route('buyer.products.show', $item->id) }}" class="link-blue text-sm leading-snug line-clamp-2 mb-1">{{ $item->name }}</a>
-                <div class="flex text-[#de7921] text-xs mb-1">&#9733;&#9733;&#9733;&#9733;&#9734;</div>
-                @if($item->unit_price && $item->unit_price !== 'Request quote')
-                    <span class="text-base font-bold text-[#0f1111]">&#8358;{{ number_format((float) $item->unit_price) }}</span>
-                @else
-                    <span class="text-sm font-bold text-[#007185]">Request Quote</span>
-                @endif
-            </div>
-        </div>
-        @endforeach
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;padding-bottom:60px">
+  <div>
+    <div style="background:var(--bg-alt);border-radius:var(--radius);aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:6rem;border:1px solid var(--border);position:relative;overflow:hidden">
+      @if($product->image_path)
+        <img src="{{ asset($product->image_path) }}" alt="{{ $product->name }}" style="width:100%;height:100%;object-fit:contain;padding:24px">
+      @else
+        <i data-lucide="package" style="width:80px;height:80px;color:#cbd5e1"></i>
+      @endif
     </div>
+  </div>
+
+  <div>
+    <div style="display:inline-block;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--primary);margin-bottom:8px">
+      {{ $product->category->name ?? 'General' }}
+    </div>
+    <h1 style="font-size:1.75rem;font-weight:700;margin:0 0 8px;line-height:1.2">{{ $product->name }}</h1>
+    <div style="font-size:1rem;color:var(--accent);letter-spacing:2px;margin-bottom:12px">
+      @for($i = 1; $i <= 5; $i++)
+        @if($i <= round($avgRating))&#9733;@else&#9734;@endif
+      @endfor
+    </div>
+
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+      @if($product->unit_price && $product->unit_price !== 'Request quote')
+        <span style="font-size:2rem;font-weight:800">&#8358;{{ number_format((float) $product->unit_price) }}</span>
+      @else
+        <span style="font-size:1.2rem;font-weight:600;color:var(--primary)">Request Quote</span>
+      @endif
+      <span style="font-size:.82rem;color:var(--text-muted);background:var(--bg-alt);padding:4px 12px;border-radius:50px">MOQ: {{ $product->moq }}</span>
+    </div>
+
+    @if($product->description)
+      <div style="font-size:.95rem;color:var(--text-muted);line-height:1.7;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--border)">
+        {{ $product->description }}
+      </div>
+    @endif
+
+    <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;margin-bottom:20px;font-size:.88rem;color:#166534">
+      <span style="font-size:1.2rem">🚚</span>
+      <span>Estimated delivery: <strong>7–14 business days</strong></span>
+      <span style="margin-left:auto;font-size:.78rem;color:#4ade80">Free shipping</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px">
+      <div style="padding:12px 16px;background:var(--bg-alt);border-radius:8px">
+        <div style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Category</div>
+        <div style="font-size:.95rem;font-weight:600;margin-top:2px">{{ $product->category->name ?? 'N/A' }}</div>
+      </div>
+      <div style="padding:12px 16px;background:var(--bg-alt);border-radius:8px">
+        <div style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Min Order Qty</div>
+        <div style="font-size:.95rem;font-weight:600;margin-top:2px">{{ $product->moq }}</div>
+      </div>
+      <div style="padding:12px 16px;background:var(--bg-alt);border-radius:8px">
+        <div style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Unit Price</div>
+        <div style="font-size:.95rem;font-weight:600;margin-top:2px">&#8358;{{ $product->unit_price && $product->unit_price !== 'Request quote' ? number_format((float) $product->unit_price) : 'Request Quote' }}</div>
+      </div>
+      <div style="padding:12px 16px;background:var(--bg-alt);border-radius:8px">
+        <div style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Seller</div>
+        <div style="font-size:.95rem;font-weight:600;margin-top:2px">{{ $product->sellerProfile->business_name ?? 'ATEX' }}</div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+      <label style="font-size:.9rem;font-weight:600">Quantity:</label>
+      <div style="display:flex;align-items:center;border:1px solid var(--border);border-radius:8px;overflow:hidden">
+        <button onclick="changeQty(-1)" style="width:40px;height:40px;background:var(--bg-alt);font-size:1.1rem;font-weight:600;border:none;cursor:pointer;transition:background var(--transition)" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='var(--bg-alt)'">−</button>
+        <span id="qtyDisplay" style="width:48px;text-align:center;font-weight:600;font-size:1rem">1</span>
+        <button onclick="changeQty(1)" style="width:40px;height:40px;background:var(--bg-alt);font-size:1.1rem;font-weight:600;border:none;cursor:pointer;transition:background var(--transition)" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='var(--bg-alt)'">+</button>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <button class="btn-primary" onclick="addToCart({{ $product->id }}, '{{ $product->name }}', {{ $product->unit_price && $product->unit_price !== 'Request quote' ? (float) $product->unit_price : 0 }})" style="display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border-radius:50px;font-weight:600;font-size:.95rem;border:none;cursor:pointer;background:var(--primary);color:#fff;transition:all var(--transition)" onmouseover="this.style.background='var(--primary-dark)';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 30px rgba(37,99,235,.4)'" onmouseout="this.style.background='var(--primary)';this.style.transform='';this.style.boxShadow=''">
+        🛒 Add to Cart
+      </button>
+      <a href="{{ route('buyer.products.index') }}" style="display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border-radius:50px;font-weight:600;font-size:.95rem;border:2px solid var(--border);color:var(--text);text-decoration:none;transition:all var(--transition)" onmouseover="this.style.borderColor='var(--text)'" onmouseout="this.style.borderColor='var(--border)'">
+        &larr; Back to Products
+      </a>
+    </div>
+  </div>
 </div>
-@endif
+
+<div style="padding:40px 0 60px;border-top:1px solid var(--border)">
+  <h2 style="font-size:1.3rem;margin:0 0 24px">You May Also Like</h2>
+  @if($related->count() > 0)
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px">
+    @foreach($related as $item)
+      <a href="{{ route('buyer.products.show', $item->id) }}" style="border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;cursor:pointer;text-decoration:none;color:inherit;transition:transform var(--transition),box-shadow var(--transition)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="aspect-ratio:1;background:var(--bg-alt);display:flex;align-items:center;justify-content:center;font-size:2.5rem;padding:12px">
+          @if($item->image_path)
+            <img src="{{ asset($item->image_path) }}" alt="{{ $item->name }}" style="width:100%;height:100%;object-fit:contain">
+          @else
+            <i data-lucide="package" style="width:36px;height:36px;color:#cbd5e1"></i>
+          @endif
+        </div>
+        <div style="padding:12px">
+          <h4 style="font-size:.88rem;margin:0 0 4px">{{ $item->name }}</h4>
+          <div style="font-weight:700;font-size:.95rem">&#8358;{{ $item->unit_price && $item->unit_price !== 'Request quote' ? number_format((float) $item->unit_price) : 'Request Quote' }}</div>
+        </div>
+      </a>
+    @endforeach
+  </div>
+  @else
+  <p style="color:var(--text-muted);font-size:.9rem">No related products found.</p>
+  @endif
+</div>
+
+<div style="padding:40px 0 60px;border-top:1px solid var(--border)">
+  <h2 style="font-size:1.3rem;margin-bottom:24px">Customer Reviews</h2>
+
+  @if($reviews->count() > 0)
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+    <span style="font-size:2rem;font-weight:700">{{ number_format($avgRating, 1) }}</span>
+    <span style="font-size:1.2rem;color:var(--accent);letter-spacing:2px">
+      @for($i = 1; $i <= 5; $i++)
+        @if($i <= round($avgRating))&#9733;@else&#9734;@endif
+      @endfor
+    </span>
+    <span style="font-size:.88rem;color:var(--text-muted)">({{ $reviews->count() }} {{ Str::plural('review', $reviews->count()) }})</span>
+  </div>
+
+  @foreach($reviews as $review)
+  <div style="padding:20px 0;border-bottom:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <div style="width:36px;height:36px;border-radius:50%;background:var(--bg-alt);display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:600;color:var(--text-muted)">{{ strtoupper(substr($review->user->name ?? 'A', 0, 2)) }}</div>
+      <span style="font-weight:600;font-size:.9rem">{{ $review->user->name ?? 'Anonymous' }}</span>
+      <span style="font-size:.8rem;color:var(--text-muted);margin-left:auto">{{ $review->created_at->format('M j, Y') }}</span>
+    </div>
+    <div style="font-size:.95rem;color:var(--accent);letter-spacing:2px;margin-bottom:4px">
+      @for($i = 1; $i <= 5; $i++)
+        @if($i <= $review->rating)&#9733;@else&#9734;@endif
+      @endfor
+    </div>
+    @if($review->comment)
+    <div style="font-size:.9rem;color:var(--text-muted);line-height:1.6">{{ $review->comment }}</div>
+    @endif
+  </div>
+  @endforeach
+  @else
+  <p style="color:var(--text-muted);font-size:.9rem">No reviews yet for this product.</p>
+  @endif
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text);color:#fff;padding:14px 28px;border-radius:50px;font-weight:500;font-size:.92rem;opacity:0;transition:all .35s cubic-bezier(.22,1,.36,1);z-index:300;pointer-events:none"></div>
+
+<script>
+let currentQty = 1;
+
+function changeQty(delta) {
+  currentQty = Math.max(1, currentQty + delta);
+  document.getElementById('qtyDisplay').textContent = currentQty;
+}
+
+function addToCart(id, name, price) {
+  const existing = cart.find(c => c.id === id);
+  if (existing) {
+    existing.qty += currentQty;
+  } else {
+    cart.push({ id: String(id), name, price, qty: currentQty });
+  }
+  currentQty = 1;
+  document.getElementById('qtyDisplay').textContent = 1;
+  updateCartUI();
+  showToast(name + ' added to cart');
+}
+
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.opacity = '1';
+  el.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(el._timeout);
+  el._timeout = setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(-50%) translateY(80px)';
+  }, 3000);
+}
+</script>
 @endsection

@@ -66,6 +66,65 @@ Route::middleware('auth')->group(function () {
 Route::get('/products', [\App\Http\Controllers\Buyer\ProductController::class, 'index'])->name('buyer.products.index');
 Route::get('/products/{id}', [\App\Http\Controllers\Buyer\ProductController::class, 'show'])->name('buyer.products.show');
 
+Route::get('/cart', function () {
+    return view('buyer.products.cart');
+})->name('buyer.cart.index');
+
+Route::post('/checkout', function (\Illuminate\Http\Request $request) {
+    if (!auth()->check()) {
+        return response()->json(['status' => 'ok', 'message' => 'Order saved locally']);
+    }
+
+    $data = $request->validate([
+        'items' => 'required|array',
+        'items.*.product_id' => 'required|exists:products,id',
+        'items.*.quantity' => 'required|integer|min:1',
+        'total' => 'required|numeric|min:0',
+    ]);
+
+    $user = auth()->user();
+    $buyer = \App\Models\BuyerProfile::firstOrCreate(
+        ['user_id' => $user->id],
+        ['country' => 'Nigeria', 'verification_status' => 'approved']
+    );
+
+    $orderIds = [];
+    foreach ($data['items'] as $item) {
+        $product = \App\Models\Product::find($item['product_id']);
+        if (!$product || !$product->seller_profile_id) continue;
+
+        $orderNumber = 'ORD-' . strtoupper(\Illuminate\Support\Str::random(8));
+        $totalAmount = (float) $product->unit_price * $item['quantity'];
+
+        $order = \App\Models\Order::create([
+            'order_number' => $orderNumber,
+            'product_id' => $product->id,
+            'buyer_profile_id' => $buyer->id,
+            'seller_profile_id' => $product->seller_profile_id,
+            'order_quantity' => $item['quantity'],
+            'total_amount' => $totalAmount,
+            'currency' => 'NGN',
+            'fulfillment_mode' => $product->fulfillment_mode ?? 'seller_direct',
+            'fulfillment_status' => 'pending',
+            'commission_amount' => round($totalAmount * 0.10, 2),
+            'tax_amount' => round($totalAmount * 0.075, 2),
+            'net_payout_amount' => round($totalAmount * 0.825, 2),
+            'settlement_status' => 'pending',
+            'payment_status' => 'held',
+            'shipment_status' => 'pending_assignment',
+            'status' => 'confirmed',
+        ]);
+
+        $orderIds[] = $order->id;
+    }
+
+    return response()->json(['status' => 'ok', 'order_ids' => $orderIds]);
+})->name('checkout.store');
+
+Route::get('/orders', function () {
+    return view('buyer.orders.index');
+})->name('buyer.orders.index');
+
 Route::get('/api/world/states/{countryCode}', function (string $countryCode) {
     $states = \Imujas9\World\Facades\State::where('country_code', strtoupper($countryCode))->get(['name', 'code']);
     return response()->json($states);
@@ -75,6 +134,39 @@ Route::middleware(['auth', 'verified', 'security_policy', 'legal_acceptance'])->
     Route::get('/kyc/onboarding', [\App\Http\Controllers\Auth\KycOnboardingController::class, 'show'])->name('kyc.onboarding');
     Route::post('/kyc/onboarding', [\App\Http\Controllers\Auth\KycOnboardingController::class, 'store'])->name('kyc.onboarding.store');
 
+});
+
+Route::middleware(['auth', 'verified', 'security_policy', 'legal_acceptance'])->group(function () {
+    Route::prefix('buyer')->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'buyerDashboard'])->name('buyer.dashboard');
+        
+        // Profile Settings
+        Route::get('/profile', [\App\Http\Controllers\Buyer\ProfileController::class, 'show'])->name('buyer.profile.show');
+        Route::put('/profile/info', [\App\Http\Controllers\Buyer\ProfileController::class, 'updateInfo'])->name('buyer.profile.update-info');
+        Route::put('/profile/password', [\App\Http\Controllers\Buyer\ProfileController::class, 'updatePassword'])->name('buyer.profile.password');
+        Route::get('/profile/2fa', [\App\Http\Controllers\Buyer\ProfileController::class, 'showTwoFactor'])->name('buyer.profile.2fa');
+        Route::post('/profile/2fa/confirm', [\App\Http\Controllers\Buyer\ProfileController::class, 'confirmTwoFactor'])->name('buyer.profile.2fa.confirm');
+        Route::post('/profile/2fa/disable', [\App\Http\Controllers\Buyer\ProfileController::class, 'disableTwoFactor'])->name('buyer.profile.2fa.disable');
+
+        // All Categories
+        Route::get('/categories', [\App\Http\Controllers\Buyer\ProductController::class, 'categories'])->name('buyer.categories.index');
+
+        // Order Tracking
+        Route::get('/orders/{reference}/track', [\App\Http\Controllers\Buyer\OrderController::class, 'track'])->name('buyer.orders.track');
+
+        // Order Reviews
+        Route::get('/orders/{reference}/review', [\App\Http\Controllers\Buyer\OrderController::class, 'review'])->name('buyer.orders.review');
+        Route::post('/orders/{reference}/review', [\App\Http\Controllers\Buyer\OrderController::class, 'storeReview'])->name('buyer.orders.review.store');
+
+        // Reorder
+        Route::get('/orders/{reference}/reorder', [\App\Http\Controllers\Buyer\OrderController::class, 'reorder'])->name('buyer.orders.reorder');
+
+        // Seller Onboarding for Buyers
+        Route::get('/become-a-seller', [\App\Http\Controllers\SellerOnboardingController::class, 'show'])->name('seller.onboarding');
+        Route::post('/become-a-seller', [\App\Http\Controllers\SellerOnboardingController::class, 'store'])->name('seller.onboarding.store');
+        Route::get('/become-a-seller/upgrade', [\App\Http\Controllers\SellerOnboardingController::class, 'showUpgrade'])->name('seller.onboarding.upgrade');
+        Route::post('/become-a-seller/upgrade', [\App\Http\Controllers\SellerOnboardingController::class, 'storeUpgrade'])->name('seller.onboarding.upgrade.store');
+    });
 });
 
 Route::middleware(['auth', 'verified', 'security_policy', 'kyc_completed', 'legal_acceptance'])->group(function () {
@@ -93,24 +185,6 @@ Route::middleware(['auth', 'verified', 'security_policy', 'kyc_completed', 'lega
 
         Route::get('/profile', [\App\Http\Controllers\Seller\ProfileController::class, 'show'])->name('seller.profile.show');
         Route::post('/profile', [\App\Http\Controllers\Seller\ProfileController::class, 'update'])->name('seller.profile.update');
-    });
-
-    Route::prefix('buyer')->group(function () {
-        Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'buyerDashboard'])->name('buyer.dashboard');
-        
-        // Profile Settings
-        Route::get('/profile', [\App\Http\Controllers\Buyer\ProfileController::class, 'show'])->name('buyer.profile.show');
-        Route::put('/profile/info', [\App\Http\Controllers\Buyer\ProfileController::class, 'updateInfo'])->name('buyer.profile.update-info');
-        Route::put('/profile/password', [\App\Http\Controllers\Buyer\ProfileController::class, 'updatePassword'])->name('buyer.profile.password');
-        Route::get('/profile/2fa', [\App\Http\Controllers\Buyer\ProfileController::class, 'showTwoFactor'])->name('buyer.profile.2fa');
-        Route::post('/profile/2fa/confirm', [\App\Http\Controllers\Buyer\ProfileController::class, 'confirmTwoFactor'])->name('buyer.profile.2fa.confirm');
-        Route::post('/profile/2fa/disable', [\App\Http\Controllers\Buyer\ProfileController::class, 'disableTwoFactor'])->name('buyer.profile.2fa.disable');
-
-        // Seller Onboarding for Buyers
-        Route::get('/become-a-seller', [\App\Http\Controllers\SellerOnboardingController::class, 'show'])->name('seller.onboarding');
-        Route::post('/become-a-seller', [\App\Http\Controllers\SellerOnboardingController::class, 'store'])->name('seller.onboarding.store');
-        Route::get('/become-a-seller/upgrade', [\App\Http\Controllers\SellerOnboardingController::class, 'showUpgrade'])->name('seller.onboarding.upgrade');
-        Route::post('/become-a-seller/upgrade', [\App\Http\Controllers\SellerOnboardingController::class, 'storeUpgrade'])->name('seller.onboarding.upgrade.store');
     });
 
     Route::prefix('logistics')->group(function () {

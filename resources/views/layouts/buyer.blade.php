@@ -131,13 +131,17 @@
                             <span class="text-sm font-bold">Register</span>
                         </a>
                         @endauth
-                        <a href="#" class="flex flex-col leading-tight px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded text-xs">
+                        <a href="{{ route('buyer.orders.index') }}" class="flex flex-col leading-tight px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded text-xs">
                             <span class="text-[11px] text-white/60">Returns</span>
                             <span class="text-sm font-bold">& Orders</span>
                         </a>
-                        <a href="#" class="flex items-center gap-1 px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded">
-                            <i data-lucide="shopping-cart" class="w-[22px] h-[22px]"></i>
-                            <span class="text-sm font-bold">Cart</span>
+                        <a href="{{ route('buyer.cart.index') }}" class="flex items-center gap-1 px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded relative">
+                            <svg viewBox="0 0 24 24" fill="#fff" width="22" height="22"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                            <div class="cart-text">
+                                <span style="font-size:.7rem;color:rgba(255,255,255,.7);line-height:1">Cart</span>
+                                <span style="font-size:.85rem;font-weight:700;color:#fff;line-height:1.2" id="cartLabel">0</span>
+                            </div>
+                            <span class="cart-count" id="cartCount" style="position:absolute;top:-2px;left:18px;background:#f08804;color:#131921;font-size:.65rem;font-weight:700;min-width:18px;height:16px;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:0 3px;line-height:1;opacity:0;transform:scale(.5);transition:.25s ease">0</span>
                         </a>
                     </div>
                 </div>
@@ -149,7 +153,7 @@
             <div class="max-w-[1500px] mx-auto px-4 flex items-center h-[40px] gap-2 md:gap-5 pb-1 -mb-1">
                 <!-- Fixed Left Items -->
                 <div class="flex items-center gap-1 md:gap-3 shrink-0">
-                    <a href="{{ route('buyer.products.index') }}" class="flex items-center gap-1.5 whitespace-nowrap font-medium px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded">
+                    <a href="{{ url('/') }}" class="flex items-center gap-1.5 whitespace-nowrap font-medium px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded">
                         <i data-lucide="home" class="w-[18px] h-[18px]"></i>
                     </a>
                     <a href="{{ route('buyer.products.index') }}" class="whitespace-nowrap font-medium px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded hidden sm:block">All Products</a>
@@ -305,6 +309,117 @@
             </button>
         </div>
     </div>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()" style="position:fixed;inset:0;background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:200"></div>
+    <aside class="cart-sidebar" id="cartSidebar" style="position:fixed;top:0;right:0;width:420px;max-width:90vw;height:100vh;background:#fff;z-index:201;transform:translateX(100%);transition:transform .35s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:24px;border-bottom:1px solid #e2e8f0">
+        <h2 style="font-size:1.25rem;margin:0">Cart</h2>
+        <button onclick="toggleCart()" style="width:36px;height:36px;border-radius:50%;background:#f8fafc;font-size:1.2rem;border:none;cursor:pointer">✕</button>
+      </div>
+      <div class="cart-items" id="cartItems" style="flex:1;overflow-y:auto;padding:16px 24px">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#64748b;text-align:center;padding:40px"><p>Your cart is empty</p></div>
+      </div>
+      <div style="padding:24px;border-top:1px solid #e2e8f0">
+        <div style="display:flex;justify-content:space-between;font-size:1.1rem;font-weight:700;margin-bottom:16px"><span>Total</span><span id="cartTotal">₦0.00</span></div>
+        <a href="{{ route('buyer.cart.index') }}" style="display:block;text-align:center;padding:8px;font-size:.85rem;color:#2563eb;margin-bottom:8px;text-decoration:none">View Full Cart →</a>
+        <button onclick="handleCheckout()" style="width:100%;padding:16px;border-radius:50px;background:#0f172a;color:#fff;font-weight:600;font-size:1rem;border:none;cursor:pointer;transition:background .25s ease" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#0f172a'">Checkout</button>
+      </div>
+    </aside>
+
+    <div class="toast" id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#0f172a;color:#fff;padding:14px 28px;border-radius:50px;font-weight:500;font-size:.92rem;opacity:0;transition:all .35s cubic-bezier(.22,1,.36,1);z-index:300;pointer-events:none"></div>
+
+    <script>
+    let cart = JSON.parse(localStorage.getItem('atex_cart') || '[]');
+
+    function toggleCart() {
+      const overlay = document.getElementById('cartOverlay');
+      const sidebar = document.getElementById('cartSidebar');
+      if (!overlay || !sidebar) return;
+      const isOpen = overlay.style.opacity === '1';
+      overlay.style.opacity = isOpen ? '0' : '1';
+      overlay.style.pointerEvents = isOpen ? 'none' : 'auto';
+      sidebar.style.transform = isOpen ? 'translateX(100%)' : 'translateX(0px)';
+    }
+
+    function addToCart(btn) {
+      const id = btn.dataset.productId;
+      const name = btn.dataset.productName;
+      const price = parseFloat(btn.dataset.productPrice) || 0;
+      const existing = cart.find(c => c.id === id);
+      if (existing) { existing.qty++; } else { cart.push({ id, name, price, qty: 1 }); }
+      updateCartUI();
+      showToast(name + ' added to cart');
+    }
+
+    function removeFromCart(id) { cart = cart.filter(c => c.id !== id); updateCartUI(); }
+
+    function changeQty(id, delta) {
+      const item = cart.find(c => c.id === id);
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) { removeFromCart(id); return; }
+      updateCartUI();
+    }
+
+    function updateCartUI() {
+      const count = cart.reduce((s, c) => s + c.qty, 0);
+      localStorage.setItem('atex_cart', JSON.stringify(cart));
+      const badge = document.getElementById('cartCount');
+      if (badge) {
+        badge.textContent = count;
+        badge.style.opacity = count > 0 ? '1' : '0';
+        badge.style.transform = count > 0 ? 'scale(1)' : 'scale(.5)';
+      }
+      const label = document.getElementById('cartLabel');
+      if (label) label.textContent = count;
+      const container = document.getElementById('cartItems');
+      const totalEl = document.getElementById('cartTotal');
+      if (!container) return;
+      if (cart.length === 0) {
+        container.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#64748b;text-align:center;padding:40px"><p>Your cart is empty</p></div>';
+        if (totalEl) totalEl.textContent = '₦0.00';
+        return;
+      }
+      container.innerHTML = cart.map(c => `
+        <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #e2e8f0">
+          <div style="width:40px;height:40px;border-radius:8px;background:#f8fafc;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">📦</div>
+          <div style="flex:1">
+            <div style="font-size:.85rem;font-weight:600">${c.name}</div>
+            <div style="font-size:.8rem;color:#64748b">₦${parseFloat(c.price).toFixed(2)}</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+              <button onclick="changeQty('${c.id}',-1)" style="width:24px;height:24px;border-radius:50%;background:#f8fafc;font-weight:600;font-size:.85rem;border:none;cursor:pointer">−</button>
+              <span style="font-weight:600;font-size:.85rem;min-width:16px;text-align:center">${c.qty}</span>
+              <button onclick="changeQty('${c.id}',1)" style="width:24px;height:24px;border-radius:50%;background:#f8fafc;font-weight:600;font-size:.85rem;border:none;cursor:pointer">+</button>
+              <button onclick="removeFromCart('${c.id}')" style="font-size:.78rem;color:#64748b;padding:2px 6px;border:none;cursor:pointer;background:none">✕</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      const total = cart.reduce((s, c) => s + parseFloat(c.price) * c.qty, 0);
+      if (totalEl) totalEl.textContent = '₦' + total.toFixed(2);
+    }
+
+    function handleCheckout() {
+      if (cart.length === 0) { showToast('Cart is empty'); return; }
+      showToast('Checkout coming soon!');
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      if (!el) return;
+      el.textContent = msg;
+      el.style.opacity = '1';
+      el.style.transform = 'translateX(-50%) translateY(0)';
+      clearTimeout(el._timeout);
+      el._timeout = setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateX(-50%) translateY(80px)';
+      }, 3000);
+    }
+
+    updateCartUI();
+    </script>
 
     <script>
         lucide.createIcons();

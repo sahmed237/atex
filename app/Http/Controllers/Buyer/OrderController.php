@@ -10,6 +10,7 @@ use App\Models\SellerProfile;
 use App\Models\Settlement;
 use App\Models\Shipment;
 use App\Models\AtexAuditLog;
+use App\Models\ProductReview;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -172,6 +173,84 @@ class OrderController extends Controller
         return view('buyer.orders.show', compact('order', 'user'));
     }
 
+    public function track($reference)
+    {
+        $order = Order::where('order_number', $reference)->with(['shipment', 'product', 'sellerProfile', 'buyerProfile'])->first();
+
+        if (!$order) {
+            // Dummy tracking data for dashboard sample orders
+            $tracking = [
+                'order_number' => $reference,
+                'status' => match (true) {
+                    str_contains($reference, '12345') => 'Processing',
+                    str_contains($reference, '12344') => 'Delivered',
+                    default => 'Shipped',
+                },
+                'payment_status' => 'held',
+                'shipment_status' => match (true) {
+                    str_contains($reference, '12345') => 'picked_up',
+                    str_contains($reference, '12344') => 'delivered',
+                    default => 'in_transit',
+                },
+                'product_name' => 'Premium Export Product',
+                'quantity' => '50 MT',
+                'origin' => 'Yola, Adamawa',
+                'destination' => 'Lagos Port',
+                'tracking_number' => 'AEM-' . strtoupper(substr(md5($reference), 0, 8)),
+                'logistics_partner' => 'Sahel Freight Logistics',
+                'created_at' => now()->subDays(match (true) {
+                    str_contains($reference, '12345') => 2,
+                    str_contains($reference, '12344') => 14,
+                    default => 7,
+                }),
+                'timeline' => [
+                    ['status' => 'Order Placed', 'date' => now()->subDays(7), 'description' => 'Quote accepted and order created'],
+                    ['status' => 'Payment Confirmed', 'date' => now()->subDays(6), 'description' => 'Payment held in escrow'],
+                    ['status' => 'Processing', 'date' => now()->subDays(4), 'description' => 'Seller preparing shipment'],
+                    ['status' => 'Picked Up', 'date' => now()->subDays(2), 'description' => 'Cargo picked up by logistics partner'],
+                    ['status' => 'In Transit', 'date' => now()->subDay(), 'description' => 'Shipment en route to destination'],
+                ],
+            ];
+            return view('buyer.orders.track', compact('tracking'));
+        }
+
+        $tracking = [
+            'order_number' => $order->order_number,
+            'status' => $order->status,
+            'payment_status' => $order->payment_status,
+            'shipment_status' => $order->shipment_status,
+            'product_name' => $order->product->name ?? 'Direct Trade Lot',
+            'quantity' => $order->order_quantity,
+            'origin' => $order->shipment->origin_location ?? 'Adamawa',
+            'destination' => $order->destination_location,
+            'tracking_number' => $order->shipment->tracking_number ?? 'Not assigned',
+            'logistics_partner' => $order->shipment->logisticsProfile->company_name ?? 'TBD',
+            'created_at' => $order->created_at,
+            'timeline' => [],
+        ];
+
+        $shipStatus = $order->shipment_status;
+        $tracking['timeline'][] = ['status' => 'Order Placed', 'date' => $order->created_at, 'description' => 'Quote accepted and order created'];
+        $tracking['timeline'][] = ['status' => 'Payment Confirmed', 'date' => $order->created_at->addDay(), 'description' => 'Payment held in escrow'];
+        if (in_array($shipStatus, ['picked_up', 'customs_cleared', 'departed_origin', 'in_transit', 'delivered'])) {
+            $tracking['timeline'][] = ['status' => 'Picked Up', 'date' => $order->created_at->addDays(3), 'description' => 'Cargo picked up by logistics'];
+        }
+        if (in_array($shipStatus, ['customs_cleared', 'departed_origin', 'in_transit', 'delivered'])) {
+            $tracking['timeline'][] = ['status' => 'Customs Cleared', 'date' => $order->created_at->addDays(5), 'description' => 'Export documentation approved'];
+        }
+        if (in_array($shipStatus, ['departed_origin', 'in_transit', 'delivered'])) {
+            $tracking['timeline'][] = ['status' => 'Departed Origin', 'date' => $order->created_at->addDays(7), 'description' => 'Shipment departed origin'];
+        }
+        if (in_array($shipStatus, ['in_transit', 'delivered'])) {
+            $tracking['timeline'][] = ['status' => 'In Transit', 'date' => $order->created_at->addDays(10), 'description' => 'Shipment en route'];
+        }
+        if ($shipStatus === 'delivered') {
+            $tracking['timeline'][] = ['status' => 'Delivered', 'date' => $order->created_at->addDays(14), 'description' => 'Shipment delivered successfully'];
+        }
+
+        return view('buyer.orders.track', compact('tracking'));
+    }
+
     public function fulfillment()
     {
         $user = Auth::user();
@@ -232,6 +311,71 @@ class OrderController extends Controller
         ]);
 
         return redirect()->route('admin.fulfillment.index')->with('success', 'Fulfillment order status updated successfully.');
+    }
+
+    public function review($reference)
+    {
+        $order = Order::where('order_number', $reference)->first();
+        if (!$order) {
+            return view('buyer.orders.review', [
+                'reference' => $reference,
+                'product_name' => 'Premium Export Product',
+                'order' => null,
+            ]);
+        }
+        return view('buyer.orders.review', [
+            'reference' => $reference,
+            'product_name' => $order->product->name ?? 'Direct Trade Lot',
+            'order' => $order,
+        ]);
+    }
+
+    public function storeReview(Request $request, $reference)
+    {
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string|max:1000',
+        ]);
+
+        $existing = ProductReview::where('user_id', Auth::id())
+            ->where('order_reference', $reference)
+            ->first();
+
+        if ($existing) {
+            return back()->with('error', 'You have already reviewed this order.');
+        }
+
+        ProductReview::create([
+            'user_id' => Auth::id(),
+            'order_reference' => $reference,
+            'product_name' => $request->product_name ?? 'Premium Export Product',
+            'rating' => $request->rating,
+            'comment' => $request->comment,
+        ]);
+
+        return redirect()->route('buyer.dashboard')->with('success', 'Thank you! Your review has been submitted.');
+    }
+
+    public function reorder($reference)
+    {
+        $order = Order::where('order_number', $reference)->first();
+        if (!$order) {
+            return view('buyer.orders.reorder', [
+                'reference' => $reference,
+                'product_name' => 'Premium Export Product',
+                'amount' => match ($reference) {
+                    'ORD-12343' => '15000',
+                    default => '0',
+                },
+                'order' => null,
+            ]);
+        }
+        return view('buyer.orders.reorder', [
+            'reference' => $reference,
+            'product_name' => $order->product->name ?? 'Direct Trade Lot',
+            'amount' => $order->total_amount,
+            'order' => $order,
+        ]);
     }
 }
 
