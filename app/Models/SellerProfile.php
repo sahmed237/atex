@@ -30,9 +30,6 @@ class SellerProfile extends Model
         'bank_name',
         'account_number',
         'account_name',
-        'trade_capacity',
-        'years_of_experience',
-        'export_markets',
         'rejection_reason',
         'regulatory_reviews',
         'country',
@@ -85,5 +82,35 @@ class SellerProfile extends Model
     public function exporterProfile()
     {
         return $this->hasOne(ExporterProfile::class);
+    }
+
+    public function getTradeCapacityAttribute()
+    {
+        return $this->exporterProfile ? $this->exporterProfile->export_capacity : null;
+    }
+
+    public function setTradeCapacityAttribute($value)
+    {
+        // Intercept legacy column assignment
+    }
+
+    public function getExportMarketsAttribute()
+    {
+        return $this->exporterProfile ? $this->exporterProfile->export_markets : null;
+    }
+
+    public function setExportMarketsAttribute($value)
+    {
+        // Intercept legacy column assignment
+    }
+
+    public function getYearsOfExperienceAttribute()
+    {
+        return $this->exporterProfile ? $this->exporterProfile->years_of_experience : null;
+    }
+
+    public function setYearsOfExperienceAttribute($value)
+    {
+        // Intercept legacy column assignment
     }
 }

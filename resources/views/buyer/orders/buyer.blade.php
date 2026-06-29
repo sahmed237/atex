@@ -45,7 +45,7 @@
             <span class="status {{ $order->shipment_status }}">{{ str_replace('_', ' ', $order->shipment_status) }}</span>
           </td>
           <td style="padding: 12px 5px; text-align: right;">
-            <a class="btn secondary" href="{{ route('admin.orders.show', $order->id) }}" style="min-height: 32px; padding: 0 10px; font-size: 0.85rem; font-weight: normal;">Track Shipment</a>
+            <a class="btn secondary" href="{{ route('buyer.orders.track', $order->order_number) }}" style="min-height: 32px; padding: 0 10px; font-size: 0.85rem; font-weight: normal;">Track Shipment</a>
           </td>
         </tr>
       @empty

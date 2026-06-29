@@ -133,7 +133,7 @@ Route::get('/api/world/states/{countryCode}', function (string $countryCode) {
 Route::middleware(['auth', 'verified', 'security_policy', 'legal_acceptance'])->group(function () {
     Route::get('/kyc/onboarding', [\App\Http\Controllers\Auth\KycOnboardingController::class, 'show'])->name('kyc.onboarding');
     Route::post('/kyc/onboarding', [\App\Http\Controllers\Auth\KycOnboardingController::class, 'store'])->name('kyc.onboarding.store');
-
+    Route::get('/exporter/onboarding', [\App\Http\Controllers\Auth\KycOnboardingController::class, 'show'])->name('exporter.onboarding');
 });
 
 Route::middleware(['auth', 'verified', 'security_policy', 'legal_acceptance'])->group(function () {

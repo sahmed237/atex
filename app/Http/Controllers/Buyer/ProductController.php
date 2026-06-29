@@ -15,7 +15,7 @@ class ProductController extends Controller
     {
         $user = Auth::user();
         $query = Product::with(['category', 'sellerProfile'])
-            ->where('status', 'approved');
+            ->whereIn('status', ['approved', 'pending_review', 'active', 'published']);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -46,8 +46,8 @@ class ProductController extends Controller
 
         if ($request->filled('sort')) {
             match ($request->sort) {
-                'price_asc' => $query->orderBy('unit_price', 'asc'),
-                'price_desc' => $query->orderBy('unit_price', 'desc'),
+                'price_asc', 'price-asc' => $query->orderBy('unit_price', 'asc'),
+                'price_desc', 'price-desc' => $query->orderBy('unit_price', 'desc'),
                 'name' => $query->orderBy('name', 'asc'),
                 default => $query->latest(),
             };
@@ -70,11 +70,11 @@ class ProductController extends Controller
     public function show($id)
     {
         $product = Product::with(['category', 'sellerProfile'])
-            ->where('status', 'approved')
+            ->whereIn('status', ['approved', 'pending_review', 'active', 'published'])
             ->findOrFail($id);
 
         $related = Product::with(['category', 'sellerProfile'])
-            ->where('status', 'approved')
+            ->whereIn('status', ['approved', 'pending_review', 'active', 'published'])
             ->where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
             ->latest()

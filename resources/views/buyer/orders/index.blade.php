@@ -235,13 +235,14 @@ function reorder(orderId) {
   const orders = JSON.parse(localStorage.getItem('atex_orders') || '[]');
   const order = orders.find(o => o.id === orderId);
   if (!order) return;
-  const cart = JSON.parse(localStorage.getItem('atex_cart') || '[]');
+  const cart = JSON.parse(localStorage.getItem('gt_cart') || localStorage.getItem('atex_cart') || '[]');
   (order.items || []).forEach(i => {
     const existing = cart.find(c => c.id === i.id);
     if (existing) { existing.qty += i.qty || 1; }
     else { cart.push({ id: i.id, name: i.name, price: parseFloat(i.price), qty: i.qty || 1 }); }
   });
   localStorage.setItem('atex_cart', JSON.stringify(cart));
+  localStorage.setItem('gt_cart', JSON.stringify(cart));
   updateCartUI();
   showToast('Items added to cart');
 }

@@ -55,16 +55,19 @@ class RegisteredUserController extends Controller
 
         $passwordRule = Rules\Password::min((int) ($passwordSettings['password_min_length'] ?? 8));
         
-        if (($passwordSettings['password_require_uppercase'] ?? false) && ($passwordSettings['password_require_lowercase'] ?? false)) {
+        $reqUpper = !empty($passwordSettings['password_require_uppercase']);
+        $reqLower = !empty($passwordSettings['password_require_lowercase']);
+
+        if ($reqUpper && $reqLower) {
             $passwordRule->mixedCase();
-        } elseif ($passwordSettings['password_require_uppercase'] ?? false || $passwordSettings['password_require_lowercase'] ?? false) {
+        } elseif ($reqUpper || $reqLower) {
             $passwordRule->letters();
         }
 
-        if ($passwordSettings['password_require_number'] ?? false) {
+        if (!empty($passwordSettings['password_require_number'])) {
             $passwordRule->numbers();
         }
-        if ($passwordSettings['password_require_special'] ?? false) {
+        if (!empty($passwordSettings['password_require_special'])) {
             $passwordRule->symbols();
         }
 
@@ -83,6 +86,7 @@ class RegisteredUserController extends Controller
         ]);
 
         // Assign the role
+        \Spatie\Permission\Models\Role::findOrCreate('buyer', 'web');
         $user->assignRole('buyer');
 
         // Accept active legal documents implicitly

@@ -58,6 +58,47 @@
         </div>
     </div>
 
+    <!-- Horizontal Animated Progress Bar -->
+    <div class="bg-white rounded-lg border border-[#e7e7e7] p-6 mb-4 shadow-sm">
+        <h3 class="text-xs font-bold text-[#565959] uppercase tracking-wider mb-6 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+            Live Transit Progress
+        </h3>
+        <div class="relative flex items-center justify-between max-w-3xl mx-auto px-4">
+            <!-- Connecting Line -->
+            <div class="absolute left-8 right-8 top-1/2 -translate-y-1/2 h-1.5 bg-gray-100 z-0"></div>
+            @php
+                $progressPct = $tracking['status'] === 'Delivered' ? 100 : ($tracking['status'] === 'Processing' ? 33 : 66);
+            @endphp
+            <div class="absolute left-8 top-1/2 -translate-y-1/2 h-1.5 bg-gradient-to-r from-blue-600 to-green-600 transition-all duration-1000 z-0" style="width: calc({{ $progressPct }}% - 4rem);"></div>
+
+            <!-- Steps -->
+            <div class="relative z-10 flex flex-col items-center">
+                <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-md font-bold text-sm">✓</div>
+                <span class="text-xs font-bold text-[#0f1111] mt-2">Origin Adamawa</span>
+            </div>
+
+            <div class="relative z-10 flex flex-col items-center">
+                <div class="w-10 h-10 rounded-full {{ $progressPct >= 33 ? 'bg-blue-600 text-white shadow-md animate-bounce' : 'bg-gray-200 text-gray-500' }} flex items-center justify-center font-bold text-sm">
+                    {{ $progressPct >= 66 ? '✓' : '🏛️' }}
+                </div>
+                <span class="text-xs font-bold text-[#0f1111] mt-2">Customs Cleared</span>
+            </div>
+
+            <div class="relative z-10 flex flex-col items-center">
+                <div class="w-10 h-10 rounded-full {{ $progressPct >= 66 ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 text-gray-500' }} flex items-center justify-center font-bold text-sm">
+                    {{ $progressPct >= 100 ? '✓' : '🚢' }}
+                </div>
+                <span class="text-xs font-bold text-[#0f1111] mt-2">In Transit</span>
+            </div>
+
+            <div class="relative z-10 flex flex-col items-center">
+                <div class="w-10 h-10 rounded-full {{ $progressPct >= 100 ? 'bg-green-600 text-white shadow-lg' : 'bg-gray-200 text-gray-500' }} flex items-center justify-center font-bold text-sm">🎉</div>
+                <span class="text-xs font-bold text-[#0f1111] mt-2">Delivered</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Timeline -->
     <div class="bg-white rounded-lg border border-[#e7e7e7] overflow-hidden shadow-sm">
         <div class="px-6 py-4 border-b border-[#e7e7e7]">

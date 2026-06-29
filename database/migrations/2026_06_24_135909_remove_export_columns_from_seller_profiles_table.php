@@ -11,6 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+        \Illuminate\Support\Facades\DB::unprepared("
+            DROP TRIGGER IF EXISTS trg_seller_profiles_insert;
+            DROP TRIGGER IF EXISTS trg_seller_profiles_update;
+            DROP TRIGGER IF EXISTS trg_seller_profiles_delete;
+        ");
+
         Schema::table('seller_profiles', function (Blueprint $table) {
             $table->dropColumn(['trade_capacity', 'years_of_experience', 'export_markets']);
         });

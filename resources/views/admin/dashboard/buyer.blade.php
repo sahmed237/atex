@@ -80,6 +80,22 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#f0f2f2]">
+                    @forelse($recentOrders ?? [] as $order)
+                    <tr class="hover:bg-[#f7f8f8] transition-colors">
+                        <td class="px-4 py-3 font-semibold text-[#0f1111]">#{{ $order->order_number }}</td>
+                        <td class="px-4 py-3 text-[#565959]">{{ $order->created_at->format('M d, Y') }}</td>
+                        <td class="px-4 py-3">
+                            <span class="inline-flex items-center gap-1 text-xs font-medium {{ $order->status === 'delivered' ? 'text-[#007600]' : 'text-[#c45500]' }}">
+                                <span class="w-1.5 h-1.5 rounded-full {{ $order->status === 'delivered' ? 'bg-[#007600]' : 'bg-[#c45500]' }}"></span>
+                                {{ ucfirst($order->status) }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-right font-bold">&#8358;{{ number_format($order->total_amount, 2) }}</td>
+                        <td class="px-4 py-3 text-right">
+                            <a href="{{ route('buyer.orders.track', $order->order_number) }}" class="link-blue text-xs font-semibold">Track</a>
+                        </td>
+                    </tr>
+                    @empty
                     <tr class="hover:bg-[#f7f8f8] transition-colors">
                         <td class="px-4 py-3 font-semibold text-[#0f1111]">#ORD-12345</td>
                         <td class="px-4 py-3 text-[#565959]">Today</td>
@@ -122,6 +138,7 @@
                             <a href="{{ route('buyer.orders.reorder', 'ORD-12343') }}" class="link-blue text-xs font-semibold">Reorder</a>
                         </td>
                     </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

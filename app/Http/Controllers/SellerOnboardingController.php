@@ -106,7 +106,15 @@ class SellerOnboardingController extends Controller
             $kycData
         );
 
-        return redirect()->route('seller.onboarding')->with('success', 'Your local seller registration has been submitted for review. You will be notified once approved.');
+        if (!$user->hasRole('seller')) {
+            $user->assignRole('seller');
+        }
+
+        $this->uploadDocument($request, 'cac_document', 'CAC Certificate', $sellerProfile->id);
+        $this->uploadDocument($request, 'valid_id', 'Valid Identification', $sellerProfile->id);
+        $this->uploadDocument($request, 'proof_of_address', 'Proof of Address', $sellerProfile->id);
+
+        return redirect()->route('dashboard')->with('status', 'Your seller registration has been submitted for review.');
     }
 
 

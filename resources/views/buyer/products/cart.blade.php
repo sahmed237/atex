@@ -137,7 +137,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-let cart = JSON.parse(localStorage.getItem('atex_cart') || '[]');
+let cart = JSON.parse(localStorage.getItem('gt_cart') || localStorage.getItem('atex_cart') || '[]');
 
 function renderCart() {
   const container = document.getElementById('cartPage');
@@ -206,6 +206,7 @@ function renderCart() {
         <div class="summary-row sub"><span>Estimated Tax</span><span>₦${tax.toLocaleString(undefined, {minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
         <div class="summary-row total"><span>Total</span><span>₦${total.toLocaleString(undefined, {minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
         <button class="checkout-btn" onclick="handleCheckout()">Proceed to Checkout</button>
+        <button onclick="openProFormaInvoice()" style="width:100%; padding:14px; margin-top:10px; background:#eff6ff; border:2px solid #2563eb; border-radius:50px; font-weight:700; font-size:0.95rem; color:#2563eb; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">📥 Download Pro-Forma Invoice</button>
         <a href="{{ route('buyer.products.index') }}" class="continue-link">Continue Shopping</a>
         <div class="shipping-estimate">
           <h4>Shipping to</h4>
@@ -238,6 +239,7 @@ function removeFromCart(id) { cart = cart.filter(c => c.id !== id); updateCartUI
 function updateCartUI() {
   const count = cart.reduce((s, c) => s + c.qty, 0);
   localStorage.setItem('atex_cart', JSON.stringify(cart));
+  localStorage.setItem('gt_cart', JSON.stringify(cart));
   const ce = document.getElementById('cartCount');
   if (ce) { ce.textContent = count; ce.style.opacity = count > 0 ? '1' : '0'; ce.style.transform = count > 0 ? 'scale(1)' : 'scale(.5)'; }
   const label = document.getElementById('cartLabel');

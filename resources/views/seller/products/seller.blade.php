@@ -11,7 +11,7 @@
       <h2>Submit New Product</h2>
       <span class="status pending">Draft</span>
     </div>
-    <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" class="form-grid" style="margin-top: 20px; display: grid; gap: 15px;">
+    <form action="{{ route('seller.catalog.store') }}" method="POST" enctype="multipart/form-data" class="form-grid" style="margin-top: 20px; display: grid; gap: 15px;">
       @csrf
       <label>Product Name
         <input name="name" required placeholder="e.g. Cleaned Sesame Seed">

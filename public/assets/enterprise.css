@@ -30,12 +30,8 @@ button, input, select, textarea { font: inherit; }
 .sidebar {
   position: sticky;
   top: 0;
-  height: 100vh;
   padding: 22px;
-  color: #e5efe9;
-  background: linear-gradient(180deg, #113726 0%, #0d281d 100%);
   border-right: 0;
-  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.06);
 }
 .brand { display: flex; gap: 12px; align-items: center; margin-bottom: 28px; }
 .mark { display: grid; place-items: center; width: 36px; height: 36px; flex: 0 0 36px; overflow: hidden; background: #fff; border: 1px solid var(--line); border-radius: 8px; }

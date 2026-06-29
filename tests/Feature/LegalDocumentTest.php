@@ -30,7 +30,6 @@ class LegalDocumentTest extends TestCase
     {
         $this->withoutExceptionHandling();
         $admin = User::factory()->create([
-            'kyc_verification_status' => 'approved',
             'is_active' => true,
         ]);
         $admin->assignRole('super-admin');
@@ -51,6 +50,7 @@ class LegalDocumentTest extends TestCase
             'version' => '1.0',
             'effective_date' => now()->format('Y-m-d'),
             'content' => '<p>These are the terms</p>',
+            'is_active' => true,
         ]);
 
         $response->assertRedirect();
@@ -66,9 +66,7 @@ class LegalDocumentTest extends TestCase
 
     public function test_admin_can_add_version_and_it_generates_hash()
     {
-        $admin = User::factory()->create([
-            'kyc_verification_status' => 'approved'
-        ]);
+        $admin = User::factory()->create();
         $admin->assignRole('super-admin');
 
         $document = LegalDocument::create([
@@ -95,9 +93,7 @@ class LegalDocumentTest extends TestCase
 
     public function test_user_is_redirected_to_acceptance_page()
     {
-        $admin = User::factory()->create([
-            'kyc_verification_status' => 'approved'
-        ]);
+        $admin = User::factory()->create();
         $document = LegalDocument::create([
             'document_type' => 'terms',
             'title' => 'Terms of Service'
@@ -110,11 +106,10 @@ class LegalDocumentTest extends TestCase
             'created_by' => $admin->id
         ]);
 
-        $user = User::factory()->create([
-            'kyc_verification_status' => 'approved'
-        ]);
+        $user = User::factory()->create();
         Role::findOrCreate('buyer', 'web');
         $user->assignRole('buyer');
+        \App\Models\BuyerProfile::create(['user_id' => $user->id, 'verification_status' => 'approved']);
         
         $response = $this->actingAs($user)->get('/dashboard');
         $response->assertRedirect(route('legal-acceptance.show'));
@@ -136,6 +131,9 @@ class LegalDocumentTest extends TestCase
         ]);
 
         $user = User::factory()->create();
+        Role::findOrCreate('buyer', 'web');
+        $user->assignRole('buyer');
+        \App\Models\BuyerProfile::create(['user_id' => $user->id, 'verification_status' => 'approved']);
         
         $response = $this->actingAs($user)->post('/legal-acceptance', [
             'documents' => [$version->id]

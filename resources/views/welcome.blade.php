@@ -22,7 +22,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; co
 a { color: inherit; text-decoration: none; }
 img { max-width: 100%; display: block; }
 button { cursor: pointer; font: inherit; border: none; background: none; }
-.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+.container { max-width: 1286px; margin: 0 auto; padding: 0 24px; }
 .section { padding: 80px 0; }
 .section-label { display: inline-block; font-size: .8rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--primary); margin-bottom: 8px; }
 .section-title { font-size: 2.25rem; font-weight: 700; margin-bottom: 12px; letter-spacing: -.02em; }
@@ -46,42 +46,42 @@ button { cursor: pointer; font: inherit; border: none; background: none; }
 @media (max-width: 820px) { .hero-carousel .hero-arrow { display: none; } .hero-controls { bottom: 16px; } }
 
 /* ─── HERO ─── */
-.hero { padding: 120px 0 100px; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #fff; overflow: hidden; position: relative; }
-.hero::before { content: ''; position: absolute; top: -50%; right: -20%; width: 700px; height: 700px; background: radial-gradient(circle, rgba(37,99,235,.15) 0%, transparent 70%); pointer-events: none; }
-.hero::after { content: ''; position: absolute; bottom: -30%; left: -10%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(22,163,74,.1) 0%, transparent 70%); pointer-events: none; }
+.hero { padding: 120px 0 100px; color: var(--text); overflow: hidden; position: relative; }
+.hero::before { content: ''; position: absolute; top: -50%; right: -20%; width: 700px; height: 700px; background: radial-gradient(circle, rgba(37,99,235,.08) 0%, transparent 70%); pointer-events: none; }
+.hero::after { content: ''; position: absolute; bottom: -30%; left: -10%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(22,163,74,.06) 0%, transparent 70%); pointer-events: none; }
 .hero .container { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; position: relative; z-index: 1; }
 .hero h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.1; letter-spacing: -.03em; margin-bottom: 20px; }
-.hero h1 span { background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.hero p { font-size: 1.1rem; color: rgba(255,255,255,.65); margin-bottom: 32px; max-width: 500px; line-height: 1.7; }
+.hero h1 span { background: linear-gradient(135deg, #2563eb, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero p { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 32px; max-width: 500px; line-height: 1.7; }
 .hero-stats { display: flex; gap: 40px; margin-bottom: 36px; }
 .hero-stats div { text-align: left; }
 .hero-stats strong { font-size: 1.8rem; font-weight: 800; display: block; line-height: 1.2; }
-.hero-stats strong em { font-style: normal; color: #22c55e; }
-.hero-stats span { font-size: .82rem; color: rgba(255,255,255,.45); }
+.hero-stats strong em { font-style: normal; color: #16a34a; }
+.hero-stats span { font-size: .82rem; color: var(--text-muted); }
 .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
 .btn { display: inline-flex; align-items: center; gap: 8px; padding: 14px 32px; border-radius: 50px; font-weight: 600; font-size: .95rem; transition: all var(--transition); }
 .btn-primary { background: var(--primary); color: #fff; }
 .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(37,99,235,.4); }
-.btn-outline { border: 2px solid rgba(255,255,255,.2); color: #fff; }
-.btn-outline:hover { border-color: rgba(255,255,255,.6); background: rgba(255,255,255,.05); }
+.btn-outline { border: 2px solid rgba(0,0,0,.15); color: var(--text); }
+.btn-outline:hover { border-color: rgba(0,0,0,.4); background: rgba(0,0,0,.04); }
 .btn-green { background: var(--green); color: #fff; }
 .btn-green:hover { background: #15803d; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(22,163,74,.4); }
-.hero-image { background: rgba(255,255,255,.04); backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,.08); border-radius: 20px; overflow: hidden; aspect-ratio: 4/3; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center; }
+.hero-image { background: rgba(255,255,255,.6); backdrop-filter: blur(4px); border: 1px solid rgba(0,0,0,.06); border-radius: 20px; overflow: hidden; aspect-ratio: 4/3; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center; }
 .hero-image-icon { font-size: 4rem; margin-bottom: 20px; }
-.hero-image h3 { font-size: 1rem; color: rgba(255,255,255,.8); margin-bottom: 8px; }
-.hero-image p { font-size: .8rem; color: rgba(255,255,255,.4); margin: 0; max-width: 280px; }
+.hero-image h3 { font-size: 1rem; color: var(--text); margin-bottom: 8px; }
+.hero-image p { font-size: .8rem; color: var(--text-muted); margin: 0; max-width: 280px; }
 .hero-image-routes { display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
-.hero-image-routes span { padding: 4px 14px; border-radius: 50px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08); font-size: .75rem; color: rgba(255,255,255,.5); }
+.hero-image-routes span { padding: 4px 14px; border-radius: 50px; background: rgba(255,255,255,.5); border: 1px solid rgba(0,0,0,.06); font-size: .75rem; color: var(--text-muted); }
 @media (max-width: 820px) { .hero { padding: 80px 0 60px; } .hero .container { grid-template-columns: 1fr; text-align: center; } .hero p { margin: 0 auto 32px; } .hero-stats { justify-content: center; } .hero-stats div { text-align: center; } .hero-btns { justify-content: center; } .hero h1 { font-size: 2.5rem; } }
 
 /* ─── LOCAL HERO ─── */
-.local-hero { padding: 100px 0; background: linear-gradient(135deg, #fefce8 0%, #ecfdf5 50%, #eff6ff 100%); position: relative; overflow: hidden; }
+.local-hero { padding: 120px 0 100px; background: linear-gradient(135deg, #fefce8 0%, #ecfdf5 50%, #eff6ff 100%); position: relative; overflow: hidden; }
 .local-hero .container { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
 .local-hero-label { display: inline-block; font-size: .8rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--green); margin-bottom: 8px; }
-.local-hero h2 { font-size: 2.75rem; font-weight: 800; line-height: 1.15; letter-spacing: -.02em; margin-bottom: 16px; color: var(--text); }
+.local-hero h2 { font-size: 3.5rem; font-weight: 800; line-height: 1.1; letter-spacing: -.03em; margin-bottom: 20px; color: var(--text); }
 .local-hero h2 span { color: var(--primary); }
-.local-hero p { font-size: 1.05rem; color: var(--text-muted); margin-bottom: 28px; max-width: 480px; line-height: 1.7; }
-.local-hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+.local-hero p { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 32px; max-width: 500px; line-height: 1.7; }
+.local-hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 36px; }
 .local-hero-grid .item { display: flex; align-items: center; gap: 10px; font-size: .92rem; font-weight: 500; }
 .local-hero-grid .item .icon { width: 36px; height: 36px; border-radius: 50%; background: #dcfce7; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
 .local-hero-image { background: rgba(255,255,255,.7); backdrop-filter: blur(4px); border: 1px solid rgba(0,0,0,.06); border-radius: 20px; overflow: hidden; aspect-ratio: 4/3; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center; box-shadow: var(--shadow-lg); }
@@ -249,7 +249,7 @@ footer ul a:hover { color: #fff; }
       </div>
     </section>
 
-    <section class="hero" id="hero">
+    <section class="hero" id="hero" style="background: linear-gradient(135deg, #fefce8 0%, #ecfdf5 50%, #eff6ff 100%);">
       <div class="container">
         <div>
           <span class="section-label" style="color:var(--accent)">Adamawa Export Platform</span>
@@ -296,8 +296,15 @@ footer ul a:hover { color: #fff; }
         <button class="filter-btn active" data-category="all">All</button>
         <button class="filter-btn" data-category="electronics">Electronics</button>
         <button class="filter-btn" data-category="textiles">Textiles</button>
-        <button class="filter-btn" data-category="food">Food</button>
       </div>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; align-items:center; background:var(--bg-alt); padding:12px 16px; border-radius:12px; border:1px solid var(--border);">
+      <span style="font-size:0.8rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-right:4px;">📍 Origin LGA:</span>
+      <button class="origin-pill active" onclick="filterOrigin('all', this)" style="padding:6px 14px; border-radius:50px; border:1px solid var(--border); background:var(--primary); color:#fff; font-weight:700; font-size:0.8rem; cursor:pointer;">All Adamawa</button>
+      <button class="origin-pill" onclick="filterOrigin('Mubi', this)" style="padding:6px 14px; border-radius:50px; border:1px solid var(--border); background:var(--card-bg); color:var(--text); font-weight:700; font-size:0.8rem; cursor:pointer;">🌾 Mubi North</button>
+      <button class="origin-pill" onclick="filterOrigin('Yola', this)" style="padding:6px 14px; border-radius:50px; border:1px solid var(--border); background:var(--card-bg); color:var(--text); font-weight:700; font-size:0.8rem; cursor:pointer;">🥜 Yola South</button>
+      <button class="origin-pill" onclick="filterOrigin('Numan', this)" style="padding:6px 14px; border-radius:50px; border:1px solid var(--border); background:var(--card-bg); color:var(--text); font-weight:700; font-size:0.8rem; cursor:pointer;">🍯 Numan</button>
+      <button class="origin-pill" onclick="filterOrigin('Guyuk', this)" style="padding:6px 14px; border-radius:50px; border:1px solid var(--border); background:var(--card-bg); color:var(--text); font-weight:700; font-size:0.8rem; cursor:pointer;">🪨 Guyuk</button>
     </div>
     <div class="products-grid" id="productsGrid"></div>
     <div style="text-align:center;margin-top:40px">
@@ -486,7 +493,7 @@ footer ul a:hover { color: #fff; }
       <button onclick="exportOrder('packing')">📦 Packing List<span class="popup-label">Itemized shipment manifest</span></button>
       <button onclick="exportOrder('summary')">📋 Order Summary<span class="popup-label">Full order details for your records</span></button>
     </div>
-    <a href="#" class="view-cart-link">View Full Cart →</a>
+    <a href="{{ route('buyer.cart.index') }}" class="view-cart-link">View Full Cart →</a>
     <button class="checkout-btn" onclick="handleCheckout()">Confirm Export Order</button>
   </div>
 </aside>
@@ -547,26 +554,65 @@ var products = [
 ];
 
 var catalog = products.slice();
-var cart = JSON.parse(localStorage.getItem('gt_cart') || '[]');
+var cart = JSON.parse(localStorage.getItem('gt_cart') || localStorage.getItem('atex_cart') || '[]');
 var currentFilter = 'all';
+var currentOrigin = 'all';
+
+function filterOrigin(orig, btnEl) {
+  currentOrigin = orig;
+  document.querySelectorAll('.origin-pill').forEach(function(b) {
+    b.style.background = 'var(--card-bg)';
+    b.style.color = 'var(--text)';
+  });
+  if (btnEl) {
+    btnEl.style.background = 'var(--primary)';
+    btnEl.style.color = '#fff';
+  }
+  renderProducts();
+}
 
 function renderProducts() {
   var grid = document.getElementById('productsGrid');
   if (!grid) return;
-  var filtered = currentFilter === 'all' ? catalog : catalog.filter(function(p) { return p.category === currentFilter; });
+  var filtered = catalog.filter(function(p) {
+    var catMatch = currentFilter === 'all' || p.category === currentFilter;
+    var origMatch = currentOrigin === 'all' || (p.origin && p.origin.indexOf(currentOrigin) > -1);
+    return catMatch && origMatch;
+  });
+  var saved = JSON.parse(localStorage.getItem('atex_saved') || '[]');
+  var compare = JSON.parse(localStorage.getItem('atex_compare') || '[]');
+  
   grid.innerHTML = filtered.map(function(p) {
     var stars = '';
     for (var s = 0; s < 5; s++) { stars += s < p.rating ? '★' : '☆'; }
     var tagHtml = p.tag ? '<span class="product-tag ' + (p.tag === 'Sale' ? 'sale' : '') + '">' + p.tag + '</span>' : '';
-    var oldPriceHtml = p.oldPrice ? '<span class="old">$' + p.oldPrice.toFixed(2) + '</span>' : '';
-    return '<div class="product-card">' +
-      '<div class="product-img">' + p.emoji + tagHtml + '</div>' +
+    var ngnBase = (p.price * 1600).toFixed(0);
+    var oldNgnBase = p.oldPrice ? (p.oldPrice * 1600).toFixed(0) : null;
+    var currentPriceStr = typeof formatPriceAmount === 'function' ? formatPriceAmount(ngnBase) : '$' + p.price.toFixed(2);
+    var oldPriceStr = oldNgnBase ? (typeof formatPriceAmount === 'function' ? formatPriceAmount(oldNgnBase) : '$' + p.oldPrice.toFixed(2)) : '';
+    var oldPriceHtml = oldPriceStr ? '<span class="old" data-price-ngn="' + oldNgnBase + '">' + oldPriceStr + '</span>' : '';
+    var badgeHtml = '<div style="font-size:0.7rem; font-weight:800; color:#166534; background:#dcfce7; padding:2px 6px; border-radius:4px; display:inline-block; margin-bottom:4px;">🛡️ NEPC CERTIFIED</div>';
+    
+    var isSaved = saved.includes(p.id);
+    var heartHtml = '<button onclick="toggleWatchlist(' + p.id + ', this)" data-watchlist-id="' + p.id + '" style="position:absolute; top:8px; left:8px; background:rgba(255,255,255,0.95); border:1px solid #cbd5e1; border-radius:50%; width:32px; height:32px; font-size:1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 5px rgba(0,0,0,0.15); z-index:2;" title="Save to Watchlist">' + (isSaved ? '❤️' : '🤍') + '</button>';
+    
+    var isCompared = compare.some(function(c) { return c.id === p.id; });
+    var compareHtml = '<label class="compare-label" ' + (isCompared ? 'style="opacity:1 !important; pointer-events:auto !important; transform:translateY(0);"' : '') + '><input type="checkbox" class="compare-chk" ' + (isCompared ? 'checked' : '') + ' onclick="toggleCompareItem(' + p.id + ', \'' + p.name.replace(/'/g,"\\'") + '\', ' + ngnBase + ', \'' + p.moq + '\', \'' + p.origin + '\', this)"> ⚖️ Compare</label>';
+
+    return '<div class="product-card" style="position:relative;">' +
+      '<div class="product-img" style="position:relative;">' + heartHtml + p.emoji + tagHtml +
+      '<button onclick="openQuickView(' + p.id + ', \'' + p.name.replace(/'/g,"\\'") + '\', ' + ngnBase + ', \'' + p.moq + '\', \'' + p.origin + '\')" style="position:absolute; bottom:8px; right:8px; background:rgba(255,255,255,0.9); border:1px solid #cbd5e1; border-radius:50px; padding:4px 10px; font-size:0.75rem; font-weight:700; cursor:pointer; color:#0f172a; box-shadow:0 2px 5px rgba(0,0,0,0.1);">👁️ Quick View</button>' +
+      '</div>' +
       '<div class="product-body">' +
+      '<div style="overflow:hidden; margin-bottom:4px;">' + badgeHtml + compareHtml + '</div>' +
       '<div class="product-stars">' + stars + '</div>' +
       '<h3>' + p.name + '</h3>' +
       '<div class="product-moq">MOQ: ' + p.moq + ' · ' + p.origin + '</div>' +
-      '<div class="product-price"><span class="current">$' + p.price.toFixed(2) + '</span>' + oldPriceHtml + '</div>' +
-      '<button class="add-to-cart" onclick="addToCart(' + p.id + ')">Add to Export Order</button>' +
+      '<div class="product-price"><span class="current" data-price-ngn="' + ngnBase + '">' + currentPriceStr + '</span>' + oldPriceHtml + '</div>' +
+      '<div style="display:flex; gap:6px; margin-top:8px;">' +
+      '<button class="add-to-cart" onclick="addToCart(' + p.id + ')" style="flex:1;">Add to Export Order</button>' +
+      '<button onclick="openRfqModal(' + p.id + ', \'' + p.name.replace(/'/g,"\\'") + '\')" style="padding:8px 12px; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; font-weight:700; font-size:0.8rem; cursor:pointer; color:#0f172a;" title="Request Custom Quote">📋 RFQ</button>' +
+      '</div>' +
       '</div></div>';
   }).join('');
 }
@@ -578,11 +624,14 @@ function addToCart(id) {
   if (existing) { existing.qty++; }
   else { cart.push({ id: p.id, name: p.name, price: p.price, emoji: p.emoji, qty: 1 }); }
   localStorage.setItem('gt_cart', JSON.stringify(cart));
+  localStorage.setItem('atex_cart', JSON.stringify(cart));
   updateCartUI();
   showToast(p.emoji + ' ' + p.name + ' added to export order');
 }
 
 function updateCartUI() {
+  localStorage.setItem('gt_cart', JSON.stringify(cart));
+  localStorage.setItem('atex_cart', JSON.stringify(cart));
   var count = cart.reduce(function(s, i) { return s + i.qty; }, 0);
   var cartCount = document.getElementById('cartCount');
   if (cartCount) { cartCount.textContent = count; cartCount.style.display = count > 0 ? 'flex' : 'none'; }
@@ -615,8 +664,8 @@ function exportOrder(type) {
 function handleCheckout() {
   var items = cart.filter(function(i) { return i.qty > 0; });
   if (items.length === 0) { showToast('Your export order is empty'); return; }
-  var total = items.reduce(function(s, i) { return s + i.price * i.qty; }, 0);
-  showToast('✅ Export order confirmed! Total: $' + total.toFixed(2));
+  showToast('Proceeding to checkout...');
+  setTimeout(function() { window.location.href = '{{ route("buyer.cart.index") }}'; }, 1000);
 }
 
 function handleNewsletter(e) {

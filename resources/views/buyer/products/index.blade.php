@@ -1,286 +1,223 @@
 @extends('layouts.buyer')
 
-@section('content')
+@section('full_width_content')
 <style>
-:root {
-  --primary: #2563eb;
-  --accent: #f59e0b;
-  --green: #16a34a;
-  --bg: #ffffff;
-  --bg-alt: #f8fafc;
-  --text: #0f172a;
-  --text-muted: #64748b;
-  --border: #e2e8f0;
-  --radius: 12px;
-  --shadow-lg: 0 10px 25px rgba(0,0,0,.1);
-  --transition: .25s ease;
-}
+  /* ─── PAGE HEADER ─── */
+  .page-header {
+    padding: 32px 0 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .page-header .container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+  .page-header h1 { font-size: 1.75rem; font-weight: 700; color: var(--text); margin: 0; }
+  .page-header .count { color: var(--text-muted); font-size: .92rem; font-weight: 400; }
+  .page-header .sort-group { display: flex; align-items: center; gap: 8px; }
+  .page-header .sort-group label { font-size: .85rem; color: var(--text-muted); margin: 0; }
+  .page-header .sort-group select {
+    padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px;
+    font-size: .88rem; background: var(--bg); color: var(--text); outline: none; cursor: pointer;
+  }
+
+  /* ─── LAYOUT ─── */
+  .layout { display: grid; grid-template-columns: 240px 1fr; gap: 32px; padding: 32px 0; }
+  @media (max-width: 820px) { .layout { grid-template-columns: 1fr; } }
+
+  /* ─── SIDEBAR FILTERS ─── */
+  .sidebar { background: transparent !important; color: var(--text) !important; padding: 0 !important; border: none !important; box-shadow: none !important; position: static !important; }
+  .sidebar h3 { font-size: 1rem; font-weight: 700; margin: 0 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); color: var(--text); }
+  .filter-group { margin-bottom: 24px; background: transparent !important; }
+  .filter-group h4 { font-size: .85rem; font-weight: 600; margin: 0 0 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; }
+  .filter-group label { display: flex !important; align-items: center !important; gap: 8px !important; font-size: .9rem !important; padding: 4px 0 !important; cursor: pointer !important; color: var(--text) !important; margin: 0 !important; font-weight: 400 !important; background: transparent !important; border: none !important; box-shadow: none !important; }
+  .filter-group input[type="checkbox"] { width: 16px !important; height: 16px !important; min-height: 0 !important; padding: 0 !important; border: none !important; background: transparent !important; box-shadow: none !important; accent-color: var(--primary) !important; cursor: pointer !important; margin: 0 !important; flex-shrink: 0 !important; appearance: auto !important; -webkit-appearance: auto !important; }
+  .filter-group .price-inputs { display: flex; gap: 8px; align-items: center; }
+  .filter-group .price-inputs input { width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: .85rem; outline: none; color: var(--text); background: var(--bg); }
+  .filter-group .price-inputs span { color: var(--text-muted); font-size: .85rem; }
+  .clear-filters {
+    width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px;
+    font-size: .85rem; font-weight: 500; color: var(--text-muted); transition: all var(--transition); background: none; cursor: pointer; text-align: center; display: block; text-decoration: none;
+  }
+  .clear-filters:hover { border-color: var(--text); color: var(--text); }
+
+  /* ─── PRODUCTS GRID ─── */
+  .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+  .product-card { border-radius: var(--radius); background: var(--bg); border: 1px solid var(--border); overflow: hidden; transition: transform var(--transition), box-shadow var(--transition); }
+  .product-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+  .product-img { aspect-ratio: 1; background: var(--bg-alt); display: flex; align-items: center; justify-content: center; font-size: 3rem; position: relative; }
+  .product-tag { position: absolute; top: 10px; left: 10px; padding: 3px 10px; border-radius: 50px; font-size: .7rem; font-weight: 600; background: var(--accent); color: #fff; }
+  .product-tag.sale { background: #ef4444; }
+  .product-tag.green { background: var(--green); }
+  .product-body { padding: 16px; }
+  
+  .product-body h3 { font-size: .95rem; margin: 4px 0 4px; font-weight: 600; color: var(--text); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.8em; }
+  .product-stars { font-size: .78rem; color: var(--accent); letter-spacing: 1px; margin-bottom: 4px; }
+  .product-meta { font-size: .78rem; color: var(--text-muted); margin-bottom: 6px; }
+  .product-price { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
+  .product-price .current { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+  .product-price .old { font-size: .85rem; color: var(--text-muted); text-decoration: line-through; }
+  .add-to-cart { width: 100%; padding: 10px; border-radius: 50px; background: var(--text); color: #fff; font-weight: 600; font-size: .85rem; transition: background var(--transition); border: none; cursor: pointer; }
+  .add-to-cart:hover { background: var(--primary); }
+
+  /* ─── PAGINATION ─── */
+  .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 40px; }
+  .pagination button, .pagination a {
+    width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border);
+    font-size: .88rem; font-weight: 500; transition: all var(--transition); display: flex; align-items: center; justify-content: center; text-decoration: none; color: inherit; background: none; cursor: pointer;
+  }
+  .pagination button:hover, .pagination a:hover { border-color: var(--primary); color: var(--primary); }
+  .pagination .active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); grid-column: 1 / -1; }
+  .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+  .empty-state p { font-size: 1rem; margin: 0; }
 </style>
 
-<div class="page-header" style="padding:24px 0 20px;border-bottom:1px solid var(--border)">
-  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+<!-- ═══ PAGE HEADER ═══ -->
+<div class="page-header">
+  <div class="container">
     <div>
-      <h1 style="font-size:1.5rem;font-weight:700;margin:0">All Products <span class="count" style="color:var(--text-muted);font-size:.92rem;font-weight:400">({{ $products->total() }})</span></h1>
+      <h1>All Products <span class="count" id="resultCount">({{ $products->total() }} products)</span></h1>
     </div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <label style="font-size:.85rem;color:var(--text-muted)">Sort by</label>
-      <form method="GET" action="{{ route('buyer.products.index') }}" id="sortForm">
-        <input type="hidden" name="search" value="{{ request('search') }}">
-        @foreach((array) request('category', []) as $cat)
-          <input type="hidden" name="category[]" value="{{ $cat }}">
-        @endforeach
-        <input type="hidden" name="min_price" value="{{ request('min_price') }}">
-        <input type="hidden" name="max_price" value="{{ request('max_price') }}">
-        <select name="sort" onchange="document.getElementById('sortForm').submit()" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:.88rem;background:var(--bg);outline:none;cursor:pointer">
-          <option value="">Default</option>
-          <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
-          <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Price: High to Low</option>
-          <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Name: A-Z</option>
-        </select>
-      </form>
+    <div class="sort-group">
+      <label>Sort by</label>
+      <select id="sortSelect" onchange="applySort(this.value)">
+        <option value="default" {{ !request('sort') || request('sort') == 'default' ? 'selected' : '' }}>Default</option>
+        <option value="price_asc" {{ in_array(request('sort'), ['price_asc', 'price-asc']) ? 'selected' : '' }}>Price: Low to High</option>
+        <option value="price_desc" {{ in_array(request('sort'), ['price_desc', 'price-desc']) ? 'selected' : '' }}>Price: High to Low</option>
+        <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Name: A-Z</option>
+      </select>
     </div>
   </div>
 </div>
 
-@php
-    $activeCategories = (array) request('category', []);
-    $catNames = $categories->whereIn('slug', $activeCategories)->pluck('name', 'slug');
-    $hasFilters = request('search') || $activeCategories || request('min_price') || request('max_price') || request('sort');
-@endphp
+<!-- ═══ LAYOUT ═══ -->
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <h3>Filters</h3>
 
-@if($hasFilters)
-<div style="padding:16px 0 0;display:flex;flex-wrap:wrap;align-items:center;gap:8px">
-  <span style="font-size:.82rem;color:var(--text-muted);font-weight:500">Active filters:</span>
-  @if(request('search'))
-    <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:50px;background:var(--bg-alt);border:1px solid var(--border);font-size:.8rem">
-      Search: "{{ request('search') }}"
-      <a href="{{ route('buyer.products.index', request()->except('search', 'page')) }}" style="text-decoration:none;color:var(--text-muted);font-size:1rem;line-height:1">&times;</a>
-    </span>
-  @endif
-  @foreach($activeCategories as $slug)
-    @php $name = $catNames[$slug] ?? ucfirst($slug); @endphp
-    <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:50px;background:var(--bg-alt);border:1px solid var(--border);font-size:.8rem">
-      {{ $name }}
-      <a href="{{ route('buyer.products.index', array_merge(request()->except('category', 'page'), ['category' => array_values(array_filter($activeCategories, fn($c) => $c !== $slug))])) }}" style="text-decoration:none;color:var(--text-muted);font-size:1rem;line-height:1">&times;</a>
-    </span>
-  @endforeach
-  @if(request('min_price') || request('max_price'))
-    <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:50px;background:var(--bg-alt);border:1px solid var(--border);font-size:.8rem">
-      Price: {{ request('min_price') ? '₦'.request('min_price') : '₦0' }} – {{ request('max_price') ? '₦'.request('max_price') : '∞' }}
-      <a href="{{ route('buyer.products.index', request()->except('min_price', 'max_price', 'page')) }}" style="text-decoration:none;color:var(--text-muted);font-size:1rem;line-height:1">&times;</a>
-    </span>
-  @endif
-</div>
-@endif
+      <form method="GET" action="{{ route('buyer.products.index') }}" id="filterForm">
+        <input type="hidden" name="sort" id="formSortInput" value="{{ request('sort') }}">
+        <input type="hidden" name="search" value="{{ request('search') }}">
 
-<div style="display:grid;grid-template-columns:220px 1fr;gap:28px;padding:24px 0">
-  <aside>
-    <h3 style="font-size:1rem;font-weight:700;margin:0 0 16px;padding-bottom:8px;border-bottom:1px solid var(--border)">Filters</h3>
-    <form method="GET" action="{{ route('buyer.products.index') }}" id="filterForm">
-      <input type="hidden" name="sort" value="{{ request('sort') }}">
-      <input type="hidden" name="search" value="{{ request('search') }}">
-
-      <div style="margin-bottom:24px">
-        <h4 style="font-size:.85rem;font-weight:600;margin:0 0 8px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Category</h4>
-        @foreach($categories->take(3) as $cat)
-          <label style="display:flex;align-items:center;gap:8px;font-size:.9rem;padding:4px 0;cursor:pointer">
-            <input type="checkbox" name="category[]" value="{{ $cat->slug }}" onchange="document.getElementById('filterForm').submit()"
-                   style="width:16px;height:16px;accent-color:var(--primary);cursor:pointer"
-                   {{ in_array($cat->slug, (array) request('category', [])) ? 'checked' : '' }}>
-            {{ $cat->name }}
-          </label>
-        @endforeach
-        @if($categories->count() > 5)
-          <a href="{{ route('buyer.categories.index') }}" style="display:inline-block;margin-top:6px;font-size:.85rem;font-weight:600;color:var(--primary);text-decoration:none">
-            + {{ $categories->count() - 5 }} more &rarr;
-          </a>
-        @endif
-      </div>
-
-      <div style="margin-bottom:24px">
-        <h4 style="font-size:.85rem;font-weight:600;margin:0 0 8px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Price Range</h4>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input type="number" name="min_price" placeholder="Min" min="0" value="{{ request('min_price') }}"
-                 onchange="document.getElementById('filterForm').submit()"
-                 style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:.85rem;outline:none">
-          <span style="color:var(--text-muted);font-size:.85rem">—</span>
-          <input type="number" name="max_price" placeholder="Max" min="0" value="{{ request('max_price') }}"
-                 onchange="document.getElementById('filterForm').submit()"
-                 style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:.85rem;outline:none">
+        <div class="filter-group">
+          <h4>Category</h4>
+          @foreach($categories as $cat)
+            <label>
+              <input type="checkbox" name="category[]" value="{{ $cat->slug }}" onchange="document.getElementById('filterForm').submit()" {{ in_array($cat->slug, (array)request('category', [])) ? 'checked' : '' }}>
+              {{ $cat->name }}
+            </label>
+          @endforeach
         </div>
+
+        <div class="filter-group">
+          <h4>Price Range</h4>
+          <div class="price-inputs">
+            <input type="number" name="min_price" id="priceMin" placeholder="Min" min="0" value="{{ request('min_price') }}" onchange="document.getElementById('filterForm').submit()">
+            <span>—</span>
+            <input type="number" name="max_price" id="priceMax" placeholder="Max" min="0" value="{{ request('max_price') }}" onchange="document.getElementById('filterForm').submit()">
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <h4>Tags</h4>
+          <label><input type="checkbox" name="tags[]" value="Sale" onchange="document.getElementById('filterForm').submit()" {{ in_array('Sale', (array)request('tags', [])) ? 'checked' : '' }}> Sale</label>
+          <label><input type="checkbox" name="tags[]" value="New" onchange="document.getElementById('filterForm').submit()" {{ in_array('New', (array)request('tags', [])) ? 'checked' : '' }}> New</label>
+          <label><input type="checkbox" name="tags[]" value="Bestseller" onchange="document.getElementById('filterForm').submit()" {{ in_array('Bestseller', (array)request('tags', [])) ? 'checked' : '' }}> Bestseller</label>
+        </div>
+
+        <button type="button" class="clear-filters" onclick="window.location.href='{{ route('buyer.products.index') }}'">Clear All Filters</button>
+      </form>
+    </aside>
+
+    <div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; align-items:center; background:var(--bg-alt); padding:12px 16px; border-radius:12px; border:1px solid var(--border);">
+        <span style="font-size:0.8rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-right:4px;">📍 Origin LGA:</span>
+        <a href="{{ route('buyer.products.index') }}" class="origin-pill active" style="padding:6px 14px; border-radius:50px; border:1px solid var(--border); background:{{ !request('search') ? 'var(--primary)' : 'var(--card-bg)' }}; color:{{ !request('search') ? '#fff' : 'var(--text)' }}; font-weight:700; font-size:0.8rem; text-decoration:none;">All Adamawa</a>
+        <a href="{{ route('buyer.products.index', ['search' => 'Mubi']) }}" class="origin-pill" style="padding:6px 14px; border-radius:50px; border:1px solid var(--border); background:{{ request('search') == 'Mubi' ? 'var(--primary)' : 'var(--card-bg)' }}; color:{{ request('search') == 'Mubi' ? '#fff' : 'var(--text)' }}; font-weight:700; font-size:0.8rem; text-decoration:none;">🌾 Mubi North</a>
+        <a href="{{ route('buyer.products.index', ['search' => 'Yola']) }}" class="origin-pill" style="padding:6px 14px; border-radius:50px; border:1px solid var(--border); background:{{ request('search') == 'Yola' ? 'var(--primary)' : 'var(--card-bg)' }}; color:{{ request('search') == 'Yola' ? '#fff' : 'var(--text)' }}; font-weight:700; font-size:0.8rem; text-decoration:none;">🥜 Yola South</a>
+        <a href="{{ route('buyer.products.index', ['search' => 'Numan']) }}" class="origin-pill" style="padding:6px 14px; border-radius:50px; border:1px solid var(--border); background:{{ request('search') == 'Numan' ? 'var(--primary)' : 'var(--card-bg)' }}; color:{{ request('search') == 'Numan' ? '#fff' : 'var(--text)' }}; font-weight:700; font-size:0.8rem; text-decoration:none;">🍯 Numan</a>
+        <a href="{{ route('buyer.products.index', ['search' => 'Guyuk']) }}" class="origin-pill" style="padding:6px 14px; border-radius:50px; border:1px solid var(--border); background:{{ request('search') == 'Guyuk' ? 'var(--primary)' : 'var(--card-bg)' }}; color:{{ request('search') == 'Guyuk' ? '#fff' : 'var(--text)' }}; font-weight:700; font-size:0.8rem; text-decoration:none;">🪨 Guyuk</a>
       </div>
-
-      @if(request('search') || request('category') || request('min_price') || request('max_price') || request('sort'))
-        <a href="{{ route('buyer.products.index') }}" style="display:block;text-align:center;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:.85rem;font-weight:500;color:var(--text-muted);transition:all var(--transition);text-decoration:none"
-           onmouseover="this.style.borderColor='var(--text)';this.style.color='var(--text)'"
-           onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">Clear All Filters</a>
-      @endif
-    </form>
-  </aside>
-
-  <div>
-    @if($products->count() > 0)
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:20px">
+      @php
+        $displayedProducts = 0;
+      @endphp
+      <div class="products-grid" id="productsGrid">
         @foreach($products as $product)
-          <div class="product-card" style="border-radius:var(--radius);background:var(--bg);border:1px solid var(--border);overflow:hidden;transition:transform var(--transition),box-shadow var(--transition);cursor:pointer"
-               onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='var(--shadow-lg)'"
-               onmouseout="this.style.transform='';this.style.boxShadow=''"
-               onclick="location.href='{{ route('buyer.products.show', $product->id) }}'">
-            <div style="aspect-ratio:1;background:var(--bg-alt);display:flex;align-items:center;justify-content:center;font-size:3rem;position:relative">
+          @php
+            $emojis = ['🎧', '👜', '☕', '🔊', '🧵', '🥭', '🔋', '🧺', '🔌', '🧣', '🍵', '🌾', '📦'];
+            $emoji = $emojis[$product->id % count($emojis)];
+            
+            $tagsList = [null, 'Bestseller', 'Sale', 'New', null, 'Sale', 'Bestseller'];
+            $tag = $tagsList[$product->id % count($tagsList)];
+            $tagClass = $tag === 'Sale' ? 'sale' : ($tag === 'Bestseller' ? 'green' : '');
+            
+            if (!empty(request('tags')) && !in_array($tag, (array)request('tags', []))) {
+                continue;
+            }
+            $displayedProducts++;
+
+            $rating = 4.5;
+            $stars = '★★★★☆';
+          @endphp
+          <div class="product-card" onclick="location.href='{{ route('buyer.products.show', $product->id) }}'" style="cursor:pointer; position:relative;">
+            <div class="product-img" style="position:relative;">
+              <button onclick="event.stopPropagation(); toggleWatchlist({{ $product->id }}, this);" data-watchlist-id="{{ $product->id }}" style="position:absolute; top:8px; left:8px; background:rgba(255,255,255,0.95); border:1px solid #cbd5e1; border-radius:50%; width:32px; height:32px; font-size:1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 5px rgba(0,0,0,0.15); z-index:2;" title="Save to Watchlist">🤍</button>
               @if($product->image_path)
                 <img src="{{ asset($product->image_path) }}" alt="{{ $product->name }}" style="width:100%;height:100%;object-fit:contain;padding:12px">
               @else
-                <i data-lucide="package" style="width:48px;height:48px;color:#cbd5e1"></i>
+                {{ $emoji }}
               @endif
+              @if($tag)
+                <span class="product-tag {{ $tagClass }}">{{ $tag }}</span>
+              @endif
+              <button onclick="event.stopPropagation(); openQuickView({{ $product->id }}, '{{ addslashes($product->name) }}', {{ is_numeric($product->unit_price) ? $product->unit_price : 0 }}, '{{ addslashes($product->moq ?? '10 MT') }}', '{{ addslashes($product->origin_lga ?? 'Adamawa') }}')" style="position:absolute; bottom:8px; right:8px; background:rgba(255,255,255,0.95); border:1px solid #cbd5e1; border-radius:50px; padding:6px 12px; font-size:0.75rem; font-weight:700; cursor:pointer; color:#0f172a; box-shadow:0 2px 6px rgba(0,0,0,0.12); z-index:2;">👁️ Quick View</button>
             </div>
-            <div style="padding:14px">
-              <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:4px">{{ $product->brand_name ?: ($product->sellerProfile->business_name ?? 'ATEX') }}</div>
-              <h3 style="font-size:.95rem;margin:0 0 4px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ $product->name }}</h3>
-              <div style="font-size:.78rem;color:var(--accent);letter-spacing:1px;margin-bottom:4px">&#9733;&#9733;&#9733;&#9733;&#9734;</div>
-              <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:6px">MOQ: {{ $product->moq }}</div>
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
-                @if($product->unit_price && $product->unit_price !== 'Request quote')
-                  <span style="font-size:1.1rem;font-weight:700">&#8358;{{ number_format((float) $product->unit_price) }}</span>
-                @else
-                  <span style="font-size:.9rem;font-weight:600;color:var(--primary)">Request Quote</span>
+            <div class="product-body">
+              <div style="overflow:hidden; margin-bottom:6px;">
+                <div style="font-size:0.7rem; font-weight:800; color:#166534; background:#dcfce7; padding:3px 8px; border-radius:4px; display:inline-block;">🛡️ NEPC CERTIFIED</div>
+                <label class="compare-label" onclick="event.stopPropagation();"><input type="checkbox" class="compare-chk" onclick="toggleCompareItem({{ $product->id }}, '{{ addslashes($product->name) }}', {{ is_numeric($product->unit_price) ? $product->unit_price : 0 }}, '{{ addslashes($product->moq ?? '10 MT') }}', '{{ addslashes($product->origin_lga ?? 'Adamawa') }}', this)"> ⚖️ Compare</label>
+              </div>
+              <h3>{{ $product->name }}</h3>
+              <div class="product-stars">{{ $stars }}</div>
+              <div class="product-meta">MOQ: {{ $product->moq ?? 'N/A' }} • {{ $product->origin_lga ?? ($product->brand_name ?? 'Adamawa') }}</div>
+              <div class="product-price">
+                <span class="current" data-price-ngn="{{ is_numeric($product->unit_price) ? $product->unit_price : '' }}">{{ is_numeric($product->unit_price) ? '₦' . number_format((float) $product->unit_price, 2) : $product->unit_price }}</span>
+                @if($tag === 'Sale' && is_numeric($product->unit_price))
+                  <span class="old" data-price-ngn="{{ $product->unit_price * 1.3 }}">₦{{ number_format((float) $product->unit_price * 1.3, 2) }}</span>
                 @endif
               </div>
-              <button class="add-to-cart-btn" data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}" data-product-price="{{ $product->unit_price }}"
-                      onclick="event.stopPropagation();addToCart(this)"
-                      style="width:100%;padding:10px;border-radius:50px;background:var(--text);color:#fff;font-weight:600;font-size:.85rem;border:none;cursor:pointer;transition:background var(--transition)"
-                      onmouseover="this.style.background='var(--primary)'" onmouseout="this.style.background='var(--text)'">
-                Add to Cart
-              </button>
+              <div style="display:flex; gap:6px; margin-top:10px;">
+                <button class="add-to-cart" onclick="event.stopPropagation(); addToCartItem({ id: {{ $product->id }}, name: '{{ addslashes($product->name) }}', price: '{{ addslashes($product->unit_price) }}', emoji: '{{ $emoji }}' })" style="flex:1;">Add to Cart</button>
+                <button onclick="event.stopPropagation(); openRfqModal({{ $product->id }}, '{{ addslashes($product->name) }}')" style="padding:8px 12px; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:8px; font-weight:700; font-size:0.85rem; cursor:pointer; color:#0f172a;" title="Request Custom Quote">📋 RFQ</button>
+              </div>
             </div>
           </div>
         @endforeach
       </div>
 
-      <div style="display:flex;justify-content:center;gap:8px;margin-top:40px">
-        @if($products->onFirstPage())
-          <button disabled style="width:36px;height:36px;border-radius:8px;border:1px solid var(--border);font-size:.88rem;font-weight:500;opacity:.4">&laquo;</button>
-        @else
-          <a href="{{ $products->previousPageUrl() }}" style="width:36px;height:36px;border-radius:8px;border:1px solid var(--border);font-size:.88rem;font-weight:500;display:flex;align-items:center;justify-content:center;text-decoration:none;color:inherit">&laquo;</a>
-        @endif
-        @foreach($products->getUrlRange(1, $products->lastPage()) as $page => $url)
-          <a href="{{ $url }}" style="width:36px;height:36px;border-radius:8px;border:1px solid var(--border);font-size:.88rem;font-weight:500;display:flex;align-items:center;justify-content:center;text-decoration:none;color:inherit;{{ $page == $products->currentPage() ? 'background:var(--primary);color:#fff;border-color:var(--primary)' : '' }}">{{ $page }}</a>
-        @endforeach
-        @if($products->hasMorePages())
-          <a href="{{ $products->nextPageUrl() }}" style="width:36px;height:36px;border-radius:8px;border:1px solid var(--border);font-size:.88rem;font-weight:500;display:flex;align-items:center;justify-content:center;text-decoration:none;color:inherit">&raquo;</a>
-        @else
-          <button disabled style="width:36px;height:36px;border-radius:8px;border:1px solid var(--border);font-size:.88rem;font-weight:500;opacity:.4">&raquo;</button>
-        @endif
-      </div>
-    @else
-      <div style="text-align:center;padding:60px 20px;color:var(--text-muted)">
-        <div style="font-size:3rem;margin-bottom:12px">🔍</div>
-        <p style="font-size:1rem">No products match your filters.</p>
-        @if(request('search') || request('category') || request('min_price') || request('max_price'))
-          <a href="{{ route('buyer.products.index') }}" style="display:inline-block;margin-top:16px;padding:10px 24px;border-radius:50px;background:var(--text);color:#fff;font-weight:600;font-size:.85rem;text-decoration:none">Clear Filters</a>
+      @if($displayedProducts === 0)
+        <div class="empty-state">
+          <div class="icon">🔍</div>
+          <p>No products match your filters.</p>
+        </div>
+      @endif
+
+      <!-- Pagination -->
+      <div class="pagination" id="pagination">
+        @if($products->lastPage() > 1)
+          @for($i = 1; $i <= $products->lastPage(); $i++)
+            <a href="{{ $products->url($i) }}" class="{{ $i == $products->currentPage() ? 'active' : '' }}">{{ $i }}</a>
+          @endfor
         @endif
       </div>
-    @endif
+    </div>
   </div>
 </div>
 
-<!-- Cart Sidebar -->
-<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()" style="position:fixed;inset:0;background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity var(--transition);z-index:200"></div>
-<aside class="cart-sidebar" id="cartSidebar" style="position:fixed;top:0;right:0;width:420px;max-width:90vw;height:100vh;background:var(--bg);z-index:201;transform:translateX(100%);transition:transform .35s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column">
-  <div style="display:flex;justify-content:space-between;align-items:center;padding:24px;border-bottom:1px solid var(--border)">
-    <h2 style="font-size:1.25rem;margin:0">Cart</h2>
-    <button onclick="toggleCart()" style="width:36px;height:36px;border-radius:50%;background:var(--bg-alt);font-size:1.2rem;border:none;cursor:pointer">✕</button>
-  </div>
-  <div class="cart-items" id="cartItems" style="flex:1;overflow-y:auto;padding:16px 24px">
-    <div class="cart-empty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text-muted);text-align:center;padding:40px">
-      <p>Your cart is empty</p>
-    </div>
-  </div>
-  <div style="padding:24px;border-top:1px solid var(--border)">
-    <div style="display:flex;justify-content:space-between;font-size:1.1rem;font-weight:700;margin-bottom:16px"><span>Total</span><span id="cartTotal">₦0.00</span></div>
-    <button onclick="handleCheckout()" style="width:100%;padding:16px;border-radius:50px;background:var(--text);color:#fff;font-weight:600;font-size:1rem;border:none;cursor:pointer;transition:background var(--transition)"
-            onmouseover="this.style.background='var(--primary)'" onmouseout="this.style.background='var(--text)'">Checkout</button>
-  </div>
-</aside>
-
-<div class="toast" id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text);color:#fff;padding:14px 28px;border-radius:50px;font-weight:500;font-size:.92rem;opacity:0;transition:all .35s cubic-bezier(.22,1,.36,1);z-index:300;pointer-events:none"></div>
-
 <script>
-let cart = JSON.parse(localStorage.getItem('atex_cart') || '[]');
-
-function toggleCart() {
-  document.getElementById('cartOverlay').style.opacity = document.getElementById('cartOverlay').style.opacity === '1' ? '0' : '1';
-  document.getElementById('cartOverlay').style.pointerEvents = document.getElementById('cartOverlay').style.pointerEvents === 'auto' ? 'none' : 'auto';
-  const sidebar = document.getElementById('cartSidebar');
-  sidebar.style.transform = sidebar.style.transform === 'translateX(0px)' ? 'translateX(100%)' : 'translateX(0px)';
-}
-
-function addToCart(btn) {
-  const id = btn.dataset.productId;
-  const name = btn.dataset.productName;
-  const price = parseFloat(btn.dataset.productPrice) || 0;
-  const existing = cart.find(c => c.id === id);
-  if (existing) { existing.qty++; } else { cart.push({ id, name, price, qty: 1 }); }
-  updateCartUI();
-  showToast(name + ' added to cart');
-}
-
-function removeFromCart(id) { cart = cart.filter(c => c.id !== id); updateCartUI(); }
-
-function changeQty(id, delta) {
-  const item = cart.find(c => c.id === id);
-  if (!item) return;
-  item.qty += delta;
-  if (item.qty <= 0) { removeFromCart(id); return; }
-  updateCartUI();
-}
-
-function updateCartUI() {
-  const count = cart.reduce((s, c) => s + c.qty, 0);
-  localStorage.setItem('atex_cart', JSON.stringify(cart));
-  const container = document.getElementById('cartItems');
-  const totalEl = document.getElementById('cartTotal');
-  if (!container) return;
-  if (cart.length === 0) {
-    container.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text-muted);text-align:center;padding:40px"><p>Your cart is empty</p></div>';
-    if (totalEl) totalEl.textContent = '₦0.00';
-    return;
+  function applySort(val) {
+    document.getElementById('formSortInput').value = val === 'default' ? '' : val;
+    document.getElementById('filterForm').submit();
   }
-  container.innerHTML = cart.map(c => `
-    <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">
-      <div style="width:40px;height:40px;border-radius:8px;background:var(--bg-alt);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">📦</div>
-      <div style="flex:1">
-        <div style="font-size:.85rem;font-weight:600">${c.name}</div>
-        <div style="font-size:.8rem;color:var(--text-muted)">₦${c.price.toFixed(2)}</div>
-        <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
-          <button onclick="changeQty('${c.id}',-1)" style="width:24px;height:24px;border-radius:50%;background:var(--bg-alt);font-weight:600;font-size:.85rem;border:none;cursor:pointer">−</button>
-          <span style="font-weight:600;font-size:.85rem;min-width:16px;text-align:center">${c.qty}</span>
-          <button onclick="changeQty('${c.id}',1)" style="width:24px;height:24px;border-radius:50%;background:var(--bg-alt);font-weight:600;font-size:.85rem;border:none;cursor:pointer">+</button>
-          <button onclick="removeFromCart('${c.id}')" style="font-size:.78rem;color:var(--text-muted);padding:2px 6px;border:none;cursor:pointer;background:none">✕</button>
-        </div>
-      </div>
-    </div>
-  `).join('');
-  const total = cart.reduce((s, c) => s + c.price * c.qty, 0);
-  if (totalEl) totalEl.textContent = '₦' + total.toFixed(2);
-}
-
-function handleCheckout() {
-  if (cart.length === 0) { showToast('Cart is empty'); return; }
-  showToast('Checkout coming soon!');
-}
-
-function showToast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.style.opacity = '1';
-  el.style.transform = 'translateX(-50%) translateY(0)';
-  clearTimeout(el._timeout);
-  el._timeout = setTimeout(() => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateX(-50%) translateY(80px)';
-  }, 3000);
-}
-
-updateCartUI();
 </script>
 @endsection

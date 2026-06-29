@@ -11,7 +11,7 @@
       <h2>Upload Compliance Document</h2>
       <span class="status pending">Upload</span>
     </div>
-    <form action="{{ route('admin.documents.store') }}" method="POST" enctype="multipart/form-data" class="form-grid" style="margin-top: 20px; display: grid; gap: 15px;">
+    <form action="{{ route('seller.documents.store') }}" method="POST" enctype="multipart/form-data" class="form-grid" style="margin-top: 20px; display: grid; gap: 15px;">
       @csrf
       <label>Document Title
         <input name="title" required placeholder="e.g. Phytosanitary Certificate - Lot A">

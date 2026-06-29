@@ -81,7 +81,7 @@
     @if($isPending)
         <div class="status-banner pending">
             <span class="icon">⏳</span>
-            <span>Your application is being reviewed. We'll notify you once approved.</span>
+            <span>Your application is Under Review. We'll notify you once approved.</span>
         </div>
     @elseif($isApproved)
         <div class="status-banner verified">

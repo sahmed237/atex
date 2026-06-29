@@ -8,6 +8,7 @@ use App\Models\SellerProfile;
 use App\Models\BuyerProfile;
 use App\Models\LogisticsProfile;
 use App\Models\AdminProfile;
+use App\Models\ExporterProfile;
 use App\Models\Document;
 use App\Events\KycSubmitted;
 use Illuminate\Support\Facades\Auth;
@@ -81,16 +82,28 @@ class KycOnboardingController extends Controller
             if (!$existingProfile || $request->filled('business_name')) {
                 $data['business_name'] = $request->business_name;
             }
-            $isExporter = $existingProfile && $existingProfile->seller_tier === 'export';
+            if ($request->filled('seller_tier')) {
+                $data['seller_tier'] = $request->seller_tier;
+            } elseif ($request->hasFile('nepc_certificate')) {
+                $data['seller_tier'] = 'export';
+            }
+            $isExporter = ($existingProfile && $existingProfile->seller_tier === 'export') || ($data['seller_tier'] ?? null) === 'export';
+            $exportData = [];
             if ($isExporter) {
                 if ($request->filled('trade_capacity')) {
-                    $data['trade_capacity'] = $request->trade_capacity;
+                    $exportData['export_capacity'] = $request->trade_capacity;
                 }
                 if ($request->filled('export_markets')) {
-                    $data['export_markets'] = $request->export_markets;
+                    $exportData['export_markets'] = $request->export_markets;
                 }
             }
             $profile = SellerProfile::updateOrCreate(['user_id' => $user->id], $data);
+            if ($isExporter) {
+                ExporterProfile::updateOrCreate(
+                    ['seller_profile_id' => $profile->id],
+                    array_merge(['verification_status' => 'pending'], $exportData)
+                );
+            }
             $profileType = 'seller';
         } elseif ($user->hasRole('logistics')) {
             if (!$existingProfile || $request->filled('business_name')) {
@@ -120,7 +133,7 @@ class KycOnboardingController extends Controller
             $this->uploadDocument($request, 'valid_id', 'Valid Identification', $profileType, $profile->id);
             $this->uploadDocument($request, 'proof_of_address', 'Proof of Address', $profileType, $profile->id);
 
-            if ($user->hasRole('seller') && $profile->seller_tier === 'export') {
+            if ($user->hasRole('seller') && ($profile->seller_tier === 'export' || $request->hasFile('nepc_certificate'))) {
                 $this->uploadDocument($request, 'nepc_certificate', 'NEPC Export Certificate', $profileType, $profile->id);
             }
             if ($user->hasRole('logistics')) {

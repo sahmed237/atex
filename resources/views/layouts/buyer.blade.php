@@ -1,340 +1,213 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $title ?? 'Adamawa Ecommerce platform' }} - Adamawa Ecommerce platform</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ $title ?? 'All Products — Adamawa Export' }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="{{ asset('assets/enterprise.css') }}">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --accent: #f59e0b;
+      --green: #16a34a;
+      --bg: #ffffff;
+      --bg-alt: #f8fafc;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 12px;
+      --shadow: 0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+      --shadow-lg: 0 10px 25px rgba(0,0,0,.1);
+      --transition: .25s ease;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; color: var(--text); background: var(--bg); line-height: 1.6; }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; font: inherit; border: none; background: none; }
+    .container { max-width: 1286px; margin: 0 auto; padding: 0 24px; }
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="{{ asset('assets/enterprise.css') }}">
-
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        [x-cloak] { display: none !important; }
-        .amazon-nav { background: #131921; }
-        .amazon-subnav { background: #232f3e; }
-        .amazon-gold { color: #febd69; }
-        .amazon-btn {
-            background: #ffd814;
-            border-color: #fcd200;
-            color: #0f1111;
-        }
-        .amazon-btn:hover { background: #f7ca00; }
-        .amazon-btn-secondary {
-            background: #ffa41c;
-            border-color: #ff8f00;
-            color: #0f1111;
-        }
-        .amazon-btn-secondary:hover { background: #fa8900; }
-        .product-card {
-            background: #fff;
-            border: 1px solid #e7e7e7;
-            transition: all 0.15s ease;
-        }
-        .product-card:hover {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
-        .product-card img { mix-blend-mode: multiply; }
-        .rating-star { color: #de7921; }
-        .price-symbol { font-size: 0.7rem; vertical-align: super; }
-        .link-blue { color: #007185; }
-        .link-blue:hover { color: #c7511f; text-decoration: underline; }
-        .section-title { font-size: 1.25rem; font-weight: 700; color: #0f1111; }
-
-        /* Custom scrollbar for dark backgrounds */
-        .custom-scrollbar::-webkit-scrollbar { height: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.25); border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
-        .custom-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.25) transparent; }
-    </style>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        amazon: { dark: '#131921', navy: '#232f3e', gold: '#febd69' }
-                    }
-                }
-            }
-        }
-    </script>
+    /* ─── HEADER ─── */
+    header { position: sticky; top: 0; z-index: 100; }
+    .header-main { background: #131921; color: #fff; }
+    .header-main .container { display: flex; align-items: center; gap: 16px; height: 60px; }
+    .header-main .logo { font-size: 1.5rem; font-weight: 800; color: #fff; white-space: nowrap; flex-shrink: 0; text-decoration: none; }
+    .header-main .logo span { color: #febd69; }
+    .header-search {
+      flex: 1; display: flex; max-width: 620px; margin: 0 auto; height: 40px; border: 2px solid transparent; border-radius: 6px; overflow: hidden; background: #fff; transition: border-color .2s, box-shadow .2s;
+    }
+    .header-search:focus-within { border-color: #febd69; box-shadow: 0 0 0 3px rgba(254,189,105,.25); }
+    .header-search select { padding: 0 12px; border: none; background: #e8e8e8; font-size: .8rem; cursor: pointer; outline: none; color: #444; width: auto; max-width: 110px; border-right: 1px solid #d0d0d0; font-weight: 500; text-overflow: ellipsis; appearance: auto; }
+    .header-search input { flex: 1; padding: 0 12px; border: none; font-size: .9rem; outline: none; min-width: 0; color: #000; }
+    .header-search input::placeholder { color: #999; }
+    .header-search button { width: 44px; background: #febd69; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; transition: background .2s, transform .1s; flex-shrink: 0; color: #000; }
+    .header-search button:hover { background: #f3a847; }
+    .header-search button:active { transform: scale(.95); }
+    .header-links { display: flex; align-items: center; gap: 6px; flex-shrink: 0; margin-left: auto; }
+    .header-links a { padding: 4px 8px; border-radius: 3px; transition: background var(--transition); display: flex; flex-direction: column; text-decoration: none; }
+    .header-links a:hover { background: rgba(255,255,255,.08); }
+    .header-links a .top { font-size: .7rem; color: rgba(255,255,255,.7); line-height: 1.1; }
+    .header-links a .bottom { font-size: .85rem; font-weight: 700; color: #fff; line-height: 1.2; }
+    .header-cart { display: flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 3px; cursor: pointer; transition: background var(--transition); position: relative; }
+    .header-cart:hover { background: rgba(255,255,255,.08); }
+    .header-cart svg { width: 28px; height: 28px; }
+    .header-cart .cart-text { display: flex; flex-direction: column; }
+    .header-cart .cart-text .top { font-size: .7rem; color: rgba(255,255,255,.7); line-height: 1.1; }
+    .header-cart .cart-text .bottom { font-size: .85rem; font-weight: 700; color: #fff; line-height: 1.2; }
+    .header-cart .cart-count { position: absolute; top: 0; left: 22px; background: #f08804; color: #131921; font-size: .7rem; font-weight: 700; min-width: 18px; height: 16px; border-radius: 10px; display: flex; align-items: center; justify-content: center; padding: 0 3px; opacity: 0; transform: scale(.5); transition: var(--transition); }
+    .header-cart .cart-count.visible { opacity: 1; transform: scale(1); }
+    .header-nav { background: #232f3e; height: 40px; }
+    .header-nav .container { display: flex; align-items: center; height: 100%; overflow-x: auto; scrollbar-width: none; }
+    .header-nav .container::-webkit-scrollbar { display: none; }
+    .header-nav a, .header-nav span { font-size: .84rem; color: rgba(255,255,255,.85); padding: 6px 12px; border-radius: 3px; white-space: nowrap; cursor: pointer; text-decoration: none; }
+    .header-nav a:hover { background: rgba(255,255,255,.1); color: #fff; }
+    .header-nav .nav-departments { font-weight: 700; display: flex; align-items: center; gap: 6px; font-size: .84rem; color: #fff; padding: 5px 10px; border: 1px solid rgba(255,255,255,.3); border-radius: 3px; margin-right: 4px; cursor: default; }
+    .auth-wrap { position: relative; display: inline-flex; align-items: center; }
+    .auth-wrap a { padding: 4px 8px; border-radius: 3px; transition: background var(--transition); text-decoration: none; }
+    .auth-wrap a:hover { background: rgba(255,255,255,.08); }
+    .notif-icon { position: relative; cursor: pointer; padding: 4px; margin-right: 10px; display: flex; align-items: center; transition: opacity .2s; }
+    .notif-icon:hover { opacity: .75; }
+    .notif-icon .notif-count { position: absolute; top: 0; right: 0; background: #ef4444; color: #fff; font-size: .6rem; font-weight: 700; min-width: 16px; height: 14px; border-radius: 10px; display: flex; align-items: center; justify-content: center; padding: 0 3px; line-height: 1; }
+    .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: #febd69; color: #131921; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .9rem; cursor: pointer; flex-shrink: 0; transition: transform .15s; }
+    .user-avatar:hover { transform: scale(1.08); }
+    .user-dropdown { position: absolute; top: 42px; right: 0; background: #fff; border-radius: 8px; box-shadow: var(--shadow-lg); min-width: 210px; display: none; overflow: hidden; z-index: 200; }
+    .user-dropdown.open { display: block; }
+    .user-dropdown .header { padding: 14px 16px; background: var(--bg-alt); border-bottom: 1px solid var(--border); }
+    .user-dropdown .header strong { font-size: .9rem; display: block; color: var(--text); }
+    .user-dropdown .header span { font-size: .78rem; color: var(--text-muted); }
+    .user-dropdown a { display: flex; align-items: center; gap: 10px; padding: 10px 16px; font-size: .85rem; color: var(--text) !important; transition: background var(--transition); text-decoration: none; }
+    .user-dropdown a:hover { background: var(--bg-alt); }
+    .user-dropdown a .badge { margin-left: auto; font-size: .65rem; padding: 2px 8px; border-radius: 50px; font-weight: 600; background: #fef3c7; color: #92400e; }
+    .user-dropdown a .badge.verified { background: #d1fae5; color: #065f46; }
+    .user-dropdown hr { border: none; border-top: 1px solid var(--border); margin: 0; }
+    @media (max-width: 720px) {
+      .header-links a:not(.hide-mobile) { display: none; }
+      .header-search select { width: 40px; }
+      .auth-wrap.hide-mobile { display: none !important; }
+    }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--text); color: #fff; padding: 14px 28px; border-radius: 50px; font-weight: 500; font-size: .92rem; opacity: 0; transition: all .35s cubic-bezier(.22,1,.36,1); z-index: 300; pointer-events: none; }
+    .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
 </head>
-<body class="h-full bg-[#eaeded]">
-    <div class="flex flex-col min-h-full">
-        <!-- Top Nav - Amazon style -->
-        <header class="amazon-nav text-white sticky top-0 z-50">
-            <div class="max-w-[1500px] mx-auto px-4">
-                <div class="flex items-center h-[60px] gap-4">
-                    <!-- Logo -->
-                    <a href="{{ route('buyer.products.index') }}" class="flex items-center gap-1 shrink-0 hover:outline hover:outline-1 hover:outline-white/30 px-2 py-1 rounded">
-                        <span class="text-2xl font-bold tracking-tight">ATEX</span>
-                        <span class="text-xs amazon-gold font-medium leading-none mt-2">.ng</span>
-                    </a>
+<body>
 
-                    <!-- Search Bar -->
-                    <div class="flex-1 group">
-                        <div class="flex h-[40px] items-center gap-1.5">
-                            <select class="w-[50px] bg-white text-black text-xs px-2 rounded-lg border border-gray-300 outline-none cursor-pointer h-full">
-                                <option>All</option>
-                            </select>
-                            <input type="text" id="search-input" placeholder="Search {{ $system_settings['platform_name'] ?? 'ATEX' }}"
-                                   class="flex-1 h-full px-3 text-sm text-black outline-none rounded-lg border border-gray-300 focus:border-[#febd69] transition-colors"
-                                   autocomplete="off">
-                            <button class="h-full rounded-lg amazon-gold bg-[#febd69] hover:bg-[#f3a847] text-black px-4 flex items-center justify-center transition-colors" onclick="performSearch()">
-                                <i data-lucide="search" class="w-5 h-5"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Right Links -->
-                    <div class="flex items-center gap-2 text-white/90">
-                        @auth
-                        <!-- Account Dropdown -->
-                        <div class="relative" x-data="{ open: false }" @click.away="open = false">
-                            <button @click="open = !open" class="flex flex-col leading-tight px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded text-xs text-left">
-                                <span class="text-[11px] text-white/60">Hello, {{ Str::words(auth()->user()->name ?? 'Guest', 1, '') }}</span>
-                                <span class="text-sm font-bold flex items-center gap-1">Account <i data-lucide="chevron-down" class="w-3 h-3 text-white/60"></i></span>
-                            </button>
-
-                            <div x-show="open" 
-                                 x-transition:enter="transition ease-out duration-100" 
-                                 x-transition:enter-start="transform opacity-0 scale-95" 
-                                 x-transition:enter-end="transform opacity-100 scale-100" 
-                                 x-transition:leave="transition ease-in duration-75" 
-                                 x-transition:leave-start="transform opacity-100 scale-100" 
-                                 x-transition:leave-end="transform opacity-0 scale-95" 
-                                 class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50 py-1" 
-                                 style="display: none;" x-cloak>
-                                
-                                <a href="{{ route('buyer.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">My Dashboard</a>
-                                <a href="{{ route('buyer.profile.show') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">My Profile</a>
-                                <form method="POST" action="{{ route('logout') }}" class="block">
-                                    @csrf
-                                    <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">Logout</button>
-                                </form>
-                            </div>
-                        </div>
-                        @else
-                        <a href="{{ route('login') }}" class="flex flex-col leading-tight px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded text-xs">
-                            <span class="text-[11px] text-white/60">Hello, sign in</span>
-                            <span class="text-sm font-bold">Account & Lists</span>
-                        </a>
-                        <a href="{{ route('register') }}" class="flex items-center gap-1 px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded">
-                            <span class="text-sm font-bold">Register</span>
-                        </a>
-                        @endauth
-                        <a href="{{ route('buyer.orders.index') }}" class="flex flex-col leading-tight px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded text-xs">
-                            <span class="text-[11px] text-white/60">Returns</span>
-                            <span class="text-sm font-bold">& Orders</span>
-                        </a>
-                        <a href="{{ route('buyer.cart.index') }}" class="flex items-center gap-1 px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded relative">
-                            <svg viewBox="0 0 24 24" fill="#fff" width="22" height="22"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
-                            <div class="cart-text">
-                                <span style="font-size:.7rem;color:rgba(255,255,255,.7);line-height:1">Cart</span>
-                                <span style="font-size:.85rem;font-weight:700;color:#fff;line-height:1.2" id="cartLabel">0</span>
-                            </div>
-                            <span class="cart-count" id="cartCount" style="position:absolute;top:-2px;left:18px;background:#f08804;color:#131921;font-size:.65rem;font-weight:700;min-width:18px;height:16px;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:0 3px;line-height:1;opacity:0;transform:scale(.5);transition:.25s ease">0</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <!-- Sub Nav -->
-        <nav class="amazon-subnav text-white text-sm sticky top-[60px] z-40">
-            <div class="max-w-[1500px] mx-auto px-4 flex items-center h-[40px] gap-2 md:gap-5 pb-1 -mb-1">
-                <!-- Fixed Left Items -->
-                <div class="flex items-center gap-1 md:gap-3 shrink-0">
-                    <a href="{{ url('/') }}" class="flex items-center gap-1.5 whitespace-nowrap font-medium px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded">
-                        <i data-lucide="home" class="w-[18px] h-[18px]"></i>
-                    </a>
-                    <a href="{{ route('buyer.products.index') }}" class="whitespace-nowrap font-medium px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded hidden sm:block">All Products</a>
-                    
-                    @auth
-                        @hasrole('seller')
-                        <a href="{{ route('seller.dashboard') }}" class="whitespace-nowrap font-medium px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded text-[#febd69]">My Store</a>
-                        @endhasrole
-                    @endauth
-                </div>
-                
-                <!-- Separator -->
-                <div class="h-4 w-px bg-white/30 shrink-0"></div>
-                
-                <!-- Scrollable Categories -->
-                @php
-                    $navCategories = \App\Models\Category::where('status', true)->whereNull('parent_id')->orderBy('name')->get();
-                @endphp
-                <div class="flex-1 min-w-0 overflow-x-auto custom-scrollbar flex items-center gap-2 md:gap-4 pr-2">
-                    @foreach($navCategories as $cat)
-                        <a href="{{ route('buyer.products.index', ['category' => $cat->slug]) }}" class="whitespace-nowrap hover:outline hover:outline-1 hover:outline-white/30 px-2 py-1 rounded">
-                            {{ $cat->name }}
-                        </a>
-                    @endforeach
-                </div>
-                
-                <!-- Fixed Right Items -->
-                @auth
-                <form action="{{ route('logout') }}" method="POST" class="inline shrink-0 pl-1 md:pl-2 border-l border-white/20">
-                    @csrf
-                    <button type="submit" class="whitespace-nowrap font-medium px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded flex items-center gap-1 text-white/80 hover:text-white">
-                        <i data-lucide="log-out" class="w-4 h-4"></i>
-                        <span class="hidden md:inline">Logout</span>
-                    </button>
-                </form>
-                @else
-                <div class="inline shrink-0 pl-1 md:pl-2 border-l border-white/20">
-                    <a href="{{ route('login') }}" class="whitespace-nowrap font-medium px-2 py-1 hover:outline hover:outline-1 hover:outline-white/30 rounded flex items-center gap-1 text-white/80 hover:text-white">
-                        <i data-lucide="log-in" class="w-4 h-4"></i>
-                        <span class="hidden md:inline">Login</span>
-                    </a>
-                </div>
-                @endauth
-            </div>
-        </nav>
-
-        <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto">
-            <div class="max-w-[1500px] mx-auto px-4 py-6">
-                @yield('content')
-            </div>
-        </main>
-
-        <!-- Footer -->
-        <footer class="bg-[#232f3e] text-white text-xs">
-            <div class="border-b border-white/10">
-                <div class="max-w-[1500px] mx-auto px-4 py-8">
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-                        <div>
-                            <h4 class="font-bold text-sm mb-3">Get to Know Us</h4>
-                            <ul class="space-y-1.5 text-white/60">
-                                <li><a href="#" class="hover:underline">About {{ $system_settings['platform_name'] ?? 'ATEX' }}</a></li>
-                                <li><a href="#" class="hover:underline">Careers</a></li>
-                                <li><a href="#" class="hover:underline">Press Center</a></li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-sm mb-3">Make Money with Us</h4>
-                            <ul class="space-y-1.5 text-white/60">
-                                @if(auth()->check() && auth()->user()->hasRole('seller'))
-                                    <li><a href="{{ route('exporter.onboarding') }}" class="hover:underline">Upgrade to Exporter</a></li>
-                                @else
-                                    <li><a href="{{ route('seller.onboarding') }}" class="hover:underline">Sell on {{ $system_settings['platform_name'] ?? 'ATEX' }}</a></li>
-                                @endif
-                                <li><a href="#" class="hover:underline">Become a Logistics Partner</a></li>
-                                <li><a href="#" class="hover:underline">Advertise Your Products</a></li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-sm mb-3">Let Us Help You</h4>
-                            <ul class="space-y-1.5 text-white/60">
-                                <li><a href="#" class="hover:underline">Your Account</a></li>
-                                <li><a href="#" class="hover:underline">Your Orders</a></li>
-                                <li><a href="#" class="hover:underline">Shipping Rates & Policies</a></li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-sm mb-3">Connect</h4>
-                            <ul class="space-y-1.5 text-white/60">
-                                <li><a href="#" class="hover:underline">Facebook</a></li>
-                                <li><a href="#" class="hover:underline">Twitter</a></li>
-                                <li><a href="#" class="hover:underline">Instagram</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="py-4 text-center text-white/40 text-[11px]">
-                &copy; {{ date('Y') }} Adamawa Ecommerce platform. All rights reserved.
-            </div>
-        </footer>
-    </div>
-
-    <!-- Notifications Toast -->
-    <div x-data="{ 
-            show: false, 
-            message: '', 
-            type: 'success',
-            init() {
-                @if(session('success'))
-                    this.notify('{{ session('success') }}', 'success');
-                @endif
-                @if(session('error'))
-                    this.notify('{{ session('error') }}', 'error');
-                @endif
-                @if(session('info'))
-                    this.notify('{{ session('info') }}', 'info');
-                @endif
-                @if(session('warning'))
-                    this.notify('{{ session('warning') }}', 'warning');
-                @endif
-            },
-            notify(msg, type) {
-                this.message = msg;
-                this.type = type;
-                this.show = true;
-                setTimeout(() => { this.show = false }, 5000);
-            }
-         }" 
-         x-show="show"
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="translate-y-10 opacity-0"
-         x-transition:enter-end="translate-y-0 opacity-100"
-         x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="translate-y-0 opacity-100"
-         x-transition:leave-end="translate-y-10 opacity-0"
-         class="fixed bottom-8 right-8 z-[100] max-w-sm w-full"
-         style="display: none;">
-        <div class="bg-white rounded-xl shadow-2xl border border-slate-100 p-4 flex items-center gap-4">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                 :class="{
-                    'bg-emerald-50 text-emerald-600': type === 'success',
-                    'bg-red-50 text-red-600': type === 'error',
-                    'bg-indigo-50 text-indigo-600': type === 'info',
-                    'bg-amber-50 text-amber-600': type === 'warning'
-                 }">
-                <i data-lucide="check-circle" class="w-6 h-6" x-show="type === 'success'"></i>
-                <i data-lucide="alert-circle" class="w-6 h-6" x-show="type === 'error'"></i>
-                <i data-lucide="info" class="w-6 h-6" x-show="type === 'info'"></i>
-                <i data-lucide="alert-triangle" class="w-6 h-6" x-show="type === 'warning'"></i>
-            </div>
-            <div class="flex-1">
-                <p class="text-sm font-bold text-slate-800" x-text="message"></p>
-            </div>
-            <button @click="show = false" class="text-slate-400 hover:text-slate-600 p-1">
-                <i data-lucide="x" class="w-4 h-4"></i>
-            </button>
+  <header>
+    <div class="header-main">
+      <div class="container">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <a href="{{ url('/') }}" class="logo">Adamawa<span>Export</span></a>
+          <div class="currency-switcher hide-mobile" style="display:inline-flex; align-items:center; background:#232f3e; border-radius:6px; padding:2px; border:1px solid #3a4b5f; font-size:0.75rem;">
+            <button type="button" onclick="setCurrency('NGN')" id="curr-NGN" class="curr-btn active" style="padding:4px 8px; border:none; background:#febd69; color:#131921; font-weight:800; border-radius:4px; cursor:pointer;">₦ NGN</button>
+            <button type="button" onclick="setCurrency('USD')" id="curr-USD" class="curr-btn" style="padding:4px 8px; border:none; background:transparent; color:#fff; font-weight:600; cursor:pointer;">$ USD</button>
+            <button type="button" onclick="setCurrency('EUR')" id="curr-EUR" class="curr-btn" style="padding:4px 8px; border:none; background:transparent; color:#fff; font-weight:600; cursor:pointer;">€ EUR</button>
+          </div>
         </div>
+
+        <div style="position:relative; flex:1; max-width:600px;">
+          <form method="GET" action="{{ route('buyer.products.index') }}" class="header-search" style="margin:0; width:100%;">
+            <select name="category[]" onchange="this.form.submit()">
+              <option value="">All</option>
+              @foreach(\App\Models\Category::where('status', true)->get() as $cat)
+                <option value="{{ $cat->slug }}" {{ in_array($cat->slug, (array)request('category', [])) ? 'selected' : '' }}>{{ $cat->name }}</option>
+              @endforeach
+            </select>
+            <input type="text" name="search" id="liveSearchInput" value="{{ request('search') }}" placeholder="Search products..." autocomplete="off" oninput="handleLiveSearch(this.value)">
+            <button type="submit">🔍</button>
+          </form>
+          <div id="liveSearchDropdown" style="position:absolute; top:100%; left:0; right:0; background:#fff; color:#0f172a; border-radius:10px; box-shadow:0 15px 35px rgba(0,0,0,0.25); z-index:9999; display:none; max-height:380px; overflow-y:auto; border:1px solid #cbd5e1; margin-top:6px;"></div>
+        </div>
+
+        <div class="header-links">
+          <div class="auth-wrap hide-mobile" id="authWrap">
+            @auth
+            <div id="authUser" style="position:relative; display:inline-flex; align-items:center;">
+              <div class="notif-icon" id="notifIcon" onclick="window.location.href='{{ route('buyer.orders.index') }}'">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                <span class="notif-count" id="notifCount">0</span>
+              </div>
+              <div class="user-avatar" id="userAvatar" onclick="toggleDropdown(event)">{{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}</div>
+              <div class="user-dropdown" id="userDropdown">
+                <div class="header" id="dropdownHeader"><strong>{{ auth()->user()->name }}</strong><span>{{ auth()->user()->email }}</span></div>
+                <a href="{{ route('buyer.profile.show') }}">🔐 KYC Verification <span class="badge verified">Verified</span></a>
+                <a href="{{ route('buyer.orders.index') }}">📦 My Orders</a>
+                <a href="{{ route('buyer.cart.index') }}">🛒 My Cart</a>
+                <hr>
+                <form method="POST" action="{{ route('logout') }}" id="logoutForm">
+                  @csrf
+                  <a href="#" onclick="event.preventDefault(); document.getElementById('logoutForm').submit();">🚪 Sign Out</a>
+                </form>
+              </div>
+            </div>
+            @else
+            <a href="{{ route('login') }}" id="authSignIn">
+              <span class="top">Hello</span>
+              <span class="bottom">Sign In</span>
+            </a>
+            @endauth
+          </div>
+          <a href="{{ route('buyer.orders.index') }}" class="hide-mobile">
+            <span class="top">Returns</span>
+            <span class="bottom">& Orders</span>
+          </a>
+          <div class="header-cart" onclick="toggleCart()">
+            <svg viewBox="0 0 24 24" fill="#fff"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+            <div class="cart-text">
+              <span class="bottom">Cart</span>
+            </div>
+            <span class="cart-count" id="cartCount">0</span>
+          </div>
+        </div>
+      </div>
     </div>
-
-    <!-- Cart Sidebar -->
-    <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()" style="position:fixed;inset:0;background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:200"></div>
-    <aside class="cart-sidebar" id="cartSidebar" style="position:fixed;top:0;right:0;width:420px;max-width:90vw;height:100vh;background:#fff;z-index:201;transform:translateX(100%);transition:transform .35s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column">
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:24px;border-bottom:1px solid #e2e8f0">
-        <h2 style="font-size:1.25rem;margin:0">Cart</h2>
-        <button onclick="toggleCart()" style="width:36px;height:36px;border-radius:50%;background:#f8fafc;font-size:1.2rem;border:none;cursor:pointer">✕</button>
+    <div class="header-nav">
+      <div class="container">
+        <span class="nav-departments"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><circle cx="4" cy="4" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="20" cy="4" r="2"/><circle cx="4" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="20" cy="12" r="2"/><circle cx="4" cy="20" r="2"/><circle cx="12" cy="20" r="2"/><circle cx="20" cy="20" r="2"/></svg> Browse</span>
+        <a href="{{ url('/') }}#local">Local Goods</a>
+        <a href="{{ route('buyer.products.index') }}" style="color:#fff; font-weight:700;">Products</a>
+        <a href="{{ url('/') }}#import">Overseas Import</a>
+        <a href="{{ url('/') }}#how">How It Works</a>
+        <a href="{{ url('/') }}#testimonials">Testimonials</a>
       </div>
-      <div class="cart-items" id="cartItems" style="flex:1;overflow-y:auto;padding:16px 24px">
-        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#64748b;text-align:center;padding:40px"><p>Your cart is empty</p></div>
-      </div>
-      <div style="padding:24px;border-top:1px solid #e2e8f0">
-        <div style="display:flex;justify-content:space-between;font-size:1.1rem;font-weight:700;margin-bottom:16px"><span>Total</span><span id="cartTotal">₦0.00</span></div>
-        <a href="{{ route('buyer.cart.index') }}" style="display:block;text-align:center;padding:8px;font-size:.85rem;color:#2563eb;margin-bottom:8px;text-decoration:none">View Full Cart →</a>
-        <button onclick="handleCheckout()" style="width:100%;padding:16px;border-radius:50px;background:#0f172a;color:#fff;font-weight:600;font-size:1rem;border:none;cursor:pointer;transition:background .25s ease" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#0f172a'">Checkout</button>
-      </div>
-    </aside>
+    </div>
+  </header>
 
-    <div class="toast" id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#0f172a;color:#fff;padding:14px 28px;border-radius:50px;font-weight:500;font-size:.92rem;opacity:0;transition:all .35s cubic-bezier(.22,1,.36,1);z-index:300;pointer-events:none"></div>
+  <main>
+    @if(View::hasSection('full_width_content'))
+      @yield('full_width_content')
+    @else
+      <div class="container" style="padding-top: 24px; padding-bottom: 40px;">
+        @yield('content')
+      </div>
+    @endif
+  </main>
 
-    <script>
-    let cart = JSON.parse(localStorage.getItem('atex_cart') || '[]');
+  <!-- ═══ CART OVERLAY & SIDEBAR ═══ -->
+  <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()" style="position:fixed;inset:0;background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity var(--transition);z-index:200"></div>
+  <aside class="cart-sidebar" id="cartSidebar" style="position:fixed;top:0;right:0;width:420px;max-width:90vw;height:100vh;background:var(--bg);z-index:201;transform:translateX(100%);transition:transform .35s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:24px;border-bottom:1px solid var(--border)">
+      <h2 style="font-size:1.25rem; font-weight:700; margin:0;">Cart</h2>
+      <button onclick="toggleCart()" style="width:36px;height:36px;border-radius:50%;background:var(--bg-alt);font-size:1.2rem;border:none;cursor:pointer">✕</button>
+    </div>
+    <div class="cart-items" id="cartItems" style="flex:1;overflow-y:auto;padding:16px 24px">
+      <div class="cart-empty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text-muted);text-align:center;padding:40px">
+        <p>Your cart is empty</p>
+      </div>
+    </div>
+    <div style="padding:24px;border-top:1px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;font-size:1.1rem;font-weight:700;margin-bottom:16px"><span>Total</span><span id="cartTotal">₦0.00</span></div>
+      <a href="{{ route('buyer.cart.index') }}" style="display:block;text-align:center;padding:8px;font-size:.85rem;color:var(--primary);text-decoration:none;">View Full Cart →</a>
+      <button onclick="handleCheckout()" style="width:100%;padding:16px;border-radius:50px;background:var(--text);color:#fff;font-weight:600;font-size:1rem;border:none;cursor:pointer;transition:background var(--transition)" onmouseover="this.style.background='var(--primary)'" onmouseout="this.style.background='var(--text)'">Checkout</button>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let cart = JSON.parse(localStorage.getItem('gt_cart') || localStorage.getItem('atex_cart') || '[]');
 
     function toggleCart() {
       const overlay = document.getElementById('cartOverlay');
@@ -346,101 +219,88 @@
       sidebar.style.transform = isOpen ? 'translateX(100%)' : 'translateX(0px)';
     }
 
-    function addToCart(btn) {
-      const id = btn.dataset.productId;
-      const name = btn.dataset.productName;
-      const price = parseFloat(btn.dataset.productPrice) || 0;
-      const existing = cart.find(c => c.id === id);
-      if (existing) { existing.qty++; } else { cart.push({ id, name, price, qty: 1 }); }
+    function addToCartItem(item) {
+      const existing = cart.find(c => c.id == item.id);
+      if (existing) { existing.qty++; } else { cart.push({ ...item, qty: 1 }); }
       updateCartUI();
-      showToast(name + ' added to cart');
+      showToast(`${item.name} added to cart`);
     }
 
-    function removeFromCart(id) { cart = cart.filter(c => c.id !== id); updateCartUI(); }
+    function removeFromCart(id) { cart = cart.filter(c => c.id != id); updateCartUI(); }
 
     function changeQty(id, delta) {
-      const item = cart.find(c => c.id === id);
+      const item = cart.find(c => c.id == id);
       if (!item) return;
       item.qty += delta;
       if (item.qty <= 0) { removeFromCart(id); return; }
       updateCartUI();
     }
 
+    function parsePriceVal(val) {
+      if (!val) return 0;
+      if (typeof val === 'number') return val;
+      const cleaned = String(val).replace(/[^0-9.]/g, '');
+      return parseFloat(cleaned) || 0;
+    }
+
     function updateCartUI() {
       const count = cart.reduce((s, c) => s + c.qty, 0);
+      localStorage.setItem('gt_cart', JSON.stringify(cart));
       localStorage.setItem('atex_cart', JSON.stringify(cart));
-      const badge = document.getElementById('cartCount');
-      if (badge) {
-        badge.textContent = count;
-        badge.style.opacity = count > 0 ? '1' : '0';
-        badge.style.transform = count > 0 ? 'scale(1)' : 'scale(.5)';
-      }
+      const ce = document.getElementById('cartCount');
+      if (ce) { ce.textContent = count; ce.classList.toggle('visible', count > 0); }
       const label = document.getElementById('cartLabel');
-      if (label) label.textContent = count;
+      if (label) label.textContent = count > 0 ? count : '';
       const container = document.getElementById('cartItems');
       const totalEl = document.getElementById('cartTotal');
       if (!container) return;
       if (cart.length === 0) {
-        container.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#64748b;text-align:center;padding:40px"><p>Your cart is empty</p></div>';
+        container.innerHTML = '<div class="cart-empty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text-muted);text-align:center;padding:40px"><p>Your cart is empty</p></div>';
         if (totalEl) totalEl.textContent = '₦0.00';
         return;
       }
       container.innerHTML = cart.map(c => `
-        <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #e2e8f0">
-          <div style="width:40px;height:40px;border-radius:8px;background:#f8fafc;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">📦</div>
+        <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">
+          <div style="width:48px;height:48px;border-radius:8px;background:var(--bg-alt);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">${c.emoji || '📦'}</div>
           <div style="flex:1">
-            <div style="font-size:.85rem;font-weight:600">${c.name}</div>
-            <div style="font-size:.8rem;color:#64748b">₦${parseFloat(c.price).toFixed(2)}</div>
+            <div style="font-size:.88rem;font-weight:600">${c.name}</div>
+            <div style="font-size:.8rem;color:var(--text-muted)">${isNaN(parseFloat(c.price)) && String(c.price).match(/[^0-9.,]/) ? c.price : '₦' + parsePriceVal(c.price).toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
             <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
-              <button onclick="changeQty('${c.id}',-1)" style="width:24px;height:24px;border-radius:50%;background:#f8fafc;font-weight:600;font-size:.85rem;border:none;cursor:pointer">−</button>
+              <button onclick="changeQty('${c.id}',-1)" style="width:24px;height:24px;border-radius:50%;background:var(--bg-alt);font-weight:600;font-size:.85rem;border:none;cursor:pointer">−</button>
               <span style="font-weight:600;font-size:.85rem;min-width:16px;text-align:center">${c.qty}</span>
-              <button onclick="changeQty('${c.id}',1)" style="width:24px;height:24px;border-radius:50%;background:#f8fafc;font-weight:600;font-size:.85rem;border:none;cursor:pointer">+</button>
-              <button onclick="removeFromCart('${c.id}')" style="font-size:.78rem;color:#64748b;padding:2px 6px;border:none;cursor:pointer;background:none">✕</button>
+              <button onclick="changeQty('${c.id}',1)" style="width:24px;height:24px;border-radius:50%;background:var(--bg-alt);font-weight:600;font-size:.85rem;border:none;cursor:pointer">+</button>
+              <button onclick="removeFromCart('${c.id}')" style="font-size:.78rem;color:var(--text-muted);padding:2px 6px;border:none;cursor:pointer;background:none">✕</button>
             </div>
           </div>
         </div>
       `).join('');
-      const total = cart.reduce((s, c) => s + parseFloat(c.price) * c.qty, 0);
-      if (totalEl) totalEl.textContent = '₦' + total.toFixed(2);
+      const total = cart.reduce((s, c) => s + parsePriceVal(c.price) * c.qty, 0);
+      if (totalEl) totalEl.textContent = `₦${total.toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
     }
 
     function handleCheckout() {
       if (cart.length === 0) { showToast('Cart is empty'); return; }
-      showToast('Checkout coming soon!');
+      const total = cart.reduce((sum, c) => sum + parsePriceVal(c.price) * c.qty, 0);
+      showToast('Proceeding to checkout — ₦' + total.toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+      setTimeout(() => window.location.href = '{{ route("buyer.cart.index") }}', 1000);
     }
 
     function showToast(msg) {
       const el = document.getElementById('toast');
       if (!el) return;
       el.textContent = msg;
-      el.style.opacity = '1';
-      el.style.transform = 'translateX(-50%) translateY(0)';
+      el.classList.add('visible');
       clearTimeout(el._timeout);
-      el._timeout = setTimeout(() => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateX(-50%) translateY(80px)';
-      }, 3000);
+      el._timeout = setTimeout(() => el.classList.remove('visible'), 3000);
     }
 
+    function toggleDropdown(e) { e.stopPropagation(); document.getElementById('userDropdown')?.classList.toggle('open'); }
+    document.addEventListener('click', function() { const dd = document.getElementById('userDropdown'); if (dd && dd.classList.contains('open')) dd.classList.remove('open'); });
+
     updateCartUI();
-    </script>
-
-    <script>
-        lucide.createIcons();
-
-        function performSearch() {
-            const query = document.getElementById('search-input')?.value;
-            if (query) {
-                window.location.href = '{{ route("buyer.products.index") }}?search=' + encodeURIComponent(query);
-            }
-        }
-
-        document.getElementById('search-input')?.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') performSearch();
-        });
-
-        document.addEventListener('livewire:navigated', () => lucide.createIcons());
-    </script>
-    @stack('scripts')
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  </script>
+  @include('layouts.ux')
+  @stack('scripts')
 </body>
 </html>

@@ -19,6 +19,10 @@
   </div>
 
   <div>
+    <div style="display:flex; gap:8px; margin-bottom:10px;">
+      <span style="background:#dcfce7; color:#166534; font-size:0.75rem; font-weight:800; padding:4px 10px; border-radius:50px;">🛡️ NEPC EXPORT CERTIFIED</span>
+      <span style="background:#eff6ff; color:#1e40af; font-size:0.75rem; font-weight:800; padding:4px 10px; border-radius:50px;">✅ GOVERNMENT VERIFIED</span>
+    </div>
     <div style="display:inline-block;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--primary);margin-bottom:8px">
       {{ $product->category->name ?? 'General' }}
     </div>
@@ -31,7 +35,7 @@
 
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
       @if($product->unit_price && $product->unit_price !== 'Request quote')
-        <span style="font-size:2rem;font-weight:800">&#8358;{{ number_format((float) $product->unit_price) }}</span>
+        <span style="font-size:2rem;font-weight:800" class="current" data-price-ngn="{{ is_numeric($product->unit_price) ? $product->unit_price : '' }}">&#8358;{{ number_format((float) $product->unit_price) }}</span>
       @else
         <span style="font-size:1.2rem;font-weight:600;color:var(--primary)">Request Quote</span>
       @endif
@@ -61,7 +65,7 @@
       </div>
       <div style="padding:12px 16px;background:var(--bg-alt);border-radius:8px">
         <div style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Unit Price</div>
-        <div style="font-size:.95rem;font-weight:600;margin-top:2px">&#8358;{{ $product->unit_price && $product->unit_price !== 'Request quote' ? number_format((float) $product->unit_price) : 'Request Quote' }}</div>
+        <div style="font-size:.95rem;font-weight:600;margin-top:2px" class="current" data-price-ngn="{{ is_numeric($product->unit_price) ? $product->unit_price : '' }}">{{ is_numeric($product->unit_price) ? '₦' . number_format((float) $product->unit_price) : $product->unit_price }}</div>
       </div>
       <div style="padding:12px 16px;background:var(--bg-alt);border-radius:8px">
         <div style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Seller</div>
@@ -79,11 +83,14 @@
     </div>
 
     <div style="display:flex;gap:12px;flex-wrap:wrap">
-      <button class="btn-primary" onclick="addToCart({{ $product->id }}, '{{ $product->name }}', {{ $product->unit_price && $product->unit_price !== 'Request quote' ? (float) $product->unit_price : 0 }})" style="display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border-radius:50px;font-weight:600;font-size:.95rem;border:none;cursor:pointer;background:var(--primary);color:#fff;transition:all var(--transition)" onmouseover="this.style.background='var(--primary-dark)';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 30px rgba(37,99,235,.4)'" onmouseout="this.style.background='var(--primary)';this.style.transform='';this.style.boxShadow=''">
+      <button class="btn-primary" onclick="addToCart({{ $product->id }}, '{{ addslashes($product->name) }}', '{{ addslashes($product->unit_price) }}')" style="display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:50px;font-weight:600;font-size:.95rem;border:none;cursor:pointer;background:var(--primary);color:#fff;transition:all var(--transition)" onmouseover="this.style.background='var(--primary-dark)';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 30px rgba(37,99,235,.4)'" onmouseout="this.style.background='var(--primary)';this.style.transform='';this.style.boxShadow=''">
         🛒 Add to Cart
       </button>
-      <a href="{{ route('buyer.products.index') }}" style="display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border-radius:50px;font-weight:600;font-size:.95rem;border:2px solid var(--border);color:var(--text);text-decoration:none;transition:all var(--transition)" onmouseover="this.style.borderColor='var(--text)'" onmouseout="this.style.borderColor='var(--border)'">
-        &larr; Back to Products
+      <button onclick="openRfqModal({{ $product->id }}, '{{ addslashes($product->name) }}')" style="display:inline-flex;align-items:center;gap:8px;padding:14px 24px;border-radius:50px;font-weight:700;font-size:.95rem;border:2px solid #2563eb;color:#2563eb;background:#eff6ff;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#eff6ff'">
+        📋 Request Bulk Quote
+      </button>
+      <a href="{{ route('buyer.products.index') }}" style="display:inline-flex;align-items:center;gap:8px;padding:14px 24px;border-radius:50px;font-weight:600;font-size:.95rem;border:2px solid var(--border);color:var(--text);text-decoration:none;transition:all var(--transition)" onmouseover="this.style.borderColor='var(--text)'" onmouseout="this.style.borderColor='var(--border)'">
+        &larr; Back
       </a>
     </div>
   </div>

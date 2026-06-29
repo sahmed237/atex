@@ -198,4 +198,49 @@ class User extends Authenticatable implements MustVerifyEmail
 
         return $activeVersions->diff($acceptedVersions)->isEmpty();
     }
+
+    public function setKycVerificationStatusAttribute($value)
+    {
+        // Intercept legacy attribute assignment
+    }
+
+    public function getKycVerificationStatusAttribute()
+    {
+        $profile = \App\Models\SellerProfile::where('user_id', $this->id)->first()
+            ?? \App\Models\BuyerProfile::where('user_id', $this->id)->first()
+            ?? \App\Models\ExporterProfile::where('user_id', $this->id)->first()
+            ?? \App\Models\LogisticsProfile::where('user_id', $this->id)->first()
+            ?? \App\Models\AdminProfile::where('user_id', $this->id)->first();
+        return $profile ? $profile->verification_status : null;
+    }
+
+    public function setKycApprovedAtAttribute($value)
+    {
+        // Intercept legacy attribute assignment
+    }
+
+    public function getKycApprovedAtAttribute()
+    {
+        $profile = \App\Models\SellerProfile::where('user_id', $this->id)->first()
+            ?? \App\Models\BuyerProfile::where('user_id', $this->id)->first()
+            ?? \App\Models\ExporterProfile::where('user_id', $this->id)->first()
+            ?? \App\Models\LogisticsProfile::where('user_id', $this->id)->first()
+            ?? \App\Models\AdminProfile::where('user_id', $this->id)->first();
+        return $profile ? $profile->approved_at : null;
+    }
+
+    public function setKycSubmittedAtAttribute($value)
+    {
+        // Intercept legacy attribute assignment
+    }
+
+    public function getKycSubmittedAtAttribute()
+    {
+        $profile = \App\Models\SellerProfile::where('user_id', $this->id)->first()
+            ?? \App\Models\BuyerProfile::where('user_id', $this->id)->first()
+            ?? \App\Models\ExporterProfile::where('user_id', $this->id)->first()
+            ?? \App\Models\LogisticsProfile::where('user_id', $this->id)->first()
+            ?? \App\Models\AdminProfile::where('user_id', $this->id)->first();
+        return $profile ? ($profile->updated_at ?? $profile->created_at) : null;
+    }
 }

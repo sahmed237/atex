@@ -154,11 +154,19 @@ class KycFlowTest extends TestCase
             ->actingAs($user)
             ->post(route('seller.onboarding.store'), [
                 'business_name' => 'New Seller Co',
+                'business_category' => 'Agriculture',
                 'business_type' => 'SME',
                 'country' => 'Nigeria',
                 'state' => 'Abuja',
                 'lga' => 'Municipal',
-                'address' => '15 Trade St, Abuja',
+                'business_address' => '15 Trade St, Abuja',
+                'phone' => '08012345678',
+                'full_name' => 'John Doe',
+                'date_of_birth' => '1990-01-01',
+                'nationality' => 'Nigerian',
+                'residential_address' => '15 Trade St, Abuja',
+                'id_type' => 'nin',
+                'id_number' => '12345678901',
                 'registration_number' => 'RC789012',
                 'tax_number' => 'TIN67890',
                 'bvn' => '11111111111',
@@ -199,10 +207,9 @@ class KycFlowTest extends TestCase
             ->post(route('seller.onboarding.store'), []);
 
         $response->assertSessionHasErrors([
-            'business_name', 'business_type', 'country', 'state',
-            'lga', 'address', 'bvn', 'nin', 'bank_name',
-            'account_number', 'account_name', 'cac_document',
-            'valid_id', 'proof_of_address',
+            'business_name', 'business_category', 'business_address', 'country', 'state',
+            'phone', 'full_name', 'date_of_birth', 'nationality', 'residential_address',
+            'id_type', 'id_number',
         ]);
     }
 

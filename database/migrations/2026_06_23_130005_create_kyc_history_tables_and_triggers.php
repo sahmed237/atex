@@ -16,16 +16,25 @@ return new class extends Migration
         $itemReviewsCols = ["id","owner_type","owner_id","item_key","status","comment","reviewer_id","reviewed_at","created_at","updated_at"];
 
         // 1. Create Tables
-        DB::unprepared("
-            CREATE TABLE seller_profile_hist AS SELECT * FROM seller_profiles WHERE 1=0;
-            ALTER TABLE seller_profile_hist ADD COLUMN hist_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY FIRST, ADD COLUMN operation_type VARCHAR(20) AFTER hist_id, ADD COLUMN changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP AFTER operation_type;
+        if (DB::getDriverName() === 'sqlite') {
+            $createCols = fn($cols) => implode(', ', array_map(fn($c) => "`$c` TEXT", $cols));
+            DB::unprepared("
+                CREATE TABLE IF NOT EXISTS seller_profile_hist (hist_id INTEGER PRIMARY KEY AUTOINCREMENT, operation_type TEXT, changed_at DATETIME DEFAULT CURRENT_TIMESTAMP, " . $createCols($sellerProfileCols) . ");
+                CREATE TABLE IF NOT EXISTS seller_profile_kyc_hist (hist_id INTEGER PRIMARY KEY AUTOINCREMENT, operation_type TEXT, changed_at DATETIME DEFAULT CURRENT_TIMESTAMP, " . $createCols($sellerProfileKycCols) . ");
+                CREATE TABLE IF NOT EXISTS seller_profile_kyc_item_reviews_hist (hist_id INTEGER PRIMARY KEY AUTOINCREMENT, operation_type TEXT, changed_at DATETIME DEFAULT CURRENT_TIMESTAMP, " . $createCols($itemReviewsCols) . ");
+            ");
+        } else {
+            DB::unprepared("
+                CREATE TABLE seller_profile_hist AS SELECT * FROM seller_profiles WHERE 1=0;
+                ALTER TABLE seller_profile_hist ADD COLUMN hist_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY FIRST, ADD COLUMN operation_type VARCHAR(20) AFTER hist_id, ADD COLUMN changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP AFTER operation_type;
 
-            CREATE TABLE seller_profile_kyc_hist AS SELECT * FROM seller_profile_kycs WHERE 1=0;
-            ALTER TABLE seller_profile_kyc_hist ADD COLUMN hist_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY FIRST, ADD COLUMN operation_type VARCHAR(20) AFTER hist_id, ADD COLUMN changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP AFTER operation_type;
+                CREATE TABLE seller_profile_kyc_hist AS SELECT * FROM seller_profile_kycs WHERE 1=0;
+                ALTER TABLE seller_profile_kyc_hist ADD COLUMN hist_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY FIRST, ADD COLUMN operation_type VARCHAR(20) AFTER hist_id, ADD COLUMN changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP AFTER operation_type;
 
-            CREATE TABLE seller_profile_kyc_item_reviews_hist AS SELECT * FROM seller_profile_kyc_item_reviews WHERE 1=0;
-            ALTER TABLE seller_profile_kyc_item_reviews_hist ADD COLUMN hist_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY FIRST, ADD COLUMN operation_type VARCHAR(20) AFTER hist_id, ADD COLUMN changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP AFTER operation_type;
-        ");
+                CREATE TABLE seller_profile_kyc_item_reviews_hist AS SELECT * FROM seller_profile_kyc_item_reviews WHERE 1=0;
+                ALTER TABLE seller_profile_kyc_item_reviews_hist ADD COLUMN hist_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY FIRST, ADD COLUMN operation_type VARCHAR(20) AFTER hist_id, ADD COLUMN changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP AFTER operation_type;
+            ");
+        }
 
         // 2. Create Triggers
         $this->createTriggers('seller_profiles', 'seller_profile_hist', $sellerProfileCols);

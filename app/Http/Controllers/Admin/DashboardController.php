@@ -75,13 +75,25 @@ class DashboardController extends Controller
     public function buyerDashboard()
     {
         $user = Auth::user();
+        $buyerProfile = \App\Models\BuyerProfile::where('user_id', $user->id)->first();
+        
+        $totalOrders = 0;
+        $totalSpent = 0.00;
+        $recentOrders = collect();
+
+        if ($buyerProfile) {
+            $totalOrders = \App\Models\Order::where('buyer_profile_id', $buyerProfile->id)->count();
+            $totalSpent = \App\Models\Order::where('buyer_profile_id', $buyerProfile->id)->sum('total_amount');
+            $recentOrders = \App\Models\Order::where('buyer_profile_id', $buyerProfile->id)->with('product')->latest()->take(5)->get();
+        }
+
         $metrics = [
-            'total_orders' => 0,
+            'total_orders' => $totalOrders,
             'active_rfqs' => 0,
             'saved_items' => 0,
-            'total_spent' => 0.00,
+            'total_spent' => $totalSpent,
         ];
         $sellerProfile = \App\Models\SellerProfile::where('user_id', $user->id)->first();
-        return view('admin.dashboard.buyer', compact('metrics', 'user', 'sellerProfile'));
+        return view('admin.dashboard.buyer', compact('metrics', 'user', 'sellerProfile', 'recentOrders'));
     }
 }
