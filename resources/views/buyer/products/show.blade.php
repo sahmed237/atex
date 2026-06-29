@@ -20,8 +20,11 @@
 
   <div>
     <div style="display:flex; gap:8px; margin-bottom:10px;">
-      <span style="background:#dcfce7; color:#166534; font-size:0.75rem; font-weight:800; padding:4px 10px; border-radius:50px;">🛡️ NEPC EXPORT CERTIFIED</span>
-      <span style="background:#eff6ff; color:#1e40af; font-size:0.75rem; font-weight:800; padding:4px 10px; border-radius:50px;">✅ GOVERNMENT VERIFIED</span>
+      @if($product->isExport())
+        <span style="background:#f3e8ff; color:#7c3aed; font-size:0.75rem; font-weight:800; padding:4px 10px; border-radius:50px;">🌍 Export Item</span>
+      @else
+        <span style="background:#dcfce7; color:#166534; font-size:0.75rem; font-weight:800; padding:4px 10px; border-radius:50px;">📍 Local Item</span>
+      @endif
     </div>
     <div style="display:inline-block;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--primary);margin-bottom:8px">
       {{ $product->category->name ?? 'General' }}
@@ -83,12 +86,15 @@
     </div>
 
     <div style="display:flex;gap:12px;flex-wrap:wrap">
-      <button class="btn-primary" onclick="addToCart({{ $product->id }}, '{{ addslashes($product->name) }}', '{{ addslashes($product->unit_price) }}')" style="display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:50px;font-weight:600;font-size:.95rem;border:none;cursor:pointer;background:var(--primary);color:#fff;transition:all var(--transition)" onmouseover="this.style.background='var(--primary-dark)';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 30px rgba(37,99,235,.4)'" onmouseout="this.style.background='var(--primary)';this.style.transform='';this.style.boxShadow=''">
-        🛒 Add to Cart
-      </button>
-      <button onclick="openRfqModal({{ $product->id }}, '{{ addslashes($product->name) }}')" style="display:inline-flex;align-items:center;gap:8px;padding:14px 24px;border-radius:50px;font-weight:700;font-size:.95rem;border:2px solid #2563eb;color:#2563eb;background:#eff6ff;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#eff6ff'">
-        📋 Request Bulk Quote
-      </button>
+      @if($product->isLocal())
+        <button class="btn-primary" onclick="addToCart({{ $product->id }}, '{{ addslashes($product->name) }}', '{{ addslashes($product->unit_price) }}')" style="display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:50px;font-weight:600;font-size:.95rem;border:none;cursor:pointer;background:var(--primary);color:#fff;transition:all var(--transition)" onmouseover="this.style.background='var(--primary-dark)';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 30px rgba(37,99,235,.4)'" onmouseout="this.style.background='var(--primary)';this.style.transform='';this.style.boxShadow=''">
+          🛒 Add to Cart
+        </button>
+      @else
+        <button onclick="openRfqModal({{ $product->id }}, '{{ addslashes($product->name) }}')" style="display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:50px;font-weight:700;font-size:.95rem;border:none;cursor:pointer;background:#7c3aed;color:#fff;transition:all 0.2s;" onmouseover="this.style.background='#6d28d9';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#7c3aed';this.style.transform=''">
+          📋 Request Quote
+        </button>
+      @endif
       <a href="{{ route('buyer.products.index') }}" style="display:inline-flex;align-items:center;gap:8px;padding:14px 24px;border-radius:50px;font-weight:600;font-size:.95rem;border:2px solid var(--border);color:var(--text);text-decoration:none;transition:all var(--transition)" onmouseover="this.style.borderColor='var(--text)'" onmouseout="this.style.borderColor='var(--border)'">
         &larr; Back
       </a>

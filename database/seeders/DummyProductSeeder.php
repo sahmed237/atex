@@ -127,12 +127,48 @@ class DummyProductSeeder extends Seeder
                 'hs_code' => '260700',
                 'packaging' => 'Bulk / 50kg Bags',
             ],
+            [
+                'name' => 'Dried Ginger Slices',
+                'brand_name' => null,
+                'description' => 'Premium sun-dried ginger slices sourced from organic farms. Strong aroma and high oleoresin content.',
+                'origin_lga' => 'Mubi South',
+                'moq' => '3 Metric Tons',
+                'unit_price' => '450000',
+                'readiness_score' => 70,
+                'hs_code' => '091011',
+                'packaging' => null,
+            ],
+            [
+                'name' => 'Raw Shea Butter (Grade A)',
+                'brand_name' => null,
+                'description' => 'Unrefined Grade A shea butter with high fatty acid content. Ideal for cosmetic and pharmaceutical applications.',
+                'origin_lga' => 'Numan',
+                'moq' => '2 Metric Tons',
+                'unit_price' => '320000',
+                'readiness_score' => 75,
+                'hs_code' => '151590',
+                'packaging' => null,
+            ],
+            [
+                'name' => 'Sesame Seeds (White)',
+                'brand_name' => null,
+                'description' => 'Premium white sesame seeds with high oil content. Machine-cleaned and sorted for export quality.',
+                'origin_lga' => 'Yola North',
+                'moq' => '15 Metric Tons',
+                'unit_price' => '780000',
+                'readiness_score' => 85,
+                'hs_code' => '120740',
+                'packaging' => null,
+            ],
         ];
+
+        if (\App\Models\Product::count() > 0) return;
 
         foreach ($products as $prod) {
             $prod['seller_profile_id'] = $seller->id;
             $prod['category_id'] = $categories->random()->id;
             $prod['status'] = 'approved';
+            $prod['quote_required'] = false;
             Product::create($prod);
         }
     }

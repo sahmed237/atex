@@ -12,49 +12,43 @@ class LandingPageController extends Controller
     public function index()
     {
         $user = Auth::user();
-        
-        $products = Product::where('status', 'approved')
-            ->with(['sellerProfile', 'category'])
-            ->latest()
-            ->get();
 
-        $marketplaceProducts = $products->map(function ($product) use ($user) {
-            $isBuyer = $user && $user->hasRole('buyer');
-            
-            $quoteUrl = route('login') . '?redirect=' . urlencode('admin/quotes/create?product_id=' . $product->id);
-            $orderUrl = route('login') . '?redirect=' . urlencode('admin/orders/create?product_id=' . $product->id);
-            
-            if ($user) {
-                if ($isBuyer) {
-                    $quoteUrl = route('admin.quotes.create', ['product_id' => $product->id]);
-                    $orderUrl = route('admin.orders.create', ['product_id' => $product->id]);
-                } else {
-                    $quoteUrl = route('admin.dashboard');
-                    $orderUrl = route('admin.dashboard');
-                }
-            }
+        $cacheKey = 'landing.marketplaceProducts';
+        $marketplaceProducts = \Illuminate\Support\Facades\Cache::remember($cacheKey, 300, function () {
+            $products = Product::where('status', 'approved')
+                ->with(['sellerProfile', 'category'])
+                ->latest()
+                ->get();
 
-            return [
-                'id' => (int) $product->id,
-                'name' => $product->name,
-                'category' => $product->category->name ?? '',
-                'seller' => $product->sellerProfile->business_name ?? 'Verified Seller',
-                'origin' => ($product->origin_lga ?: 'Adamawa') . ', Adamawa',
-                'moq' => $product->moq,
-                'price' => $product->unit_price ?: 'Request quote',
-                'readiness' => ((int) $product->readiness_score) . '%',
-                'image' => $product->image_path ? asset($product->image_path) : $this->marketplaceProductImage($product->category->name ?? ''),
-                'quoteUrl' => $quoteUrl,
-                'orderUrl' => $orderUrl,
-                'badges' => array_values(array_filter([
-                    'Approved',
-                    $product->hs_code ? 'HS ' . $product->hs_code : null,
-                    $product->packaging ?: null,
-                ])),
-            ];
+            $emojis = ['🎧', '👜', '☕', '🔊', '🧵', '🥭', '🔋', '🧺', '🔌', '🧣', '🍵', '🌾', '📦'];
+            $tags = [null, 'Bestseller', 'Sale', 'New'];
+
+            return $products->map(function ($product) use ($emojis, $tags) {
+                $price = is_numeric($product->unit_price) ? (float) $product->unit_price : 0;
+
+                return [
+                    'id' => (int) $product->id,
+                    'name' => $product->name,
+                    'category' => $product->category->slug ?? 'general',
+                    'seller' => $product->sellerProfile->business_name ?? 'Verified Seller',
+                    'origin' => ($product->origin_lga ?: 'Adamawa') . ', Adamawa',
+                    'moq' => $product->moq,
+                    'price' => $price,
+                    'oldPrice' => null,
+                    'emoji' => $emojis[$product->id % count($emojis)],
+                    'tag' => $tags[$product->id % count($tags)],
+                    'rating' => 4.5,
+                    'image' => $product->image_path ? asset($product->image_path) : $this->marketplaceProductImage($product->category->name ?? ''),
+                    'type' => $product->isExport() ? 'export' : 'local',
+                ];
+            });
         });
 
-        return view('welcome', compact('user', 'marketplaceProducts'));
+        $productCount = \Illuminate\Support\Facades\Cache::remember('landing.productCount', 300, function () {
+            return Product::where('status', 'approved')->count();
+        });
+
+        return view('welcome', compact('user', 'marketplaceProducts', 'productCount'));
     }
 
     private function marketplaceProductImage(string $category): string

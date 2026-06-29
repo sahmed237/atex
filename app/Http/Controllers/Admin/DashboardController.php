@@ -90,7 +90,7 @@ class DashboardController extends Controller
         $metrics = [
             'total_orders' => $totalOrders,
             'active_rfqs' => 0,
-            'saved_items' => 0,
+            'saved_items' => \App\Models\Wishlist::where('user_id', $user->id)->count(),
             'total_spent' => $totalSpent,
         ];
         $sellerProfile = \App\Models\SellerProfile::where('user_id', $user->id)->first();

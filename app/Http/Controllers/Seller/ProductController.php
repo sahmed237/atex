@@ -79,7 +79,7 @@ class ProductController extends Controller
             'brand_name' => $request->brand_name ?: $brandName,
             'fulfillment_mode' => $request->fulfillment_mode ?: 'seller_direct',
             'fulfillment_eligible' => $request->fulfillment_eligible ? true : false,
-            'quote_required' => $request->has('quote_required') ? ($request->quote_required ? true : false) : true,
+            'quote_required' => $profile->seller_tier === 'export',
             'packaging' => $request->packaging,
             'origin_lga' => $request->origin_lga,
             'status' => 'pending_review',

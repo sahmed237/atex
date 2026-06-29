@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             UnitOfMeasurementSeeder::class,
             CategorySeeder::class,
             DummyProductSeeder::class,
+            ExportSellerSeeder::class,
         ]);
 
         $user = User::firstOrCreate(
