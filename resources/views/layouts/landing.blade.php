@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Adamawa Ecommerce platform') }}</title>
     <link rel="preconnect" href="https://images.unsplash.com" />
     <link rel="stylesheet" href="{{ asset('assets/landing.css') }}" />
@@ -114,8 +115,8 @@
           <form method="GET" action="{{ route('buyer.products.index') }}" class="header-search" style="margin:0; width:100%;">
             <select name="category[]" onchange="this.form.submit()">
               <option value="">All</option>
-              @foreach(\App\Models\Category::where('status', true)->get() as $cat)
-                <option value="{{ $cat->slug }}" {{ in_array($cat->slug, (array)request('category', [])) ? 'selected' : '' }}>{{ $cat->name }}</option>
+              @foreach($sharedCategories as $cat)
+                <option value="{{ $cat->slug }}" {{ in_array($cat->slug, request('category', [])) ? 'selected' : '' }}>{{ $cat->name }}</option>
               @endforeach
             </select>
             <input type="text" name="search" id="liveSearchInput" value="{{ request('search') }}" placeholder="Search products..." autocomplete="off" oninput="handleLiveSearch(this.value)">
@@ -184,5 +185,7 @@
 
     @include('layouts.ux')
     @yield('scripts')
+
+    <script>var isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};</script>
   </body>
 </html>

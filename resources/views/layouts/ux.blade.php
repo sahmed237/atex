@@ -1,7 +1,3 @@
-@php
-  $liveProducts = \App\Models\Product::select('id', 'name', 'unit_price', 'image_path')->take(40)->get();
-@endphp
-
 <!-- ═══ QUICK VIEW MODAL ═══ -->
 <div id="quickViewModal" class="ux-modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); z-index:10000; align-items:center; justify-content:center; padding:20px;">
   <div class="ux-modal-box" style="background:#fff; color:#0f172a; border-radius:20px; max-width:650px; width:100%; padding:32px; position:relative; box-shadow:0 25px 50px rgba(0,0,0,0.25); max-height:90vh; overflow-y:auto; border:1px solid #e2e8f0;">
@@ -256,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ─── LIVE SEARCH SUGGESTIONS ───
-window.atexLiveCatalog = @json($liveProducts);
+var atexLiveCatalog = null;
 
 function handleLiveSearch(val) {
   const dropdown = document.getElementById('liveSearchDropdown');
@@ -265,8 +261,25 @@ function handleLiveSearch(val) {
     dropdown.style.display = 'none';
     return;
   }
+  if (!atexLiveCatalog) {
+    fetch('/products/search-catalog')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        atexLiveCatalog = data;
+        doLiveSearch(val, dropdown);
+      });
+    return;
+  }
+  doLiveSearch(val, dropdown);
+}
+
+function doLiveSearch(val, dropdown) {
   const q = val.toLowerCase().trim();
-  const matches = window.atexLiveCatalog.filter(p => (p.name && p.name.toLowerCase().includes(q)));
+  const matches = atexLiveCatalog.filter(p =>
+    (p.name && p.name.toLowerCase().includes(q)) ||
+    (p.brand_name && p.brand_name.toLowerCase().includes(q)) ||
+    (p.origin_lga && p.origin_lga.toLowerCase().includes(q))
+  );
   
   if (matches.length === 0) {
     dropdown.innerHTML = '<div style="padding:16px; color:#64748b; font-size:0.9rem; text-align:center;">No matching commodities found</div>';
@@ -278,11 +291,11 @@ function handleLiveSearch(val) {
     const priceStr = p.unit_price ? formatPriceAmount(p.unit_price) : '';
     const imgHtml = p.image_path ? `<img src="/${p.image_path.replace(/^\//,'')}" style="width:36px;height:36px;object-fit:cover;border-radius:6px;">` : `<span style="font-size:1.5rem;">📦</span>`;
     return `
-      <div onclick="window.location.href='/buyer/products/${p.id}'" style="display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid #f1f5f9; cursor:pointer; transition:background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+      <div onclick="window.location.href='/products/${p.id}'" style="display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid #f1f5f9; cursor:pointer; transition:background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
         ${imgHtml}
         <div style="flex:1;">
           <div style="font-weight:700; font-size:0.92rem; color:#0f172a;">${p.name}</div>
-          <div style="font-size:0.8rem; color:#64748b;">Adamawa Direct Trade</div>
+          <div style="font-size:0.8rem; color:#64748b;">${p.origin_lga ? p.origin_lga + (p.brand_name ? ' · ' + p.brand_name : '') : (p.brand_name || 'Adamawa Direct Trade')}</div>
         </div>
         <div style="font-weight:800; color:#2563eb; font-size:0.95rem;">${priceStr}</div>
       </div>
@@ -301,12 +314,20 @@ document.addEventListener('click', (e) => {
 });
 
 // ─── QUICK VIEW DRAWER/MODAL ═══
-function openQuickView(id, name, price, moq, origin) {
+function openQuickView(id, name, price, moq, origin, type) {
   const modal = document.getElementById('quickViewModal');
   const content = document.getElementById('qvContent');
   if (!modal || !content) return;
   
-  const priceStr = formatPriceAmount(price);
+  const priceStr = price > 0 ? '₦' + Number(price).toLocaleString() : 'Request Quote';
+  const isExport = type === 'export';
+  const badgeHtml = isExport
+    ? '<span style="background:#f3e8ff; color:#7c3aed; font-size:0.75rem; font-weight:800; padding:4px 10px; border-radius:50px;">🌍 Export Item</span>'
+    : '<span style="background:#dcfce7; color:#166534; font-size:0.75rem; font-weight:800; padding:4px 10px; border-radius:50px;">📍 Local Item</span>';
+  const buttonHtml = isExport
+    ? '<button onclick="closeQuickView(); openRfqModal(' + id + ', \'' + name.replace(/'/g,"\\'") + '\');" style="flex:1; padding:14px; border-radius:50px; background:#7c3aed; color:#fff; font-weight:700; border:none; cursor:pointer;">📋 Request Quote</button>'
+    : '<button onclick="addToCartItem({ id: ' + id + ', name: \'' + name.replace(/'/g,"\\'") + '\', price: \'' + price + '\', emoji: \'📦\' }); closeQuickView();" style="flex:1; padding:14px; border-radius:50px; background:#2563eb; color:#fff; font-weight:700; border:none; cursor:pointer;">🛒 Add to Cart</button>';
+  
   content.innerHTML = `
     <div style="display:flex; gap:24px; flex-wrap:wrap;">
       <div style="width:220px; height:220px; background:#f8fafc; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:5rem; border:1px solid #e2e8f0; flex-shrink:0;">
@@ -314,8 +335,7 @@ function openQuickView(id, name, price, moq, origin) {
       </div>
       <div style="flex:1; min-width:240px;">
         <div style="display:flex; gap:8px; margin-bottom:8px;">
-          <span style="background:#dcfce7; color:#166534; font-size:0.75rem; font-weight:800; padding:4px 10px; border-radius:50px;">🛡️ NEPC EXPORT CERTIFIED</span>
-          <span style="background:#eff6ff; color:#1e40af; font-size:0.75rem; font-weight:800; padding:4px 10px; border-radius:50px;">✅ GOVERNMENT VERIFIED</span>
+          ${badgeHtml}
         </div>
         <h2 style="margin:0 0 12px; font-size:1.6rem; font-weight:800; color:#0f172a;">${name}</h2>
         <div style="font-size:1.5rem; font-weight:800; color:#2563eb; margin-bottom:16px;" data-price-ngn="${price}">${priceStr}</div>
@@ -328,8 +348,7 @@ function openQuickView(id, name, price, moq, origin) {
         </div>
 
         <div style="display:flex; gap:12px;">
-          <button onclick="addToCartItem({ id: ${id}, name: '${name.replace(/'/g,"\\'")}', price: '${price}', emoji: '📦' }); closeQuickView();" style="flex:1; padding:14px; border-radius:50px; background:#2563eb; color:#fff; font-weight:700; border:none; cursor:pointer; transition:background 0.2s;">Add to Export Order</button>
-          <button onclick="closeQuickView(); openRfqModal(${id}, '${name.replace(/'/g,"\\'")}');" style="padding:14px 20px; border-radius:50px; background:#f1f5f9; color:#0f172a; font-weight:700; border:1px solid #cbd5e1; cursor:pointer;">Request Quote</button>
+          ${buttonHtml}
         </div>
       </div>
     </div>
@@ -370,24 +389,49 @@ function submitRfqForm(e) {
 window.atexSaved = JSON.parse(localStorage.getItem('atex_saved') || '[]');
 
 function toggleWatchlist(id, btnEl) {
-  const idx = window.atexSaved.indexOf(id);
-  if (idx > -1) {
-    window.atexSaved.splice(idx, 1);
-    if (btnEl) btnEl.innerHTML = '🤍';
-    if (typeof showToast === 'function') showToast('Removed from saved commodities');
-  } else {
-    window.atexSaved.push(id);
-    if (btnEl) btnEl.innerHTML = '❤️';
-    if (typeof showToast === 'function') showToast('❤️ Saved to commodity watchlist');
+  if (typeof isAuthenticated !== 'undefined' && !isAuthenticated) {
+    if (typeof showToast === 'function') showToast('Sign in to add to wishlist');
+    return;
   }
-  localStorage.setItem('atex_saved', JSON.stringify(window.atexSaved));
+  fetch('/wishlist/toggle', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '' },
+    body: JSON.stringify({ product_id: id })
+  }).then(function(r) { return r.json(); }).then(function(data) {
+    if (data.saved) {
+      if (window.atexSaved.indexOf(id) === -1) window.atexSaved.push(id);
+      if (btnEl) btnEl.innerHTML = '❤️';
+      if (typeof showToast === 'function') showToast('❤️ Saved to wishlist');
+    } else {
+      var idx = window.atexSaved.indexOf(id);
+      if (idx > -1) window.atexSaved.splice(idx, 1);
+      if (btnEl) btnEl.innerHTML = '🤍';
+      if (typeof showToast === 'function') showToast('Removed from wishlist');
+    }
+    localStorage.setItem('atex_saved', JSON.stringify(window.atexSaved));
+  }).catch(function() {
+    if (typeof showToast === 'function') showToast('Error saving to wishlist');
+  });
 }
 
 function initWatchlistButtons() {
-  document.querySelectorAll('[data-watchlist-id]').forEach(btn => {
-    const id = parseInt(btn.getAttribute('data-watchlist-id'));
-    btn.innerHTML = window.atexSaved.includes(id) ? '❤️' : '🤍';
-  });
+  if (typeof isAuthenticated !== 'undefined' && isAuthenticated) {
+    fetch('/wishlist', { headers: { 'Accept': 'application/json' } })
+      .then(function(r) { return r.json(); })
+      .then(function(ids) {
+        window.atexSaved = ids;
+        localStorage.setItem('atex_saved', JSON.stringify(ids));
+        document.querySelectorAll('[data-watchlist-id]').forEach(function(btn) {
+          var id = parseInt(btn.getAttribute('data-watchlist-id'));
+          btn.innerHTML = window.atexSaved.includes(id) ? '❤️' : '🤍';
+        });
+      });
+  } else {
+    document.querySelectorAll('[data-watchlist-id]').forEach(function(btn) {
+      var id = parseInt(btn.getAttribute('data-watchlist-id'));
+      btn.innerHTML = window.atexSaved.includes(id) ? '❤️' : '🤍';
+    });
+  }
 }
 document.addEventListener('DOMContentLoaded', initWatchlistButtons);
 

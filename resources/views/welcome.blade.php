@@ -104,21 +104,22 @@ button { cursor: pointer; font: inherit; border: none; background: none; }
 
 /* ─── PRODUCTS ─── */
 .products-header { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 40px; }
-.filter-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.filter-btns { display: flex; gap: 8px; flex-wrap: wrap; overflow: hidden; max-height: 88px; transition: max-height 0.3s ease; align-items: center; }
+.filter-btns.expanded { max-height: 2000px; }
 .filter-btn { padding: 8px 20px; border-radius: 50px; font-size: .88rem; font-weight: 500; border: 1px solid var(--border); color: var(--text-muted); transition: all var(--transition); }
 .filter-btn.active, .filter-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
 .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 24px; }
-.product-card { border-radius: var(--radius); background: var(--bg); border: 1px solid var(--border); overflow: hidden; transition: transform var(--transition), box-shadow var(--transition); }
+.product-card { border-radius: var(--radius); background: var(--bg); border: 1px solid var(--border); overflow: hidden; transition: transform var(--transition), box-shadow var(--transition); display: flex; flex-direction: column; }
 .product-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
-.product-img { aspect-ratio: 1; background: var(--bg-alt); display: flex; align-items: center; justify-content: center; font-size: 3.5rem; position: relative; }
+.product-img { aspect-ratio: 1; background: var(--bg-alt); display: flex; align-items: center; justify-content: center; font-size: 3.5rem; position: relative; flex-shrink: 0; }
 .product-tag { position: absolute; top: 12px; left: 12px; padding: 4px 12px; border-radius: 50px; font-size: .75rem; font-weight: 600; background: var(--accent); color: #fff; }
 .product-tag.sale { background: #ef4444; }
 .product-tag.green { background: var(--green); }
-.product-body { padding: 20px; }
-.product-body h3 { font-size: 1.05rem; margin: 4px 0 6px; }
+.product-body { padding: 20px; flex: 1; display: flex; flex-direction: column; }
+.product-body h3 { font-size: 1.05rem; margin: 4px 0 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .product-stars { font-size: .82rem; color: var(--accent); letter-spacing: 1px; margin-bottom: 6px; }
 .product-moq { font-size: .8rem; color: var(--text-muted); margin-bottom: 8px; }
-.product-price { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.product-price { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; margin-top: auto; }
 .product-price .current { font-size: 1.2rem; font-weight: 700; }
 .product-price .old { font-size: .92rem; color: var(--text-muted); text-decoration: line-through; }
 .add-to-cart { width: 100%; padding: 12px; border-radius: 50px; background: var(--text); color: #fff; font-weight: 600; font-size: .9rem; transition: background var(--transition); }
@@ -256,7 +257,7 @@ footer ul a:hover { color: #fff; }
           <h1>Source Products.<br>Export <span>Worldwide.</span></h1>
           <p>Connect with verified suppliers across Adamawa, import quality goods, and export to buyers in 60+ countries. All from one dashboard.</p>
           <div class="hero-stats">
-            <div><strong>12K<em>+</em></strong><span>Products Listed</span></div>
+            <div><strong>{{ number_format($productCount) }}<em>+</em></strong><span>Products Listed</span></div>
             <div><strong>60<em>+</em></strong><span>Export Countries</span></div>
             <div><strong>2.4K<em>+</em></strong><span>Trade Partners</span></div>
           </div>
@@ -294,9 +295,13 @@ footer ul a:hover { color: #fff; }
       </div>
       <div class="filter-btns">
         <button class="filter-btn active" data-category="all">All</button>
-        <button class="filter-btn" data-category="electronics">Electronics</button>
-        <button class="filter-btn" data-category="textiles">Textiles</button>
+        <div id="catFilterExtra" style="display:contents;">
+          @foreach($sharedCategories as $cat)
+            <button class="filter-btn" data-category="{{ $cat->slug }}">{{ $cat->name }}</button>
+          @endforeach
+        </div>
       </div>
+      <button type="button" id="catFilterToggle" onclick="toggleCatFilters()" style="background:none; border:none; color:var(--primary); font-size:0.8rem; font-weight:600; cursor:pointer; padding:4px 0; white-space:nowrap;">Show more ▾</button>
     </div>
     <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; align-items:center; background:var(--bg-alt); padding:12px 16px; border-radius:12px; border:1px solid var(--border);">
       <span style="font-size:0.8rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-right:4px;">📍 Origin LGA:</span>
@@ -542,16 +547,10 @@ buildDots();
 resetAutoplay();
 
 // ─── PRODUCT DATA ───
-var products = [
-  { id: 1, name: 'Wireless Earbuds (TWS)', category: 'electronics', price: 7.20, oldPrice: null, emoji: '🎧', tag: 'Bestseller', origin: 'China', moq: '200 pcs', rating: 5 },
-  { id: 2, name: 'Cotton Tote Bags', category: 'textiles', price: 3.80, oldPrice: null, emoji: '👜', tag: null, origin: 'India', moq: '500 pcs', rating: 4 },
-  { id: 3, name: 'Organic Coffee Beans', category: 'food', price: 12.50, oldPrice: 16.00, emoji: '☕', tag: 'Sale', origin: 'Colombia', moq: '100 lbs', rating: 5 },
-  { id: 4, name: 'Bluetooth Speakers', category: 'electronics', price: 14.90, oldPrice: null, emoji: '🔊', tag: 'New', origin: 'China', moq: '100 pcs', rating: 5 },
-  { id: 5, name: 'Bamboo Fiber Textiles', category: 'textiles', price: 5.40, oldPrice: 7.20, emoji: '🧵', tag: 'Sale', origin: 'Vietnam', moq: '300 yds', rating: 4 },
-  { id: 6, name: 'Dried Mango Chips', category: 'food', price: 4.30, oldPrice: null, emoji: '🥭', tag: null, origin: 'Philippines', moq: '50 cases', rating: 4 },
-  { id: 7, name: 'Solar Power Banks', category: 'electronics', price: 11.00, oldPrice: null, emoji: '🔋', tag: 'New', origin: 'China', moq: '150 pcs', rating: 5 },
-  { id: 8, name: 'Linen Kitchen Towels', category: 'textiles', price: 2.10, oldPrice: null, emoji: '🧺', tag: 'Bestseller', origin: 'Turkey', moq: '1000 pcs', rating: 4 },
-];
+var isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
+var products = typeof window.marketplaceProducts !== 'undefined' && window.marketplaceProducts.length
+  ? window.marketplaceProducts
+  : [];
 
 var catalog = products.slice();
 var cart = JSON.parse(localStorage.getItem('gt_cart') || localStorage.getItem('atex_cart') || '[]');
@@ -571,6 +570,12 @@ function filterOrigin(orig, btnEl) {
   renderProducts();
 }
 
+function toggleCatFilters() {
+  var el = document.querySelector('.filter-btns');
+  var btn = document.getElementById('catFilterToggle');
+  el.classList.toggle('expanded');
+  btn.textContent = el.classList.contains('expanded') ? 'Show less ▴' : 'Show more ▾';
+}
 function renderProducts() {
   var grid = document.getElementById('productsGrid');
   if (!grid) return;
@@ -579,39 +584,40 @@ function renderProducts() {
     var origMatch = currentOrigin === 'all' || (p.origin && p.origin.indexOf(currentOrigin) > -1);
     return catMatch && origMatch;
   });
-  var saved = JSON.parse(localStorage.getItem('atex_saved') || '[]');
+  var saved = window.atexSaved || JSON.parse(localStorage.getItem('atex_saved') || '[]');
   var compare = JSON.parse(localStorage.getItem('atex_compare') || '[]');
   
   grid.innerHTML = filtered.map(function(p) {
     var stars = '';
     for (var s = 0; s < 5; s++) { stars += s < p.rating ? '★' : '☆'; }
     var tagHtml = p.tag ? '<span class="product-tag ' + (p.tag === 'Sale' ? 'sale' : '') + '">' + p.tag + '</span>' : '';
-    var ngnBase = (p.price * 1600).toFixed(0);
-    var oldNgnBase = p.oldPrice ? (p.oldPrice * 1600).toFixed(0) : null;
-    var currentPriceStr = typeof formatPriceAmount === 'function' ? formatPriceAmount(ngnBase) : '$' + p.price.toFixed(2);
-    var oldPriceStr = oldNgnBase ? (typeof formatPriceAmount === 'function' ? formatPriceAmount(oldNgnBase) : '$' + p.oldPrice.toFixed(2)) : '';
-    var oldPriceHtml = oldPriceStr ? '<span class="old" data-price-ngn="' + oldNgnBase + '">' + oldPriceStr + '</span>' : '';
-    var badgeHtml = '<div style="font-size:0.7rem; font-weight:800; color:#166534; background:#dcfce7; padding:2px 6px; border-radius:4px; display:inline-block; margin-bottom:4px;">🛡️ NEPC CERTIFIED</div>';
+    var priceNum = parseFloat(p.price) || 0;
+    var currentPriceStr = priceNum > 0 ? '₦' + priceNum.toLocaleString() : 'Request Quote';
+    var oldPriceHtml = p.oldPrice ? '<span class="old">₦' + parseFloat(p.oldPrice).toLocaleString() + '</span>' : '';
+    var badgeHtml = p.type === 'export'
+      ? '<div style="font-size:0.7rem; font-weight:800; color:#7c3aed; background:#f3e8ff; padding:2px 6px; border-radius:4px; display:inline-block; margin-bottom:4px;">🌍 Export</div>'
+      : '<div style="font-size:0.7rem; font-weight:800; color:#166534; background:#dcfce7; padding:2px 6px; border-radius:4px; display:inline-block; margin-bottom:4px;">📍 Local</div>';
     
     var isSaved = saved.includes(p.id);
-    var heartHtml = '<button onclick="toggleWatchlist(' + p.id + ', this)" data-watchlist-id="' + p.id + '" style="position:absolute; top:8px; left:8px; background:rgba(255,255,255,0.95); border:1px solid #cbd5e1; border-radius:50%; width:32px; height:32px; font-size:1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 5px rgba(0,0,0,0.15); z-index:2;" title="Save to Watchlist">' + (isSaved ? '❤️' : '🤍') + '</button>';
+    var heartHtml = '<button onclick="event.stopPropagation(); toggleWatchlist(' + p.id + ', this)" data-watchlist-id="' + p.id + '" style="position:absolute; top:8px; right:8px; background:rgba(255,255,255,0.95); border:1px solid #cbd5e1; border-radius:50%; width:32px; height:32px; font-size:1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 5px rgba(0,0,0,0.15); z-index:2;" title="Save to Watchlist">' + (isSaved ? '❤️' : '🤍') + '</button>';
     
     var isCompared = compare.some(function(c) { return c.id === p.id; });
-    var compareHtml = '<label class="compare-label" ' + (isCompared ? 'style="opacity:1 !important; pointer-events:auto !important; transform:translateY(0);"' : '') + '><input type="checkbox" class="compare-chk" ' + (isCompared ? 'checked' : '') + ' onclick="toggleCompareItem(' + p.id + ', \'' + p.name.replace(/'/g,"\\'") + '\', ' + ngnBase + ', \'' + p.moq + '\', \'' + p.origin + '\', this)"> ⚖️ Compare</label>';
+    var compareHtml = '<label class="compare-label" ' + (isCompared ? 'style="opacity:1 !important; pointer-events:auto !important; transform:translateY(0);"' : '') + '><input type="checkbox" class="compare-chk" ' + (isCompared ? 'checked' : '') + ' onclick="toggleCompareItem(' + p.id + ', \'' + p.name.replace(/'/g,"\\'") + '\', ' + priceNum + ', \'' + p.moq + '\', \'' + p.origin + '\', this)"> ⚖️ Compare</label>';
 
-    return '<div class="product-card" style="position:relative;">' +
-      '<div class="product-img" style="position:relative;">' + heartHtml + p.emoji + tagHtml +
-      '<button onclick="openQuickView(' + p.id + ', \'' + p.name.replace(/'/g,"\\'") + '\', ' + ngnBase + ', \'' + p.moq + '\', \'' + p.origin + '\')" style="position:absolute; bottom:8px; right:8px; background:rgba(255,255,255,0.9); border:1px solid #cbd5e1; border-radius:50px; padding:4px 10px; font-size:0.75rem; font-weight:700; cursor:pointer; color:#0f172a; box-shadow:0 2px 5px rgba(0,0,0,0.1);">👁️ Quick View</button>' +
+    return '<div class="product-card" style="position:relative; cursor:pointer;" onclick="location.href=\'/products/' + p.id + '\'">' +
+      '<div class="product-img" style="position:relative;">' + heartHtml + (p.emoji || '📦') + tagHtml +
+      '<button onclick="openQuickView(' + p.id + ', \'' + p.name.replace(/'/g,"\\'") + '\', ' + priceNum + ', \'' + p.moq + '\', \'' + p.origin + '\', \'' + (p.type || 'local') + '\')" style="position:absolute; bottom:8px; right:8px; background:rgba(255,255,255,0.9); border:1px solid #cbd5e1; border-radius:50px; padding:4px 10px; font-size:0.75rem; font-weight:700; cursor:pointer; color:#0f172a; box-shadow:0 2px 5px rgba(0,0,0,0.1);">👁️ Quick View</button>' +
       '</div>' +
       '<div class="product-body">' +
       '<div style="overflow:hidden; margin-bottom:4px;">' + badgeHtml + compareHtml + '</div>' +
       '<div class="product-stars">' + stars + '</div>' +
       '<h3>' + p.name + '</h3>' +
       '<div class="product-moq">MOQ: ' + p.moq + ' · ' + p.origin + '</div>' +
-      '<div class="product-price"><span class="current" data-price-ngn="' + ngnBase + '">' + currentPriceStr + '</span>' + oldPriceHtml + '</div>' +
+      '<div class="product-price"><span class="current" data-price-ngn="' + priceNum + '">' + currentPriceStr + '</span>' + oldPriceHtml + '</div>' +
       '<div style="display:flex; gap:6px; margin-top:8px;">' +
-      '<button class="add-to-cart" onclick="addToCart(' + p.id + ')" style="flex:1;">Add to Export Order</button>' +
-      '<button onclick="openRfqModal(' + p.id + ', \'' + p.name.replace(/'/g,"\\'") + '\')" style="padding:8px 12px; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; font-weight:700; font-size:0.8rem; cursor:pointer; color:#0f172a;" title="Request Custom Quote">📋 RFQ</button>' +
+      (p.type === 'local'
+        ? '<button class="add-to-cart" onclick="addToCart(' + p.id + ')" style="flex:1;">Add to Cart</button>'
+        : '<button class="add-to-cart" onclick="openRfqModal(' + p.id + ', \'' + p.name.replace(/'/g,"\\'") + '\')" style="flex:1; background:#7c3aed;">📋 Request Quote</button>') +
       '</div>' +
       '</div></div>';
   }).join('');

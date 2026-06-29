@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>{{ $title ?? 'All Products — Adamawa Export' }}</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -109,9 +110,9 @@
 
         <div style="position:relative; flex:1; max-width:600px;">
           <form method="GET" action="{{ route('buyer.products.index') }}" class="header-search" style="margin:0; width:100%;">
-            <select name="category[]" onchange="this.form.submit()">
+            <select name="category[]" onchange="if(this.value===''){window.location.href='{{ route('buyer.products.index') }}'}else{this.form.submit()}">
               <option value="">All</option>
-              @foreach(\App\Models\Category::where('status', true)->get() as $cat)
+              @foreach($sharedCategories as $cat)
                 <option value="{{ $cat->slug }}" {{ in_array($cat->slug, (array)request('category', [])) ? 'selected' : '' }}>{{ $cat->name }}</option>
               @endforeach
             </select>
@@ -300,6 +301,7 @@
     updateCartUI();
     if (typeof lucide !== 'undefined') lucide.createIcons();
   </script>
+  <script>var isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};</script>
   @include('layouts.ux')
   @stack('scripts')
 </body>

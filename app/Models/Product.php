@@ -37,7 +37,7 @@ class Product extends Model
 
     public function sellerProfile(): BelongsTo
     {
-        return $this->belongsTo(SellerProfile::class);
+        return $this->belongsTo(SellerProfile::class, 'seller_profile_id');
     }
 
     public function category(): BelongsTo
@@ -58,5 +58,17 @@ class Product extends Model
     public function inventories(): HasMany
     {
         return $this->hasMany(FulfillmentInventory::class);
+    }
+
+    public function isExport(): bool
+    {
+        return $this->relationLoaded('sellerProfile')
+            && $this->sellerProfile
+            && $this->sellerProfile->seller_tier === 'export';
+    }
+
+    public function isLocal(): bool
+    {
+        return !$this->isExport();
     }
 }

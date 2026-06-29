@@ -22,18 +22,20 @@ class ProductController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('brand_name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('origin_lga', 'like', "%{$search}%")
+                  ->orWhere('hs_code', 'like', "%{$search}%");
             });
         }
 
         if ($request->filled('category')) {
-            $categories = $request->category;
-            if (!is_array($categories)) {
-                $categories = [$categories];
+            $categories = (array) $request->category;
+            $categories = array_filter($categories);
+            if (!empty($categories)) {
+                $query->whereHas('category', function($q) use ($categories) {
+                    $q->whereIn('slug', $categories);
+                });
             }
-            $query->whereHas('category', function($q) use ($categories) {
-                $q->whereIn('slug', $categories);
-            });
         }
 
         if ($request->filled('min_price')) {
@@ -56,9 +58,8 @@ class ProductController extends Controller
         }
 
         $products = $query->paginate(12)->withQueryString();
-        $categories = Category::where('status', true)->get();
 
-        return view('buyer.products.index', compact('products', 'categories', 'user'));
+        return view('buyer.products.index', compact('products', 'user'));
     }
 
     public function categories()

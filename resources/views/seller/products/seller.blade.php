@@ -78,10 +78,11 @@
       </div>
 
       <div style="display: flex; gap: 20px; margin-top: 10px;">
-        <label style="display: flex; flex-direction: row; align-items: center; gap: 8px; font-weight: normal;">
-          <input type="checkbox" name="quote_required" value="1" checked style="width: auto; min-height: auto;">
-          <span>Quote negotiation required</span>
-        </label>
+        @if(isset($profile) && $profile->seller_tier === 'export')
+          <div style="padding:6px 14px; background:#f3e8ff; border-radius:6px; font-size:0.85rem; color:#7c3aed; font-weight:600;">🌍 Export item — Quotes required</div>
+        @else
+          <input type="hidden" name="quote_required" value="0">
+        @endif
         <label style="display: flex; flex-direction: row; align-items: center; gap: 8px; font-weight: normal;">
           <input type="checkbox" name="fulfillment_eligible" value="1" style="width: auto; min-height: auto;">
           <span>Eligible for AfriBridge fulfillment</span>

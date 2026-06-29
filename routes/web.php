@@ -64,6 +64,9 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/products', [\App\Http\Controllers\Buyer\ProductController::class, 'index'])->name('buyer.products.index');
+Route::get('/products/search-catalog', function () {
+    return \App\Models\Product::select('id', 'name', 'brand_name', 'unit_price', 'image_path', 'origin_lga', 'moq')->take(40)->get();
+})->name('products.search-catalog');
 Route::get('/products/{id}', [\App\Http\Controllers\Buyer\ProductController::class, 'show'])->name('buyer.products.show');
 
 Route::get('/cart', function () {
@@ -371,6 +374,23 @@ Route::middleware(['auth', 'verified', 'security_policy', 'kyc_completed', 'lega
 });
 
 Route::get('/shop/{unique_id}', [PublicShopController::class, 'show'])->name('public.shop.show');
+
+// ─── Wishlist ───
+Route::middleware('auth')->group(function () {
+    Route::get('/wishlist', function () {
+        return response()->json(\App\Models\Wishlist::where('user_id', auth()->id())->pluck('product_id'));
+    })->name('wishlist.list');
+    Route::post('/wishlist/toggle', function (\Illuminate\Http\Request $request) {
+        $request->validate(['product_id' => 'required|exists:products,id']);
+        $existing = \App\Models\Wishlist::where('user_id', auth()->id())->where('product_id', $request->product_id)->first();
+        if ($existing) {
+            $existing->delete();
+            return response()->json(['saved' => false]);
+        }
+        \App\Models\Wishlist::create(['user_id' => auth()->id(), 'product_id' => $request->product_id]);
+        return response()->json(['saved' => true]);
+    })->name('wishlist.toggle');
+});
 
 
 

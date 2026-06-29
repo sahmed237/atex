@@ -34,12 +34,15 @@ class AppServiceProvider extends ServiceProvider
             return $user->hasRole('super-admin') ? true : null;
         });
 
-        // Share settings with all views
+        // Share settings & categories with all views
         view()->composer('*', function ($view) {
             if (Schema::hasTable('settings')) {
                 $settings = \App\Models\Setting::all()->pluck('value', 'key')->toArray();
                 $view->with('system_settings', $settings);
             }
+            $view->with('sharedCategories', \Illuminate\Support\Facades\Cache::remember('categories.active', 3600, function () {
+                return \App\Models\Category::where('status', true)->get();
+            }));
         });
 
         // Authentication Logging
