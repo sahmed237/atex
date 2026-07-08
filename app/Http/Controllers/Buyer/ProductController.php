@@ -14,8 +14,16 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
+        $countryCode = session('user_country', 'NG');
+
         $query = Product::with(['category', 'sellerProfile'])
             ->whereIn('status', ['approved', 'pending_review', 'active', 'published']);
+
+        if ($countryCode !== 'NG') {
+            $query->whereHas('sellerProfile', function ($q) {
+                $q->where('seller_tier', 'export');
+            });
+        }
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -74,13 +82,19 @@ class ProductController extends Controller
             ->whereIn('status', ['approved', 'pending_review', 'active', 'published'])
             ->findOrFail($id);
 
+        $countryCode = session('user_country', 'NG');
         $related = Product::with(['category', 'sellerProfile'])
             ->whereIn('status', ['approved', 'pending_review', 'active', 'published'])
             ->where('category_id', $product->category_id)
-            ->where('id', '!=', $product->id)
-            ->latest()
-            ->take(4)
-            ->get();
+            ->where('id', '!=', $product->id);
+
+        if ($countryCode !== 'NG') {
+            $related->whereHas('sellerProfile', function ($q) {
+                $q->where('seller_tier', 'export');
+            });
+        }
+
+        $related = $related->latest()->take(4)->get();
 
         $reviews = ProductReview::with('user')
             ->where('product_name', $product->name)

@@ -12,6 +12,10 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\SecurityEnforcementController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 
+use App\Http\Controllers\LocationController;
+
+Route::post('/location/set', [LocationController::class, 'setCountry'])->name('location.set');
+
 Route::get('/', [\App\Http\Controllers\Atex\LandingPageController::class, 'index'])->name('home');
 
 Route::get('/register', [\App\Http\Controllers\Auth\RegisteredUserController::class, 'create'])->name('register');

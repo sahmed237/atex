@@ -12,13 +12,21 @@ class LandingPageController extends Controller
     public function index()
     {
         $user = Auth::user();
+        $countryCode = session('user_country', 'NG');
 
-        $cacheKey = 'landing.marketplaceProducts';
-        $marketplaceProducts = \Illuminate\Support\Facades\Cache::remember($cacheKey, 300, function () {
-            $products = Product::where('status', 'approved')
+        $cacheKey = 'landing.marketplaceProducts.' . $countryCode;
+        $marketplaceProducts = \Illuminate\Support\Facades\Cache::remember($cacheKey, 300, function () use ($countryCode) {
+            $query = Product::where('status', 'approved')
                 ->with(['sellerProfile', 'category'])
-                ->latest()
-                ->get();
+                ->latest();
+
+            if ($countryCode !== 'NG') {
+                $query->whereHas('sellerProfile', function ($q) {
+                    $q->where('seller_tier', 'export');
+                });
+            }
+
+            $products = $query->get();
 
             $emojis = ['🎧', '👜', '☕', '🔊', '🧵', '🥭', '🔋', '🧺', '🔌', '🧣', '🍵', '🌾', '📦'];
             $tags = [null, 'Bestseller', 'Sale', 'New'];
@@ -44,8 +52,14 @@ class LandingPageController extends Controller
             });
         });
 
-        $productCount = \Illuminate\Support\Facades\Cache::remember('landing.productCount', 300, function () {
-            return Product::where('status', 'approved')->count();
+        $productCount = \Illuminate\Support\Facades\Cache::remember('landing.productCount.' . $countryCode, 300, function () use ($countryCode) {
+            $query = Product::where('status', 'approved');
+            if ($countryCode !== 'NG') {
+                $query->whereHas('sellerProfile', function ($q) {
+                    $q->where('seller_tier', 'export');
+                });
+            }
+            return $query->count();
         });
 
         return view('welcome', compact('user', 'marketplaceProducts', 'productCount'));

@@ -75,6 +75,13 @@
 <div class="page-header">
   <div class="container">
     <div>
+      <div style="margin-bottom: 6px;">
+        @if(session('user_country', 'NG') != 'NG')
+          <span style="display:inline-block; padding: 4px 10px; background: #dbeafe; color: #1e40af; font-size: 0.75rem; font-weight: 700; border-radius: 50px;">🌍 International Catalog (Export Only) • {{ session('user_currency', 'USD') }}</span>
+        @else
+          <span style="display:inline-block; padding: 4px 10px; background: #dcfce7; color: #166534; font-size: 0.75rem; font-weight: 700; border-radius: 50px;">🇳🇬 Domestic & Export Catalog • {{ session('user_currency', 'NGN') }}</span>
+        @endif
+      </div>
       <h1>All Products <span class="count" id="resultCount">({{ $products->total() }} products)</span></h1>
     </div>
     <div class="sort-group">

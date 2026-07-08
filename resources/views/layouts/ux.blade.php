@@ -215,7 +215,7 @@ input.compare-chk {
 // ─── CURRENCY SWITCHER ───
 window.atexRates = { NGN: 1, USD: 0.000625, EUR: 0.000571 };
 window.atexSymbols = { NGN: '₦', USD: '$', EUR: '€' };
-window.currentCurrency = localStorage.getItem('atex_currency') || 'NGN';
+window.currentCurrency = "{{ session('user_currency', 'NGN') }}" || localStorage.getItem('atex_currency') || 'NGN';
 
 function setCurrency(curr) {
   window.currentCurrency = curr;
@@ -243,6 +243,51 @@ function updateAllPrices() {
     if (base && !isNaN(base)) {
       el.textContent = formatPriceAmount(base);
     }
+  });
+}
+
+// ─── COUNTRY / LOCATION OVERRIDE ───
+function toggleCountryDropdown(e) {
+  if (e) e.stopPropagation();
+  const menu = document.getElementById('countryDropdownMenu');
+  if (menu) {
+    menu.style.display = menu.style.display === 'none' || menu.style.display === '' ? 'block' : 'none';
+  }
+}
+
+document.addEventListener('click', function(e) {
+  const menu = document.getElementById('countryDropdownMenu');
+  if (menu && !e.target.closest('.country-selector')) {
+    menu.style.display = 'none';
+  }
+});
+
+function selectCountryOverride(e, code, name, currency) {
+  if (e) e.preventDefault();
+  
+  const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+  const token = csrfMeta ? csrfMeta.getAttribute('content') : '';
+
+  fetch('/location/set', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': token
+    },
+    body: JSON.stringify({
+      country: code,
+      country_name: name,
+      currency: currency
+    })
+  }).then(res => res.json())
+  .then(data => {
+    if (data.status === 'success') {
+      localStorage.setItem('atex_currency', currency);
+      window.location.reload();
+    }
+  }).catch(err => {
+    console.error('Error updating location:', err);
+    window.location.reload();
   });
 }
 

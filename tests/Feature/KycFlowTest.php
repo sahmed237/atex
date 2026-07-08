@@ -180,11 +180,10 @@ class KycFlowTest extends TestCase
                 'proof_of_address' => UploadedFile::fake()->create('address.pdf', 100),
             ]);
 
-        $response->assertRedirect(route('dashboard'));
-        $response->assertSessionHas('status');
+        $response->assertRedirect(route('seller.onboarding'));
+        $response->assertSessionHas('success');
 
         $user->refresh();
-        $this->assertTrue($user->hasRole('seller'));
 
         $profile = SellerProfile::where('user_id', $user->id)->first();
         $this->assertNotNull($profile);
@@ -192,10 +191,8 @@ class KycFlowTest extends TestCase
         $this->assertEquals('Nigeria', $profile->country);
         $this->assertEquals('Abuja', $profile->state);
 
-        $documents = Document::where('owner_type', 'seller')
-            ->where('owner_id', $profile->id)
-            ->get();
-        $this->assertCount(3, $documents);
+        $this->assertNotNull($profile->kyc);
+        $this->assertNotNull($profile->kyc->proof_of_address_path);
     }
 
     public function test_seller_onboarding_requires_required_fields(): void

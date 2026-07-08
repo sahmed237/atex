@@ -101,10 +101,31 @@
       <div class="container">
         <div style="display:flex; align-items:center; gap:12px;">
           <a href="{{ url('/') }}" class="logo">Adamawa<span>Export</span></a>
-          <div class="currency-switcher hide-mobile" style="display:inline-flex; align-items:center; background:#232f3e; border-radius:6px; padding:2px; border:1px solid #3a4b5f; font-size:0.75rem;">
-            <button type="button" onclick="setCurrency('NGN')" id="curr-NGN" class="curr-btn active" style="padding:4px 8px; border:none; background:#febd69; color:#131921; font-weight:800; border-radius:4px; cursor:pointer;">₦ NGN</button>
-            <button type="button" onclick="setCurrency('USD')" id="curr-USD" class="curr-btn" style="padding:4px 8px; border:none; background:transparent; color:#fff; font-weight:600; cursor:pointer;">$ USD</button>
-            <button type="button" onclick="setCurrency('EUR')" id="curr-EUR" class="curr-btn" style="padding:4px 8px; border:none; background:transparent; color:#fff; font-weight:600; cursor:pointer;">€ EUR</button>
+          <div style="display:inline-flex; align-items:center; gap:8px;">
+            <div class="country-selector hide-mobile" style="position:relative;">
+              <button type="button" onclick="toggleCountryDropdown(event)" style="display:inline-flex; align-items:center; gap:6px; background:#232f3e; border:1px solid #3a4b5f; border-radius:6px; padding:4px 10px; color:#fff; font-size:0.75rem; font-weight:600; cursor:pointer; transition:0.2s;">
+                <span id="headerCountryFlag" style="font-size:0.95rem;">@if(session('user_country', 'NG')=='NG') 🇳🇬 @elseif(session('user_country')=='US') 🇺🇸 @elseif(session('user_country')=='GB') 🇬🇧 @elseif(session('user_country')=='DE') 🇩🇪 @elseif(session('user_country')=='FR') 🇫🇷 @elseif(session('user_country')=='CN') 🇨🇳 @elseif(session('user_country')=='AE') 🇦🇪 @elseif(session('user_country')=='ZA') 🇿🇦 @else 🌍 @endif</span>
+                <span id="headerCountryCode">{{ session('user_country', 'NG') }}</span>
+                <span id="headerCountryCurr" style="color:#febd69;">({{ session('user_currency', 'NGN') }})</span>
+                <span style="font-size:0.55rem; opacity:0.7;">▼</span>
+              </button>
+              <div id="countryDropdownMenu" style="position:absolute; top:100%; left:0; margin-top:6px; background:#131921; border:1px solid #3a4b5f; border-radius:8px; box-shadow:0 10px 25px rgba(0,0,0,0.5); width:190px; z-index:99999; display:none; padding:6px 0; text-align:left;">
+                <div style="padding:4px 12px; font-size:0.65rem; color:#94a3b8; text-transform:uppercase; font-weight:700; border-bottom:1px solid #232f3e; margin-bottom:4px;">Select Destination</div>
+                <a href="#" onclick="selectCountryOverride(event, 'NG', 'Nigeria', 'NGN')" style="display:flex; align-items:center; gap:8px; padding:6px 12px; color:#fff; font-size:0.8rem; text-decoration:none; transition:0.2s;" onmouseover="this.style.background='#232f3e'" onmouseout="this.style.background='transparent'">🇳🇬 Nigeria <span style="margin-left:auto; color:#febd69; font-size:0.7rem;">NGN</span></a>
+                <a href="#" onclick="selectCountryOverride(event, 'US', 'United States', 'USD')" style="display:flex; align-items:center; gap:8px; padding:6px 12px; color:#fff; font-size:0.8rem; text-decoration:none; transition:0.2s;" onmouseover="this.style.background='#232f3e'" onmouseout="this.style.background='transparent'">🇺🇸 United States <span style="margin-left:auto; color:#febd69; font-size:0.7rem;">USD</span></a>
+                <a href="#" onclick="selectCountryOverride(event, 'GB', 'United Kingdom', 'EUR')" style="display:flex; align-items:center; gap:8px; padding:6px 12px; color:#fff; font-size:0.8rem; text-decoration:none; transition:0.2s;" onmouseover="this.style.background='#232f3e'" onmouseout="this.style.background='transparent'">🇬🇧 United Kingdom <span style="margin-left:auto; color:#febd69; font-size:0.7rem;">EUR</span></a>
+                <a href="#" onclick="selectCountryOverride(event, 'DE', 'Germany', 'EUR')" style="display:flex; align-items:center; gap:8px; padding:6px 12px; color:#fff; font-size:0.8rem; text-decoration:none; transition:0.2s;" onmouseover="this.style.background='#232f3e'" onmouseout="this.style.background='transparent'">🇩🇪 Germany <span style="margin-left:auto; color:#febd69; font-size:0.7rem;">EUR</span></a>
+                <a href="#" onclick="selectCountryOverride(event, 'FR', 'France', 'EUR')" style="display:flex; align-items:center; gap:8px; padding:6px 12px; color:#fff; font-size:0.8rem; text-decoration:none; transition:0.2s;" onmouseover="this.style.background='#232f3e'" onmouseout="this.style.background='transparent'">🇫🇷 France <span style="margin-left:auto; color:#febd69; font-size:0.7rem;">EUR</span></a>
+                <a href="#" onclick="selectCountryOverride(event, 'CN', 'China', 'USD')" style="display:flex; align-items:center; gap:8px; padding:6px 12px; color:#fff; font-size:0.8rem; text-decoration:none; transition:0.2s;" onmouseover="this.style.background='#232f3e'" onmouseout="this.style.background='transparent'">🇨🇳 China <span style="margin-left:auto; color:#febd69; font-size:0.7rem;">USD</span></a>
+                <a href="#" onclick="selectCountryOverride(event, 'AE', 'United Arab Emirates', 'USD')" style="display:flex; align-items:center; gap:8px; padding:6px 12px; color:#fff; font-size:0.8rem; text-decoration:none; transition:0.2s;" onmouseover="this.style.background='#232f3e'" onmouseout="this.style.background='transparent'">🇦🇪 UAE <span style="margin-left:auto; color:#febd69; font-size:0.7rem;">USD</span></a>
+                <a href="#" onclick="selectCountryOverride(event, 'ZA', 'South Africa', 'USD')" style="display:flex; align-items:center; gap:8px; padding:6px 12px; color:#fff; font-size:0.8rem; text-decoration:none; transition:0.2s;" onmouseover="this.style.background='#232f3e'" onmouseout="this.style.background='transparent'">🇿🇦 South Africa <span style="margin-left:auto; color:#febd69; font-size:0.7rem;">USD</span></a>
+              </div>
+            </div>
+            <div class="currency-switcher hide-mobile" style="display:inline-flex; align-items:center; background:#232f3e; border-radius:6px; padding:2px; border:1px solid #3a4b5f; font-size:0.75rem;">
+              <button type="button" onclick="setCurrency('NGN')" id="curr-NGN" class="curr-btn active" style="padding:4px 8px; border:none; background:#febd69; color:#131921; font-weight:800; border-radius:4px; cursor:pointer;">₦ NGN</button>
+              <button type="button" onclick="setCurrency('USD')" id="curr-USD" class="curr-btn" style="padding:4px 8px; border:none; background:transparent; color:#fff; font-weight:600; cursor:pointer;">$ USD</button>
+              <button type="button" onclick="setCurrency('EUR')" id="curr-EUR" class="curr-btn" style="padding:4px 8px; border:none; background:transparent; color:#fff; font-weight:600; cursor:pointer;">€ EUR</button>
+            </div>
           </div>
         </div>
 

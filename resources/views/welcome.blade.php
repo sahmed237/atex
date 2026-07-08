@@ -215,6 +215,15 @@ footer ul a:hover { color: #fff; }
 
 @section('content')
 
+<!-- ═══ GEOIP / LOCALIZATION BANNER ═══ -->
+<div style="background: @if(session('user_country', 'NG') != 'NG') #1e3a8a @else #14532d @endif; color: #fff; padding: 10px 24px; text-align: center; font-size: 0.88rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">
+  @if(session('user_country', 'NG') != 'NG')
+    <span>🌍 International Visitor Detected: Showing <strong>Export-Ready Catalog</strong> for <strong>{{ session('user_country_name', 'International') }}</strong>. Prices displayed in <strong>{{ session('user_currency', 'USD') }}</strong>.</span>
+  @else
+    <span>🇳🇬 Welcome to Adamawa Export! Showing <strong>Domestic & Export Marketplace</strong> for <strong>Nigeria</strong>. Prices displayed in <strong>₦ NGN</strong>.</span>
+  @endif
+</div>
+
 <!-- ═══ HERO CAROUSEL ═══ -->
 <section class="hero-carousel">
   <button class="hero-arrow prev" onclick="slideTo(current - 1)">‹</button>
