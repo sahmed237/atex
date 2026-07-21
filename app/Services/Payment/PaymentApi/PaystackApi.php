@@ -13,7 +13,13 @@ class PaystackApi
 
     private function __construct()
     {
-        $this->secretKey = \App\Models\Setting::where('key', 'paystack_secret_key')->value('value') ?: config('services.paystack.secret_key', '');
+        $rawKey = \App\Models\Setting::where('key', 'paystack_secret_key')->value('value') ?: config('services.paystack.secret_key', '');
+        $this->secretKey = trim($rawKey);
+
+        if (empty($this->secretKey) || str_contains($this->secretKey, '...')) {
+            throw new Exception('Paystack Secret Key is missing or set to placeholder in Admin Settings. Please set your actual Paystack Secret Key under Admin -> Settings -> Payment Gateways.');
+        }
+
         $this->baseUrl = 'https://api.paystack.co';
     }
 

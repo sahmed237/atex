@@ -59,8 +59,16 @@ class OrderController extends Controller
 
         $productId = $request->product_id;
         $product = Product::with('sellerProfile')->findOrFail($productId);
+
+        $activeGateways = \App\Models\Setting::where('group', 'payments')
+            ->where('key', 'like', '%_active')
+            ->where('value', '1')
+            ->pluck('key')
+            ->map(fn($key) => str_replace('_active', '', $key))
+            ->values()
+            ->toArray();
         
-        return view('buyer.orders.create', compact('product'));
+        return view('buyer.orders.create', compact('product', 'activeGateways'));
     }
 
     public function store(Request $request)
@@ -76,6 +84,7 @@ class OrderController extends Controller
             'destination_location' => 'required|string|max:255',
             'total_amount' => 'required|numeric|min:1',
             'currency' => 'required|string|max:10',
+            'payment_gateway' => 'nullable|string',
         ]);
 
         $product = Product::findOrFail($request->product_id);
@@ -111,7 +120,7 @@ class OrderController extends Controller
             'tax_amount' => $tax,
             'net_payout_amount' => $netPayout,
             'settlement_status' => 'pending',
-            'payment_status' => 'held',
+            'payment_status' => 'pending',
             'shipment_status' => 'pending_assignment',
             'status' => 'created',
         ]);
@@ -144,30 +153,29 @@ class OrderController extends Controller
             'ip_address' => $request->ip(),
         ]);
 
-        return redirect()->route('admin.orders.index')->with('success', 'Order placed successfully. Payment is currently in escrow hold.');
+        if ($request->filled('payment_gateway')) {
+            return app(\App\Http\Controllers\Buyer\PaymentController::class)->pay(
+                new Request(['gateway' => $request->payment_gateway]),
+                $order
+            );
+        }
+
+        return redirect()->route('admin.orders.index')->with('success', 'Order placed successfully. Payment is currently pending.');
     }
 
     public function show($id)
     {
         $user = Auth::user();
-        $order = Order::with(['buyerProfile.user', 'sellerProfile.user', 'product', 'settlement', 'shipment.logisticsProfile.user'])->findOrFail($id);
+        $order = Order::with(['buyerProfile.user', 'sellerProfile.user', 'product', 'settlement', 'shipment.logisticsProfile.user', 'payments'])->findOrFail($id);
 
-        // Security check
-        if ($user->hasRole('seller')) {
-            $profile = SellerProfile::where('user_id', $user->id)->first();
-            if ($order->seller_profile_id !== $profile->id) {
-                abort(403);
-            }
-        } elseif ($user->hasRole('buyer')) {
-            $profile = BuyerProfile::where('user_id', $user->id)->first();
-            if ($order->buyer_profile_id !== $profile->id) {
-                abort(403);
-            }
-        } elseif ($user->hasRole('logistics')) {
-            $profile = LogisticsProfile::where('user_id', $user->id)->first();
-            if ($order->shipment && $order->shipment->logistics_profile_id !== $profile->id) {
-                abort(403);
-            }
+        // Security check: User must be super-admin/admin, or the buyer, seller, or logistics partner for this order
+        $isSuperOrAdmin = $user->hasRole('super-admin') || $user->hasRole('admin');
+        $isBuyerOfOrder = $order->buyerProfile && $order->buyerProfile->user_id === $user->id;
+        $isSellerOfOrder = $order->sellerProfile && $order->sellerProfile->user_id === $user->id;
+        $isLogisticsOfOrder = $order->shipment && $order->shipment->logisticsProfile && $order->shipment->logisticsProfile->user_id === $user->id;
+
+        if (!$isSuperOrAdmin && !$isBuyerOfOrder && !$isSellerOfOrder && !$isLogisticsOfOrder) {
+            abort(403, 'Unauthorized access to order.');
         }
 
         return view('buyer.orders.show', compact('order', 'user'));

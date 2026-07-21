@@ -35,8 +35,8 @@ class MonnifyApi
             return $this->token;
         }
 
-        if (empty($this->apiKey) || empty($this->secretKey)) {
-            throw new Exception('Monnify API Key or Secret Key is missing.');
+        if (empty($this->apiKey) || empty($this->secretKey) || str_contains($this->apiKey, '...') || str_contains($this->secretKey, '...')) {
+            throw new Exception('Monnify API Key or Secret Key is missing or set to placeholder in Admin Settings.');
         }
 
         $response = Http::withHeaders([

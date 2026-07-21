@@ -81,6 +81,37 @@
         Settlement Status: <strong class="status {{ $order->settlement_status }}">{{ $order->settlement_status }}</strong>
       </div>
     </div>
+
+    <!-- Payment Transaction Logs -->
+    <div style="margin-top: 25px; border-top: 1px solid var(--line, #e2e8f0); padding-top: 20px;">
+      <h4 style="margin-top: 0; font-size: 1rem; font-weight: bold;">Payment Transaction History</h4>
+      @if($order->payments && $order->payments->count() > 0)
+        <div style="display: grid; gap: 10px; margin-top: 12px;">
+          @foreach($order->payments as $payment)
+            <div style="padding: 12px; background: var(--soft); border-radius: 8px; border: 1px solid var(--border-color, #e2e8f0); font-size: 0.85rem;">
+              <div style="display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 4px;">
+                <span style="text-transform: capitalize;">{{ $payment->gateway }} Gateway</span>
+                <span class="status {{ $payment->status }}">{{ $payment->status }}</span>
+              </div>
+              <div style="color: var(--text-muted); font-family: monospace; font-size: 0.8rem; margin-bottom: 4px;">
+                Ref: {{ $payment->reference }}
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.82rem;">
+                <span>Amount: NGN {{ number_format($payment->amount, 2) }}</span>
+                <span>{{ $payment->paid_at ? $payment->paid_at->format('M d, Y H:i') : $payment->created_at->format('M d, Y H:i') }}</span>
+              </div>
+              @if(is_array($payment->raw_details) && isset($payment->raw_details['message']))
+                <div style="margin-top: 6px; font-size: 0.8rem; color: var(--text-muted); font-style: italic;">
+                  Message: {{ $payment->raw_details['message'] }}
+                </div>
+              @endif
+            </div>
+          @endforeach
+        </div>
+      @else
+        <p style="font-size: 0.85rem; margin-top: 10px;" class="muted">No payment transactions recorded for this order yet.</p>
+      @endif
+    </div>
   </div>
 
   <!-- Logistics & Timeline Panel -->

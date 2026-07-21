@@ -87,6 +87,7 @@ Route::post('/checkout', function (\Illuminate\Http\Request $request) {
         'items.*.product_id' => 'required|exists:products,id',
         'items.*.quantity' => 'required|integer|min:1',
         'total' => 'required|numeric|min:0',
+        'payment_gateway' => 'nullable|string',
     ]);
 
     $user = auth()->user();
@@ -100,7 +101,7 @@ Route::post('/checkout', function (\Illuminate\Http\Request $request) {
         $product = \App\Models\Product::find($item['product_id']);
         if (!$product || !$product->seller_profile_id) continue;
 
-        $orderNumber = 'ORD-' . strtoupper(\Illuminate\Support\Str::random(8));
+        $orderNumber = 'AEM-ORD-' . strtoupper(\Illuminate\Support\Str::random(8));
         $totalAmount = (float) $product->unit_price * $item['quantity'];
 
         $order = \App\Models\Order::create([
@@ -117,15 +118,69 @@ Route::post('/checkout', function (\Illuminate\Http\Request $request) {
             'tax_amount' => round($totalAmount * 0.075, 2),
             'net_payout_amount' => round($totalAmount * 0.825, 2),
             'settlement_status' => 'pending',
-            'payment_status' => 'held',
+            'payment_status' => 'pending',
             'shipment_status' => 'pending_assignment',
-            'status' => 'confirmed',
+            'status' => 'created',
+        ]);
+
+        \App\Models\Settlement::create([
+            'order_id' => $order->id,
+            'seller_profile_id' => $product->seller_profile_id,
+            'gross_amount' => $totalAmount,
+            'commission_amount' => round($totalAmount * 0.10, 2),
+            'tax_amount' => round($totalAmount * 0.075, 2),
+            'net_payout_amount' => round($totalAmount * 0.825, 2),
+            'status' => 'pending',
         ]);
 
         $orderIds[] = $order->id;
     }
 
-    return response()->json(['status' => 'ok', 'order_ids' => $orderIds]);
+    $redirectUrl = null;
+    $paymentError = null;
+    if ($request->filled('payment_gateway') && !empty($orderIds)) {
+        $gatewayKey = strtolower($request->payment_gateway);
+        $firstOrder = \App\Models\Order::find($orderIds[0]);
+        $totalSum = \App\Models\Order::whereIn('id', $orderIds)->sum('total_amount');
+
+        $paymentData = (object) [
+            'id' => $firstOrder->id,
+            'payment_amount' => (float) $totalSum,
+            'prefix' => 'AEM-ORD',
+            'author_name' => $user->name ?? 'Buyer',
+        ];
+
+        $email = $user->email ?? 'buyer@atex.adamawastate.gov.ng';
+        $phone = $user->phone ?? '08000000000';
+        $callbackUrl = route('payment.callback', ['gateway' => $gatewayKey]);
+
+        try {
+            $gatewayInstance = \App\Services\Payment\Gateways\PaymentGatewayFactory::create($gatewayKey);
+            $initResult = $gatewayInstance->initialize($paymentData, $email, $phone, $callbackUrl);
+            $redirectUrl = $initResult->redirectUrl;
+
+            foreach ($orderIds as $ordId) {
+                \App\Models\OrderPayment::create([
+                    'order_id' => $ordId,
+                    'gateway' => $gatewayKey,
+                    'reference' => $initResult->reference,
+                    'amount' => (float) \App\Models\Order::find($ordId)->total_amount,
+                    'status' => 'pending',
+                    'raw_details' => json_decode($initResult->rawResponse, true),
+                ]);
+            }
+        } catch (\Throwable $e) {
+            $paymentError = $e->getMessage();
+            \Illuminate\Support\Facades\Log::error("Cart payment init error: " . $e->getMessage());
+        }
+    }
+
+    return response()->json([
+        'status' => $paymentError ? 'payment_failed' : 'ok',
+        'order_ids' => $orderIds,
+        'redirect_url' => $redirectUrl,
+        'error' => $paymentError,
+    ]);
 })->name('checkout.store');
 
 Route::get('/api/world/states/{countryCode}', function (string $countryCode) {
@@ -153,10 +208,9 @@ Route::middleware(['auth', 'verified', 'security_policy', 'legal_acceptance', 'b
         // All Categories
         Route::get('/categories', [\App\Http\Controllers\Buyer\ProductController::class, 'categories'])->name('buyer.categories.index');
 
-        // Orders Index
-        Route::get('/orders', function () {
-            return view('buyer.orders.index');
-        })->name('buyer.orders.index');
+        // Orders
+        Route::get('/orders', [\App\Http\Controllers\Buyer\OrderController::class, 'index'])->name('buyer.orders.index');
+        Route::get('/orders/{id}', [\App\Http\Controllers\Buyer\OrderController::class, 'show'])->name('buyer.orders.show');
 
         // Order Tracking
         Route::get('/orders/{reference}/track', [\App\Http\Controllers\Buyer\OrderController::class, 'track'])->name('buyer.orders.track');
@@ -398,6 +452,9 @@ Route::middleware('auth')->group(function () {
         return response()->json(['saved' => true]);
     })->name('wishlist.toggle');
 });
-
-
-
+// ─── Payment Gateway Routes ───
+Route::middleware(['auth'])->group(function () {
+    Route::post('/buyer/orders/{order}/pay', [\App\Http\Controllers\Buyer\PaymentController::class, 'pay'])->name('payment.pay');
+    Route::get('/payment/callback/{gateway}', [\App\Http\Controllers\Buyer\PaymentController::class, 'callback'])->name('payment.callback');
+});
+Route::post('/payment/webhook/{gateway}', [\App\Http\Controllers\Buyer\PaymentController::class, 'webhook'])->name('payment.webhook');

@@ -197,6 +197,16 @@ function renderCart() {
           `).join('')}
         </tbody>
       </table>
+@php
+  $activeGateways = \App\Models\Setting::where('group', 'payments')
+      ->where('key', 'like', '%_active')
+      ->where('value', '1')
+      ->pluck('key')
+      ->map(fn($key) => str_replace('_active', '', $key))
+      ->values()
+      ->toArray();
+@endphp
+
     </div>
     <div>
       <div class="order-summary">
@@ -205,6 +215,20 @@ function renderCart() {
         <div class="summary-row sub"><span>Shipping</span><span>${shipping === 0 ? 'FREE' : '₦' + shipping.toLocaleString()}</span></div>
         <div class="summary-row sub"><span>Estimated Tax</span><span>₦${tax.toLocaleString(undefined, {minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
         <div class="summary-row total"><span>Total</span><span>₦${total.toLocaleString(undefined, {minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
+        
+        <div style="margin-top: 16px; text-align: left;">
+          <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 6px;">Payment Gateway</label>
+          <select id="cartPaymentGateway" style="width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: .9rem; outline: none; background: var(--bg);">
+            @if(!empty($activeGateways))
+              @foreach($activeGateways as $gw)
+                <option value="{{ $gw }}">{{ ucfirst($gw) }} Gateway</option>
+              @endforeach
+            @else
+              <option value="paystack">Paystack Gateway</option>
+            @endif
+          </select>
+        </div>
+
         <button class="checkout-btn" onclick="handleCheckout()">Proceed to Checkout</button>
         <button onclick="openProFormaInvoice()" style="width:100%; padding:14px; margin-top:10px; background:#eff6ff; border:2px solid #2563eb; border-radius:50px; font-weight:700; font-size:0.95rem; color:#2563eb; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">📥 Download Pro-Forma Invoice</button>
         <a href="{{ route('buyer.products.index') }}" class="continue-link">Continue Shopping</a>
@@ -250,6 +274,7 @@ function updateCartUI() {
 function handleCheckout() {
   if (cart.length === 0) { showToast('Cart is empty'); return; }
   const total = cart.reduce((sum, c) => sum + parseFloat(c.price) * c.qty, 0);
+  const selectedGateway = document.getElementById('cartPaymentGateway')?.value || 'paystack';
   const orderId = 'ORD-' + Date.now().toString(36).toUpperCase();
   const order = {
     id: orderId,
@@ -269,12 +294,24 @@ function handleCheckout() {
   fetch('{{ route("checkout.store") }}', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-    body: JSON.stringify({ items, total })
-  }).catch(() => {});
-
-  showToast('Order ' + orderId + ' placed — ₦' + total.toLocaleString());
-  cart = []; updateCartUI();
-  window.location.href = '{{ route("buyer.orders.index") }}#' + orderId;
+    body: JSON.stringify({ items, total, payment_gateway: selectedGateway })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.redirect_url) {
+      cart = []; updateCartUI();
+      window.location.href = data.redirect_url;
+    } else if (data.error) {
+      showToast('Payment Gateway Error: ' + data.error);
+    } else {
+      cart = []; updateCartUI();
+      showToast('Order placed successfully');
+      window.location.href = '{{ route("buyer.orders.index") }}#' + orderId;
+    }
+  })
+  .catch(err => {
+    showToast('Checkout Error: ' + (err.message || 'Unable to process checkout'));
+  });
 }
 
 function applyCoupon() {

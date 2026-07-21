@@ -37,9 +37,19 @@ class SettingController extends Controller
             Setting::set('platform_logo', asset('storage/' . $path), 'general', 'image');
         }
 
-        // Handle missing boolean values (unchecked checkboxes)
+        // Handle missing boolean values (unchecked checkboxes) for submitted form fields
         if ($group) {
+            $submittedKeys = array_keys($inputs);
             $booleanSettings = Setting::where('group', $group)->where('type', 'boolean')->get();
+
+            if (!empty($submittedKeys)) {
+                $prefixes = array_unique(array_map(fn($k) => explode('_', $k)[0], $submittedKeys));
+                $booleanSettings = $booleanSettings->filter(function ($setting) use ($prefixes) {
+                    $settingPrefix = explode('_', $setting->key)[0];
+                    return in_array($settingPrefix, $prefixes);
+                });
+            }
+
             foreach ($booleanSettings as $setting) {
                 if (!isset($inputs[$setting->key])) {
                     $setting->update(['value' => '0']);

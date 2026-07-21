@@ -44,7 +44,22 @@
       </label>
     </div>
 
-    <button type="submit" class="btn primary full" style="margin-top: 10px; border: 0; cursor: pointer;">Place Order in Escrow</button>
+    <label>Payment Gateway Method
+      <select name="payment_gateway" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color, #cbd5e1); background: var(--bg-surface, #fff); font-size: 14px;">
+        <option value="">-- Select Active Payment Gateway --</option>
+        @if(!empty($activeGateways))
+          @foreach($activeGateways as $gateway)
+            <option value="{{ $gateway }}" {{ $loop->first ? 'selected' : '' }}>
+              {{ ucfirst($gateway) }} Payment Gateway
+            </option>
+          @endforeach
+        @else
+          <option value="paystack" selected>Paystack Gateway (Default)</option>
+        @endif
+      </select>
+    </label>
+
+    <button type="submit" class="btn primary full" style="margin-top: 10px; border: 0; cursor: pointer;">Place Order & Proceed to Pay</button>
   </form>
 </section>
 @endsection

@@ -14,7 +14,13 @@ class ZainpayApi
 
     private function __construct()
     {
-        $this->publicKey = \App\Models\Setting::where('key', 'zainpayToken')->value('value') ?: config('services.zainpay.public_key', '');
+        $rawKey = \App\Models\Setting::whereIn('key', ['zainpay_token', 'zainpayToken'])->value('value') ?: config('services.zainpay.public_key', '');
+        $this->publicKey = trim($rawKey);
+
+        if (empty($this->publicKey) || str_contains($this->publicKey, '...')) {
+            throw new Exception('Zainpay Token/Key is missing or set to placeholder in Admin Settings.');
+        }
+
         $isLive = filter_var(\App\Models\Setting::where('key', 'zainpay_mode_live')->value('value'), FILTER_VALIDATE_BOOLEAN);
         $this->baseUrl = $isLive ? 'https://api.zainpay.ng' : 'https://sandbox.zainpay.ng';
     }

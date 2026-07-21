@@ -15,7 +15,7 @@ class ZainpayGateway implements PaymentGatewayInterface
     {
         $invoiceId = $invoice->id ?? $invoice['id'];
         $amount = (float)($invoice->payment_amount ?? $invoice['payment_amount'] ?? 0);
-        $zainboxCode = \App\Models\Setting::where('key', 'zainpayZainboxCode')->value('value') ?: config('services.zainpay.zainbox_code');
+        $zainboxCode = \App\Models\Setting::whereIn('key', ['zainpay_zainbox_code', 'zainpayZainboxCode'])->value('value') ?: config('services.zainpay.zainbox_code');
         $prefix = $invoice->prefix ?? $invoice['prefix'] ?? 'INV';
         $reference = $prefix . '-' . $invoiceId . '-' . time();
 

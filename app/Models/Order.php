@@ -64,4 +64,9 @@ class Order extends Model
     {
         return $this->hasOne(Shipment::class);
     }
+
+    public function payments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(OrderPayment::class);
+    }
 }
