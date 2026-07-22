@@ -138,6 +138,17 @@
 
 <script>
 let cart = JSON.parse(localStorage.getItem('gt_cart') || localStorage.getItem('atex_cart') || '[]');
+let shipbubbleRates = [];
+let selectedCourier = null;
+let receiverDetails = {
+  name: 'Jane Doe',
+  phone: '08087654321',
+  address: '456 Broad Street',
+  city: 'Lagos',
+  state: 'Lagos',
+  country: 'NG',
+  email: 'buyer@atex.gov.ng'
+};
 
 function renderCart() {
   const container = document.getElementById('cartPage');
@@ -154,7 +165,12 @@ function renderCart() {
   }
 
   const subtotal = cart.reduce((s, c) => s + parseFloat(c.price) * c.qty, 0);
-  const shipping = subtotal >= 100000 ? 0 : 15000;
+  let shipping = 0;
+  if (selectedCourier) {
+    shipping = parseFloat(selectedCourier.total_fee || selectedCourier.shipping_fee || 0);
+  } else {
+    shipping = subtotal >= 100000 ? 0 : 15000;
+  }
   const tax = subtotal * 0.075;
   const total = subtotal + shipping + tax;
 
@@ -197,28 +213,64 @@ function renderCart() {
           `).join('')}
         </tbody>
       </table>
-@php
-  $activeGateways = \App\Models\Setting::where('group', 'payments')
-      ->where('key', 'like', '%_active')
-      ->where('value', '1')
-      ->pluck('key')
-      ->map(fn($key) => str_replace('_active', '', $key))
-      ->values()
-      ->toArray();
-@endphp
-
     </div>
     <div>
       <div class="order-summary">
         <h2>Order Summary</h2>
         <div class="summary-row sub"><span>Subtotal</span><span>₦${subtotal.toLocaleString()}</span></div>
-        <div class="summary-row sub"><span>Shipping</span><span>${shipping === 0 ? 'FREE' : '₦' + shipping.toLocaleString()}</span></div>
+        <div class="summary-row sub"><span>Shipping</span><span>${selectedCourier ? '₦' + shipping.toLocaleString() + ' (' + selectedCourier.courier_name + ')' : (shipping === 0 ? 'FREE' : '₦' + shipping.toLocaleString() + ' (Fallback)')}</span></div>
         <div class="summary-row sub"><span>Estimated Tax</span><span>₦${tax.toLocaleString(undefined, {minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
         <div class="summary-row total"><span>Total</span><span>₦${total.toLocaleString(undefined, {minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
         
+        <!-- Recipient Information -->
+        <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px; text-align: left;">
+          <h4 style="font-size: .85rem; font-weight: 700; margin-bottom: 12px; color: var(--text);">Delivery Address</h4>
+          <input type="text" id="receiverName" placeholder="Recipient Name" value="${receiverDetails.name}" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: .85rem; margin-bottom: 8px; outline: none;" onchange="fetchShipbubbleRates()">
+          <input type="text" id="receiverPhone" placeholder="Phone Number" value="${receiverDetails.phone}" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: .85rem; margin-bottom: 8px; outline: none;" onchange="fetchShipbubbleRates()">
+          <input type="text" id="receiverAddress" placeholder="Street Address" value="${receiverDetails.address}" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: .85rem; margin-bottom: 8px; outline: none;" onchange="fetchShipbubbleRates()">
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+            <input type="text" id="receiverCity" placeholder="City" value="${receiverDetails.city}" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: .85rem; outline: none;" onchange="fetchShipbubbleRates()">
+            <input type="text" id="receiverState" placeholder="State" value="${receiverDetails.state}" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: .85rem; outline: none;" onchange="fetchShipbubbleRates()">
+          </div>
+
+          <select id="shippingCountry" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: .85rem; outline: none; background: var(--bg);" onchange="fetchShipbubbleRates()">
+            <option value="NG" ${receiverDetails.country === 'NG' ? 'selected' : ''}>Nigeria</option>
+          </select>
+        </div>
+
+        <!-- Shipbubble Rates Container -->
+        <div style="margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px; text-align: left;">
+          <h4 style="font-size: .85rem; font-weight: 700; margin-bottom: 8px; color: var(--text);">Logistics Courier Option</h4>
+          <div id="shipbubbleRatesContainer" style="display: flex; flex-direction: column; gap: 8px; max-height: 150px; overflow-y: auto; padding-right: 4px;">
+            ${shipbubbleRates.length === 0 
+              ? `<button onclick="fetchShipbubbleRates()" style="width:100%; padding:8px 12px; font-size:0.8rem; font-weight:600; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; cursor:pointer;">Calculate Shipping Rates</button>` 
+              : shipbubbleRates.map(r => `
+                <label style="display: flex; align-items: center; gap: 8px; padding: 8px; border: 1px solid ${selectedCourier?.service_code === r.service_code ? 'var(--primary)' : 'var(--border)'}; border-radius: 6px; background: ${selectedCourier?.service_code === r.service_code ? '#eff6ff' : 'none'}; cursor: pointer; font-size: 0.8rem; margin: 0;">
+                  <input type="radio" name="courierOption" value="${r.service_code}" ${selectedCourier?.service_code === r.service_code ? 'checked' : ''} onchange="selectCourier('${r.service_code}')" style="margin:0;">
+                  <div style="flex:1;">
+                    <div style="font-weight:600;">${r.courier_name} (${r.service_name})</div>
+                    <div style="color:var(--text-muted);font-size:0.75rem;">ETA: ${r.delivery_eta}</div>
+                  </div>
+                  <div style="font-weight:700;color:var(--primary);">₦${parseFloat(r.total_fee || r.shipping_fee || 0).toLocaleString()}</div>
+                </label>
+              `).join('')
+            }
+          </div>
+        </div>
+
         <div style="margin-top: 16px; text-align: left;">
           <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 6px;">Payment Gateway</label>
           <select id="cartPaymentGateway" style="width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: .9rem; outline: none; background: var(--bg);">
+            @php
+              $activeGateways = \App\Models\Setting::where('group', 'payments')
+                  ->where('key', 'like', '%_active')
+                  ->where('value', '1')
+                  ->pluck('key')
+                  ->map(fn($key) => str_replace('_active', '', $key))
+                  ->values()
+                  ->toArray();
+            @endphp
             @if(!empty($activeGateways))
               @foreach($activeGateways as $gw)
                 <option value="{{ $gw }}">{{ ucfirst($gw) }} Gateway</option>
@@ -232,15 +284,6 @@ function renderCart() {
         <button class="checkout-btn" onclick="handleCheckout()">Proceed to Checkout</button>
         <button onclick="openProFormaInvoice()" style="width:100%; padding:14px; margin-top:10px; background:#eff6ff; border:2px solid #2563eb; border-radius:50px; font-weight:700; font-size:0.95rem; color:#2563eb; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">📥 Download Pro-Forma Invoice</button>
         <a href="{{ route('buyer.products.index') }}" class="continue-link">Continue Shopping</a>
-        <div class="shipping-estimate">
-          <h4>Shipping to</h4>
-          <select id="shippingCountry" onchange="renderCart()">
-            <option value="NG">Nigeria</option>
-            <option value="US">United States</option>
-            <option value="UK">United Kingdom</option>
-            <option value="EU">European Union</option>
-          </select>
-        </div>
         <div class="coupon">
           <input type="text" placeholder="Coupon code" id="couponInput">
           <button onclick="applyCoupon()">Apply</button>
@@ -250,15 +293,77 @@ function renderCart() {
   `;
 }
 
+function fetchShipbubbleRates() {
+  if (cart.length === 0) return;
+  const ratesContainer = document.getElementById('shipbubbleRatesContainer');
+  if (ratesContainer) {
+    ratesContainer.innerHTML = '<div style="font-size:0.85rem;color:var(--text-muted);padding:8px 0;text-align:center;">Calculating shipping rates...</div>';
+  }
+  
+  receiverDetails.name = document.getElementById('receiverName')?.value || receiverDetails.name;
+  receiverDetails.phone = document.getElementById('receiverPhone')?.value || receiverDetails.phone;
+  receiverDetails.address = document.getElementById('receiverAddress')?.value || receiverDetails.address;
+  receiverDetails.city = document.getElementById('receiverCity')?.value || receiverDetails.city;
+  receiverDetails.state = document.getElementById('receiverState')?.value || receiverDetails.state;
+  receiverDetails.country = document.getElementById('shippingCountry')?.value || receiverDetails.country;
+  
+  fetch('{{ route("shipping.calculate-rates") }}', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+    body: JSON.stringify({
+      items: cart.map(c => ({ id: c.id, qty: c.qty })),
+      receiver: receiverDetails
+    })
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('API failed');
+    return res.json();
+  })
+  .then(data => {
+    if (data.success && data.rates && data.rates.length > 0) {
+      shipbubbleRates = data.rates;
+      if (!selectedCourier) {
+        selectedCourier = shipbubbleRates[0];
+      } else {
+        const matched = shipbubbleRates.find(r => r.service_code === selectedCourier.service_code);
+        selectedCourier = matched || shipbubbleRates[0];
+      }
+      renderCart();
+      showToast('Shipping rates updated');
+    } else {
+      if (ratesContainer) {
+        ratesContainer.innerHTML = '<div style="font-size:0.85rem;color:#ef4444;padding:8px 0;text-align:center;">No couriers available.</div>';
+      }
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    if (ratesContainer) {
+      ratesContainer.innerHTML = '<div style="font-size:0.85rem;color:#ef4444;padding:8px 0;text-align:center;">Error calculating rates. Using fallback flat rate.</div>';
+    }
+  });
+}
+
+function selectCourier(code) {
+  const matched = shipbubbleRates.find(r => r.service_code === code);
+  if (matched) {
+    selectedCourier = matched;
+    renderCart();
+  }
+}
+
 function changeQty(id, delta) {
-  const item = cart.find(c => c.id === id);
+  const item = cart.find(c => c.id == id);
   if (!item) return;
   item.qty += delta;
   if (item.qty <= 0) { removeFromCart(id); return; }
   updateCartUI();
+  if (shipbubbleRates.length > 0) {
+    fetchShipbubbleRates();
+  }
 }
 
-function removeFromCart(id) { cart = cart.filter(c => c.id !== id); updateCartUI(); }
+function removeFromCart(id) { cart = cart.filter(c => c.id != id); updateCartUI(); }
 
 function updateCartUI() {
   const count = cart.reduce((s, c) => s + c.qty, 0);
@@ -273,13 +378,23 @@ function updateCartUI() {
 
 function handleCheckout() {
   if (cart.length === 0) { showToast('Cart is empty'); return; }
-  const total = cart.reduce((sum, c) => sum + parseFloat(c.price) * c.qty, 0);
+  
+  const subtotal = cart.reduce((sum, c) => sum + parseFloat(c.price) * c.qty, 0);
+  let shipping = 0;
+  if (selectedCourier) {
+    shipping = parseFloat(selectedCourier.total_fee || selectedCourier.shipping_fee || 0);
+  } else {
+    shipping = subtotal >= 100000 ? 0 : 15000;
+  }
+  const tax = subtotal * 0.075;
+  const total = parseFloat((subtotal + shipping + tax).toFixed(2));
+
   const selectedGateway = document.getElementById('cartPaymentGateway')?.value || 'paystack';
   const orderId = 'ORD-' + Date.now().toString(36).toUpperCase();
   const order = {
     id: orderId,
     items: cart.map(c => ({ id: c.id, name: c.name, price: parseFloat(c.price), qty: c.qty })),
-    total: parseFloat(total.toFixed(2)),
+    total: total,
     status: 'Confirmed',
     date: new Date().toISOString()
   };

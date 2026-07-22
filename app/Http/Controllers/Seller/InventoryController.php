@@ -14,8 +14,16 @@ class InventoryController extends Controller
         if (!$user->hasRole('seller')) {
             return redirect()->back();
         }
+
+        $profile = \App\Models\SellerProfile::where('user_id', $user->id)->first();
+        $records = [];
+        if ($profile) {
+            $records = \App\Models\FulfillmentInventory::where('seller_profile_id', $profile->id)
+                ->with('product')
+                ->latest()
+                ->get();
+        }
         
-        // Render a basic placeholder for now
-        return view('seller.inventory.index');
+        return view('seller.inventory.index', compact('records', 'profile'));
     }
 }

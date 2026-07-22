@@ -20,10 +20,14 @@ class Product extends Model
         'image_path',
         'seller_sku',
         'brand_name',
-        'fulfillment_mode',
+        'fulfillment_model',
         'fulfillment_eligible',
         'quote_required',
         'packaging',
+        'weight',
+        'length',
+        'width',
+        'height',
         'origin_lga',
         'readiness_score',
         'status',
@@ -33,6 +37,10 @@ class Product extends Model
         'fulfillment_eligible' => 'boolean',
         'quote_required' => 'boolean',
         'readiness_score' => 'integer',
+        'weight' => 'float',
+        'length' => 'float',
+        'width' => 'float',
+        'height' => 'float',
     ];
 
     public function sellerProfile(): BelongsTo

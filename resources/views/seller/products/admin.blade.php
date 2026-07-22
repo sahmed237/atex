@@ -29,7 +29,9 @@
             <small class="muted">LGA: {{ $product->origin_lga }}</small>
           </td>
           <td style="padding: 12px 5px;">
-            <strong>{{ $product->name }}</strong><br>
+            <a href="{{ route('seller.catalog.show', $product->id) }}" style="color: var(--primary, #2563eb); text-decoration: none; font-weight: bold; hover:underline;">
+              {{ $product->name }}
+            </a><br>
             <small class="muted">SKU: {{ $product->seller_sku }} | HS: {{ $product->hs_code ?: 'None' }}</small>
           </td>
           <td style="padding: 12px 5px;">{{ $product->category->name ?? '' }}</td>

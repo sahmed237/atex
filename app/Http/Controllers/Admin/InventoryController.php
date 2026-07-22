@@ -22,8 +22,9 @@ class InventoryController extends Controller
         $records = FulfillmentInventory::with(['sellerProfile', 'product'])->latest()->get();
         $sellers = SellerProfile::all();
         $products = Product::where('status', 'approved')->get();
+        $units = \App\Models\UnitOfMeasurement::where('status', true)->get();
 
-        return view('admin.inventory.index', compact('records', 'sellers', 'products'));
+        return view('admin.inventory.index', compact('records', 'sellers', 'products', 'units'));
     }
 
     public function receive(Request $request)
@@ -42,11 +43,13 @@ class InventoryController extends Controller
             'notes' => 'nullable|string',
         ]);
 
+        $product = Product::findOrFail($request->product_id);
+
         $inv = FulfillmentInventory::create([
             'seller_profile_id' => $request->seller_profile_id,
             'product_id' => $request->product_id,
-            'brand_name' => $request->brand_name,
-            'seller_sku' => $request->seller_sku,
+            'brand_name' => $product->brand_name,
+            'seller_sku' => $product->seller_sku,
             'quantity_received' => $request->quantity_received,
             'quantity_available' => $request->quantity_received,
             'unit_label' => $request->unit_label,

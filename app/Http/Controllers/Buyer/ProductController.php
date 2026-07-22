@@ -17,7 +17,7 @@ class ProductController extends Controller
         $countryCode = session('user_country', 'NG');
 
         $query = Product::with(['category', 'sellerProfile'])
-            ->whereIn('status', ['approved', 'pending_review', 'active', 'published']);
+            ->whereIn('status', ['approved', 'active', 'published']);
 
         if ($countryCode !== 'NG') {
             $query->whereHas('sellerProfile', function ($q) {
@@ -79,12 +79,12 @@ class ProductController extends Controller
     public function show($id)
     {
         $product = Product::with(['category', 'sellerProfile'])
-            ->whereIn('status', ['approved', 'pending_review', 'active', 'published'])
+            ->whereIn('status', ['approved', 'active', 'published'])
             ->findOrFail($id);
 
         $countryCode = session('user_country', 'NG');
         $related = Product::with(['category', 'sellerProfile'])
-            ->whereIn('status', ['approved', 'pending_review', 'active', 'published'])
+            ->whereIn('status', ['approved', 'active', 'published'])
             ->where('category_id', $product->category_id)
             ->where('id', '!=', $product->id);
 

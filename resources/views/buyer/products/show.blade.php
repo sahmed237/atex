@@ -57,7 +57,7 @@
       <span style="margin-left:auto;font-size:.78rem;color:#4ade80">Free shipping</span>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));gap:16px;margin-bottom:28px">
       <div style="padding:12px 16px;background:var(--bg-alt);border-radius:8px">
         <div style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Category</div>
         <div style="font-size:.95rem;font-weight:600;margin-top:2px">{{ $product->category->name ?? 'N/A' }}</div>
@@ -73,6 +73,28 @@
       <div style="padding:12px 16px;background:var(--bg-alt);border-radius:8px">
         <div style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Seller</div>
         <div style="font-size:.95rem;font-weight:600;margin-top:2px">{{ $product->sellerProfile->business_name ?? 'ATEX' }}</div>
+      </div>
+      <div style="padding:12px 16px;background:var(--bg-alt);border-radius:8px">
+        <div style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Weight</div>
+        <div style="font-size:.95rem;font-weight:600;margin-top:2px">{{ $product->weight ? $product->weight . ' kg' : 'N/A' }}</div>
+      </div>
+      <div style="padding:12px 16px;background:var(--bg-alt);border-radius:8px">
+        <div style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Dimensions (L×W×H)</div>
+        <div style="font-size:.95rem;font-weight:600;margin-top:2px">
+          @if($product->length || $product->width || $product->height)
+            {{ $product->length ?: 0 }} × {{ $product->width ?: 0 }} × {{ $product->height ?: 0 }} cm
+          @else
+            N/A
+          @endif
+        </div>
+      </div>
+      <div style="padding:12px 16px;background:var(--bg-alt);border-radius:8px">
+        <div style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Packaging</div>
+        <div style="font-size:.95rem;font-weight:600;margin-top:2px">{{ $product->packaging ?: 'N/A' }}</div>
+      </div>
+      <div style="padding:12px 16px;background:var(--bg-alt);border-radius:8px">
+        <div style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Origin LGA</div>
+        <div style="font-size:.95rem;font-weight:600;margin-top:2px">{{ $product->origin_lga ?: 'N/A' }}</div>
       </div>
     </div>
 

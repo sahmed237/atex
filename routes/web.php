@@ -77,6 +77,8 @@ Route::get('/cart', function () {
     return view('buyer.products.cart');
 })->name('buyer.cart.index');
 
+Route::post('/shipping/calculate-rates', [\App\Http\Controllers\Buyer\ShippingRateController::class, 'calculateRates'])->name('shipping.calculate-rates');
+
 Route::post('/checkout', function (\Illuminate\Http\Request $request) {
     if (!auth()->check()) {
         return response()->json(['status' => 'ok', 'message' => 'Order saved locally']);
@@ -235,6 +237,7 @@ Route::middleware(['auth', 'verified', 'security_policy', 'kyc_completed', 'lega
         
         Route::get('/catalog', [\App\Http\Controllers\Seller\ProductController::class, 'index'])->name('seller.catalog.index');
         Route::post('/catalog', [\App\Http\Controllers\Seller\ProductController::class, 'store'])->name('seller.catalog.store');
+        Route::get('/catalog/{id}', [\App\Http\Controllers\Seller\ProductController::class, 'show'])->name('seller.catalog.show');
 
         Route::get('/inventory', [\App\Http\Controllers\Seller\InventoryController::class, 'index'])->name('seller.inventory.index');
         Route::get('/orders', [\App\Http\Controllers\Seller\OrderController::class, 'index'])->name('seller.orders.index');

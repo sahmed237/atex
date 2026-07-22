@@ -24,7 +24,11 @@
       <label>Product Listing
         <select name="product_id" required>
           @foreach($products as $prod)
-            <option value="{{ $prod->id }}">{{ $prod->name }} (by {{ $prod->sellerProfile->business_name ?? 'Unknown' }})</option>
+            @php
+              $parts = explode(' ', $prod->moq);
+              $prodUnit = count($parts) > 1 ? end($parts) : 'units';
+            @endphp
+            <option value="{{ $prod->id }}" data-unit="{{ $prodUnit }}">{{ $prod->name }} (by {{ $prod->sellerProfile->business_name ?? 'Unknown' }})</option>
           @endforeach
         </select>
       </label>
@@ -33,19 +37,16 @@
         <label>Quantity Stored
           <input type="number" name="quantity_received" required placeholder="e.g. 50">
         </label>
-        <label>Unit Label
-          <input name="unit_label" value="units" required placeholder="e.g. units, MT, bags">
+        <label>Quantity Unit
+          <select name="unit_label" required style="width: 100%; height: 38px;">
+            @foreach($units as $unit)
+              <option value="{{ $unit->name }}">{{ $unit->name }}</option>
+            @endforeach
+          </select>
         </label>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-        <label>Brand Name (optional)
-          <input name="brand_name" placeholder="e.g. Ganye Gold">
-        </label>
-        <label>Seller SKU (optional)
-          <input name="seller_sku" placeholder="e.g. SKU-GANYE-SES">
-        </label>
-      </div>
+
 
       <label>Warehouse Storage Location
         <input name="storage_location" required value="AfriBridge Warehouse Yola" placeholder="e.g. AfriBridge Warehouse Yola">
@@ -105,4 +106,31 @@
     </table>
   </div>
 </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const productSelect = document.querySelector('select[name="product_id"]');
+    const unitSelect = document.querySelector('select[name="unit_label"]');
+    
+    function syncUnit() {
+        const selectedOption = productSelect.options[productSelect.selectedIndex];
+        if (selectedOption) {
+            const unit = selectedOption.getAttribute('data-unit');
+            if (unit) {
+                for (let i = 0; i < unitSelect.options.length; i++) {
+                    if (unitSelect.options[i].value === unit) {
+                        unitSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
+    if (productSelect && unitSelect) {
+        productSelect.addEventListener('change', syncUnit);
+        syncUnit();
+    }
+});
+</script>
 @endsection

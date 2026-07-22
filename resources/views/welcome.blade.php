@@ -573,10 +573,13 @@ function renderProducts() {
     
     var isCompared = compare.some(function(c) { return c.id === p.id; });
     var compareHtml = '<label class="compare-label" ' + (isCompared ? 'style="opacity:1 !important; pointer-events:auto !important; transform:translateY(0);"' : '') + '><input type="checkbox" class="compare-chk" ' + (isCompared ? 'checked' : '') + ' onclick="toggleCompareItem(' + p.id + ', \'' + p.name.replace(/'/g,"\\'") + '\', ' + priceNum + ', \'' + p.moq + '\', \'' + p.origin + '\', this)"> ⚖️ Compare</label>';
+    var imageHtml = p.image 
+      ? '<img src="' + p.image + '" alt="' + p.name + '" style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0;">'
+      : (p.emoji || '📦');
 
     return '<div class="product-card" style="position:relative; cursor:pointer;" onclick="location.href=\'/products/' + p.id + '\'">' +
-      '<div class="product-img" style="position:relative;">' + heartHtml + (p.emoji || '📦') + tagHtml +
-      '<button onclick="openQuickView(' + p.id + ', \'' + p.name.replace(/'/g,"\\'") + '\', ' + priceNum + ', \'' + p.moq + '\', \'' + p.origin + '\', \'' + (p.type || 'local') + '\')" style="position:absolute; bottom:8px; right:8px; background:rgba(255,255,255,0.9); border:1px solid #cbd5e1; border-radius:50px; padding:4px 10px; font-size:0.75rem; font-weight:700; cursor:pointer; color:#0f172a; box-shadow:0 2px 5px rgba(0,0,0,0.1);">👁️ Quick View</button>' +
+      '<div class="product-img" style="position:relative; overflow:hidden;">' + heartHtml + imageHtml + tagHtml +
+      '<button onclick="openQuickView(' + p.id + ', \'' + p.name.replace(/'/g,"\\'") + '\', ' + priceNum + ', \'' + p.moq + '\', \'' + p.origin + '\', \'' + (p.type || 'local') + '\')" style="position:absolute; bottom:8px; right:8px; background:rgba(255,255,255,0.9); border:1px solid #cbd5e1; border-radius:50px; padding:4px 10px; font-size:0.75rem; font-weight:700; cursor:pointer; color:#0f172a; box-shadow:0 2px 5px rgba(0,0,0,0.1); z-index:2;">👁️ Quick View</button>' +
       '</div>' +
       '<div class="product-body">' +
       '<div style="overflow:hidden; margin-bottom:4px;">' + badgeHtml + compareHtml + '</div>' +
@@ -586,8 +589,8 @@ function renderProducts() {
       '<div class="product-price"><span class="current" data-price-ngn="' + priceNum + '">' + currentPriceStr + '</span>' + oldPriceHtml + '</div>' +
       '<div style="display:flex; gap:6px; margin-top:8px;">' +
       (p.type === 'local'
-        ? '<button class="add-to-cart" onclick="addToCart(' + p.id + ')" style="flex:1;">Add to Cart</button>'
-        : '<button class="add-to-cart" onclick="openRfqModal(' + p.id + ', \'' + p.name.replace(/'/g,"\\'") + '\')" style="flex:1; background:#7c3aed;">📋 Request Quote</button>') +
+        ? '<button class="add-to-cart" onclick="event.stopPropagation(); addToCart(' + p.id + ')" style="flex:1;">Add to Cart</button>'
+        : '<button class="add-to-cart" onclick="event.stopPropagation(); openRfqModal(' + p.id + ', \'' + p.name.replace(/'/g,"\\'") + '\')" style="flex:1; background:#7c3aed;">📋 Request Quote</button>') +
       '</div>' +
       '</div></div>';
   }).join('');

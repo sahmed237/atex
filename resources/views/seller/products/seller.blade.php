@@ -33,17 +33,50 @@
         <label>HS Code
           <input name="hs_code" placeholder="e.g. 120740">
         </label>
-        <label>Minimum Order Qty (MOQ)
-          <input name="moq" required placeholder="e.g. 10 MT">
-        </label>
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px; align-items: end;">
+          <label style="margin: 0;">Minimum Order Qty (MOQ)
+            <input type="number" step="any" name="moq_value" required placeholder="e.g. 10">
+          </label>
+          <label style="margin: 0;">MOQ Unit
+            <select name="moq_unit" required style="width: 100%; height: 38px;">
+              @foreach($units as $unit)
+                <option value="{{ $unit->name }}">{{ $unit->name }}</option>
+              @endforeach
+            </select>
+          </label>
+        </div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-        <label>Available Quantity
-          <input name="available_quantity" placeholder="e.g. 150 MT">
-        </label>
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px; align-items: end;">
+          <label style="margin: 0;">Available Quantity
+            <input type="number" step="any" name="available_quantity_value" placeholder="e.g. 150">
+          </label>
+          <label style="margin: 0;">Qty Unit
+            <select name="available_quantity_unit" style="width: 100%; height: 38px;">
+              @foreach($units as $unit)
+                <option value="{{ $unit->name }}">{{ $unit->name }}</option>
+              @endforeach
+            </select>
+          </label>
+        </div>
         <label>Unit Price
           <input name="unit_price" placeholder="e.g. $1,200 / MT or leave empty">
+        </label>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px;">
+        <label>Weight (kg)
+          <input type="number" step="any" name="weight" placeholder="e.g. 50">
+        </label>
+        <label>Length (cm)
+          <input type="number" step="any" name="length" placeholder="Length">
+        </label>
+        <label>Width (cm)
+          <input type="number" step="any" name="width" placeholder="Width">
+        </label>
+        <label>Height (cm)
+          <input type="number" step="any" name="height" placeholder="Height">
         </label>
       </div>
 
@@ -52,7 +85,11 @@
           <input name="origin_lga" required placeholder="e.g. Ganye">
         </label>
         <label>Packaging
-          <input name="packaging" placeholder="e.g. 50kg export sacks">
+          <select name="packaging" required style="width: 100%; height: 38px;">
+            @foreach($packagings as $pkg)
+              <option value="{{ $pkg->name }}">{{ $pkg->name }}</option>
+            @endforeach
+          </select>
         </label>
       </div>
 
@@ -114,7 +151,9 @@
         @forelse($products as $product)
           <tr style="border-bottom: 1px solid var(--soft);">
             <td style="padding: 12px 5px;">
-              <strong>{{ $product->name }}</strong><br>
+              <a href="{{ route('seller.catalog.show', $product->id) }}" style="color: var(--primary, #2563eb); text-decoration: none; font-weight: bold; hover:underline;">
+                {{ $product->name }}
+              </a><br>
               <small class="muted">SKU: {{ $product->seller_sku }}</small>
             </td>
             <td style="padding: 12px 5px;">{{ $product->category->name ?? '' }}</td>
