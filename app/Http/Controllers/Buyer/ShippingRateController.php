@@ -68,6 +68,7 @@ class ShippingRateController extends Controller
         $maxWidth = 0;
         $totalHeight = 0;
 
+        $packageItems = [];
         foreach ($items as $item) {
             $p = Product::find($item['id']);
             if ($p) {
@@ -78,16 +79,31 @@ class ShippingRateController extends Controller
                 $maxLength = max($maxLength, (float)($p->length ?: 15.0));
                 $maxWidth = max($maxWidth, (float)($p->width ?: 15.0));
                 $totalHeight += (float)($p->height ?: 10.0) * $qty;
+
+                $packageItems[] = [
+                    'name' => $p->name ?? 'Product',
+                    'description' => substr($p->description ?? 'E-commerce goods', 0, 50),
+                    'unit_weight' => $itemWeight,
+                    'unit_amount' => (float)$p->unit_price,
+                    'quantity' => $qty
+                ];
             }
         }
 
-        $package = [
-            'weight' => $totalWeight ?: 1.0,
+        if (empty($packageItems)) {
+            $packageItems[] = [
+                'name' => 'Package',
+                'description' => 'Goods',
+                'unit_weight' => 1,
+                'unit_amount' => 1000,
+                'quantity' => 1
+            ];
+        }
+
+        $packageDimension = [
             'length' => $maxLength ?: 15.0,
             'width' => $maxWidth ?: 15.0,
-            'height' => $totalHeight ?: 10.0,
-            'value' => 1000,
-            'description' => 'E-commerce goods shipment'
+            'height' => $totalHeight ?: 10.0
         ];
 
         // Format Receiver structure for Shipbubble
@@ -104,11 +120,12 @@ class ShippingRateController extends Controller
         Log::info('Shipbubble fetchRates request payload', [
             'sender' => $sender,
             'receiver' => $receiver,
-            'package' => $package
+            'package_items' => $packageItems,
+            'package_dimension' => $packageDimension
         ]);
 
         // Call Service
-        $result = $this->shipbubbleService->fetchRates($sender, $receiver, $package);
+        $result = $this->shipbubbleService->fetchRates($sender, $receiver, $packageItems, $packageDimension);
 
         if ($result && isset($result['status']) && $result['status'] === 'success') {
             return response()->json([

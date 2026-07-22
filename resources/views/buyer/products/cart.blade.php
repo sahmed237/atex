@@ -146,7 +146,7 @@ let receiverDetails = {
   address: '456 Broad Street',
   city: 'Lagos',
   state: 'Lagos',
-  country: 'NG',
+  country: 'Nigeria',
   email: 'buyer@atex.gov.ng'
 };
 
@@ -235,7 +235,7 @@ function renderCart() {
           </div>
 
           <select id="shippingCountry" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: .85rem; outline: none; background: var(--bg);" onchange="fetchShipbubbleRates()">
-            <option value="NG" ${receiverDetails.country === 'NG' ? 'selected' : ''}>Nigeria</option>
+            <option value="Nigeria" ${receiverDetails.country === 'Nigeria' || receiverDetails.country === 'NG' ? 'selected' : ''}>Nigeria</option>
           </select>
         </div>
 
